@@ -5,6 +5,7 @@
 #   cmake --build build -j
 #   ./build/matrix_test      # 矩阵乘法：正确性 + 性能对比
 #   ./build/softmax_test     # softmax：数值稳定性 + 按行归一化
+#   ./build/vector_test      # 向量：点积 / 模长 / 余弦相似度
 #
 # 用法二（挂进已有项目）：
 #   matrix.h / softmax.h 都是 header-only 的，直接把本目录 add_subdirectory
@@ -24,8 +25,9 @@ project(mini_mlmath LANGUAGES CXX)
 # 两个测试程序，头文件写进 sources 是为了在 IDE 里能看到
 add_executable(matrix_test matrix_test.cpp matrix.h)
 add_executable(softmax_test softmax_test.cpp matrix.h softmax.h)
+add_executable(vector_test vector_test.cpp vector.h)
 
-foreach(tgt matrix_test softmax_test)
+foreach(tgt matrix_test softmax_test vector_test)
   target_compile_features(${tgt} PRIVATE cxx_std_17)
 
 # =====================================================================
