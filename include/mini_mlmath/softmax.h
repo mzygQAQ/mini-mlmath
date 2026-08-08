@@ -28,7 +28,7 @@
 #include <cstddef>
 #include <vector>
 
-#include "matrix.h"
+#include "mini_mlmath/matrix.h"
 
 // ----------------------------------------------------------------------------
 // softmax(std::vector) —— 一维向量版，返回归一化后的概率分布

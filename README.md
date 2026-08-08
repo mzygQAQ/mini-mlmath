@@ -7,14 +7,25 @@
 - **无表达式模板**（`A*B` 立即求值，不返回懒求值表达式）
 - **无 BLAS 对接**（乘法就是自己写的三层循环）
 
-## 目录结构
+## 目录结构（标准 C++ 布局，按模块分文件夹）
 
-| 文件 | 说明 |
-|---|---|
-| `matrix.h` | 库本体：`Matrix<T>`（动态大小、行主序、std::vector 存储）+ 三种乘法 |
-| `softmax.h` | 数值稳定的 softmax（一维向量 + 按行矩阵版） |
-| `matrix_test.cpp` | 矩阵乘法正确性验证 + 三版性能对比（N=512/1024/2048） |
-| `softmax_test.cpp` | softmax 数值稳定性 / 归一化验证 |
+```
+mini-mlmath/
+├── CMakeLists.txt            # 顶层：INTERFACE 库 + 挂载 tests
+├── include/
+│   └── mini_mlmath/          # 库本体，全部 header-only
+│       ├── matrix.h          #   Matrix<T>：动态大小、行主序 + 三种乘法
+│       ├── vector.h          #   Vector<T>：点积 / 模长 / 余弦相似度
+│       ├── softmax.h         #   数值稳定的 softmax（一维 + 按行矩阵版）
+│       └── variance_threshold.h  # 基于方差的特征选择（VarianceThreshold）
+└── tests/                    # 测试程序，每个模块一个
+    ├── CMakeLists.txt        #   每个 *_test.cpp 一个可执行 + 编译优化选项
+    ├── matrix_test.cpp       #   矩阵乘法正确性验证 + 三版性能对比
+    ├── softmax_test.cpp      #   softmax 数值稳定性 / 归一化验证
+    └── vector_test.cpp       #   点积 / 模长 / 余弦相似度验证
+```
+
+头文件引用统一写 `<mini_mlmath/xxx.h>`，`include/` 是头文件搜索根。
 
 ## 三种乘法（越往后越接近真实 BLAS）
 
@@ -33,8 +44,8 @@
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
-./build/matrix_test
-./build/softmax_test
+./build/tests/matrix_test
+./build/tests/softmax_test
 ```
 
 Windows 直接用 VS2022「打开本地文件夹」指向本目录（切 Release、选 x64）。

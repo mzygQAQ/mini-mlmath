@@ -9,7 +9,7 @@
 //  运行前请确认编译选项：必须 -O3（见 CMakeLists.txt 顶部注释，教训 1），
 //  否则下面的 benchmark 数字不成立。
 // ============================================================================
-#include "matrix.h"
+#include "mini_mlmath/matrix.h"
 
 #include <chrono>
 #include <iomanip>

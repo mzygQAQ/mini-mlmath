@@ -9,8 +9,8 @@
 //
 //  实现与原理见 softmax.h 头部注释（为什么减 max、为什么用自由函数）。
 // ============================================================================
-#include "matrix.h"
-#include "softmax.h"
+#include "mini_mlmath/matrix.h"
+#include "mini_mlmath/softmax.h"
 
 #include <cmath>
 #include <cstddef>

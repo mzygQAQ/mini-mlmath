@@ -12,7 +12,7 @@
 //
 //  实现与原理见 vector.h 头部注释。
 // ============================================================================
-#include "vector.h"
+#include "mini_mlmath/vector.h"
 
 #include <cmath>
 #include <iostream>
