@@ -17,7 +17,8 @@ mini-mlmath/
 │       ├── matrix.h          #   Matrix<T>：动态大小、行主序 + 三种乘法
 │       ├── vector.h          #   Vector<T>：点积 / 模长 / 余弦相似度
 │       ├── softmax.h         #   数值稳定的 softmax（一维 + 按行矩阵版）
-│       └── variance_threshold.h  # 基于方差的特征选择（VarianceThreshold）
+│       └── feature_selection/    # 特征选择模块
+│           └── variance_threshold.h  # 基于方差的特征选择（VarianceThreshold）
 └── tests/                    # 测试程序，每个模块一个
     ├── CMakeLists.txt        #   每个 *_test.cpp 一个可执行 + 编译优化选项
     ├── matrix_test.cpp       #   矩阵乘法正确性验证 + 三版性能对比
