@@ -1,11 +1,13 @@
 # mini-mlmath
 
-教学用迷你矩阵库：纯手写、零第三方依赖，用来研究「矩阵库到底怎么实现的」。
+教学用迷你机器学习数学库：纯手写、零第三方依赖，从矩阵、向量一路写到 softmax、
+激活函数、特征选择、感知机，用来研究「数值计算和机器学习到底是怎么实现的」。
 
-对比 Eigen 刻意保留三大简化：
-- **无宏**（只有 `#pragma once`）
+对比 Eigen / numpy / sklearn 刻意保留三大简化：
+- **无宏**（唯一例外是 `check.h` 里的 `CHECK` 断言——它要拿条件原文和调用点
+  文件/行号，只能靠宏，见该文件注释）
 - **无表达式模板**（`A*B` 立即求值，不返回懒求值表达式）
-- **无 BLAS 对接**（乘法就是自己写的三层循环）
+- **无 BLAS / 现成数值库对接**（矩阵乘法就是自己写的三层循环，模型就是手写的类）
 
 ## 目录结构（标准 C++ 布局，按模块分文件夹）
 
@@ -54,6 +56,8 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 ./build/tests/matrix_test
 ./build/tests/softmax_test
+./build/tests/vector_test
+./build/tests/logic_gate
 ```
 
 Windows 直接用 VS2022「打开本地文件夹」指向本目录（切 Release、选 x64）。
