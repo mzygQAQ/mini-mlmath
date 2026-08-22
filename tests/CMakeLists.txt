@@ -7,8 +7,9 @@ add_executable(matrix_test matrix_test.cpp)
 add_executable(softmax_test softmax_test.cpp)
 add_executable(vector_test vector_test.cpp)
 add_executable(logic_gate logic_gate.cpp)
+add_executable(random_check random_check.cpp)   # int 离散均匀抽样 smoke test
 
-foreach(tgt matrix_test softmax_test vector_test logic_gate)
+foreach(tgt matrix_test softmax_test vector_test logic_gate random_check)
   target_link_libraries(${tgt} PRIVATE mini_mlmath)
 
 # =====================================================================
