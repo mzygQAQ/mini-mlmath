@@ -39,7 +39,8 @@
 //      随机初始化是必要的（避免对称性），现在就把 API 摆好。
 //
 //  用法：
-//    Perceptron<double> p(/* learning_rate = */ 1.0, /* max_iter = */ 100);
+//    Perceptron<> p(/* learning_rate = */ 1.0f, /* max_iter = */ 100);  // 默认 T=float
+//    // 或显式指定：Perceptron<double> p(1.0, 100);  // 需要 double 精度时
 //    p.fit(X_train, y_train);                // X_train: n×d，y_train: n 个 ±1
 //    auto pred   = p.predict(X_test);        // 返回 ±1 的预测标签
 //    auto scores = p.decision_function(X_test); // 原始分数 w·x + b（画决策边界用）
@@ -54,14 +55,28 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <type_traits>
 #include <vector>
 
 #include "mini_mlmath/check.h"
 #include "mini_mlmath/random.h"
 #include "mini_mlmath/matrix.h"
 
-template<typename T>
+// 约束：Perceptron 的 T 必须是浮点类型（float / double / long double），
+// 整数类型会在编译期就报错。原因和 random.h 一样：int 权重会让
+// `int(-0.5) = int(0.5) = 0` 静默退化，weights 全 0。
+// 用类内 static_assert，错误指向 Perceptron 自己的实例化点，
+// 比 random 里的 static_assert 更早、更明显。
+//
+// T 默认 float：感知机算的是 w·x + b 这种简单线性运算，不需要 double 精度；
+// float 内存和带宽都更省，GPU 友好。需要 double 时显式写 Perceptron<double>。
+template<typename T = float>
 class Perceptron {
+    static_assert(std::is_floating_point_v<T>,
+                  "Perceptron<T> requires floating-point T "
+                  "(float / double / long double). int weights silently "
+                  "truncate to 0 in random init — use T=double (recommended) or T=float.");
+
 public:
     using value_type = T;
     using size_type = std::size_t;

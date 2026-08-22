@@ -63,11 +63,14 @@
 ### `ml/perceptron.h` 的接口设计
 
 ```cpp
-Perceptron<double> p(1.0, 100);        // 学习率 1.0，最多 100 轮
+Perceptron<> p(1.0f, 100);             // 默认 T=float（GPU 友好、内存省）
+// Perceptron<double> p(1.0, 100);     // 想要 double 精度时显式指定
 p.fit(X, y);                           // X: n×d 样本，y: n 个 ±1 标签
 auto pred   = p.predict(X_test);       // 返回 ±1
 auto scores = p.decision_function(X_test); // 原始分数 w·x + b
 ```
+
+T 必须是浮点类型（`float` / `double` / `long double`），用类内 `static_assert` 拦在编译期 —— 整数类型会让 `int(-0.5) = 0` 静默退化（详见 `random.h` 同名约束的注释）。
 
 ### bias folding（偏置折叠）
 

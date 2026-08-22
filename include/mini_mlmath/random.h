@@ -31,6 +31,11 @@
 //    2) 用分布对象（std::uniform_real_distribution / std::normal_distribution）
 //       而不是手写公式：normal_distribution 内部是 Box-Muller / ziggurat，
 //       手写容易出数值问题，交给标准库即可。
+//    3) T 必须是浮点类型（float / double / long double），不是「任何数」。
+//       原因：T = int 时 int(-0.5) = int(0.5) = 0，uniform<int>(-0.5, 0.5)
+//       会静默退化成「永远返回 0」—— 随机初始化变成全 0 初始化，
+//       而且能编译通过。T = bool / 整数家族都不能用。
+//       所以接口层 static_assert 拦住，编译期就报错。
 // ============================================================================
 #pragma once
 
@@ -38,6 +43,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <random>
+#include <type_traits>
 
 #include "mini_mlmath/matrix.h"
 
@@ -84,41 +90,49 @@ private:
 template <typename T>
 Matrix<T> Random::uniform_matrix(std::size_t rows, std::size_t cols,
                                  T low, T high) {
+    static_assert(std::is_floating_point_v<T>,
+                  "Random::uniform_matrix<T> requires floating-point T "
+                  "(float/double/long double). For integer matrices, fill manually.");
     Matrix<T> m(rows, cols);
-    std::uniform_real_distribution<double> dist(static_cast<double>(low),
-                                                static_cast<double>(high));
+    std::uniform_real_distribution<T> dist(low, high);
     T* d = m.data();
-    for (std::size_t i = 0; i < rows * cols; ++i) d[i] = static_cast<T>(dist(engine_));
+    for (std::size_t i = 0; i < rows * cols; ++i) d[i] = dist(engine_);
     return m;
 }
 
 template <typename T>
 Matrix<T> Random::normal_matrix(std::size_t rows, std::size_t cols,
                                 T mean, T variance) {
+    static_assert(std::is_floating_point_v<T>,
+                  "Random::normal_matrix<T> requires floating-point T "
+                  "(float/double/long double). For integer matrices, fill manually.");
     Matrix<T> m(rows, cols);
-    std::normal_distribution<double> dist(static_cast<double>(mean),
-                                          std::sqrt(static_cast<double>(variance)));
+    std::normal_distribution<T> dist(mean, std::sqrt(variance));
     T* d = m.data();
-    for (std::size_t i = 0; i < rows * cols; ++i) d[i] = static_cast<T>(dist(engine_));
+    for (std::size_t i = 0; i < rows * cols; ++i) d[i] = dist(engine_);
     return m;
 }
 
 // ----------------------------------------------------------------------------
-// 标量版实现（同样模板化留在头文件）。两个版本都走「先转 double 给标准库
-// 分布对象，再转回 T」的路线 —— 跟矩阵版完全一致：
-//   1) 标准库的分布对象只支持 float/double，自己实现 float 版本没收益；
-//   2) T=float 时精度损失 1 位（double→float），但 float 权重本来就是这个精度。
+// 标量版实现（同样模板化留在头文件）。两个版本都直接用 std::xxx_distribution<T>
+// —— 不再走「先转 double 再转回 T」的弯路，long double 也能保留精度。
+// T 必须是浮点类型（static_assert 已拦，编译期就报错），不绕开。
 // ----------------------------------------------------------------------------
 template <typename T>
 T Random::uniform(T low, T high) {
-    std::uniform_real_distribution<double> dist(static_cast<double>(low),
-                                                static_cast<double>(high));
-    return static_cast<T>(dist(engine_));
+    static_assert(std::is_floating_point_v<T>,
+                  "Random::uniform<T> requires floating-point T "
+                  "(float/double/long double). int(-0.5) silently truncates to 0, "
+                  "so int weights would always sample 0 — use T=double/float instead.");
+    std::uniform_real_distribution<T> dist(low, high);
+    return dist(engine_);
 }
 
 template <typename T>
 T Random::normal(T mean, T variance) {
-    std::normal_distribution<double> dist(static_cast<double>(mean),
-                                          std::sqrt(static_cast<double>(variance)));
-    return static_cast<T>(dist(engine_));
+    static_assert(std::is_floating_point_v<T>,
+                  "Random::normal<T> requires floating-point T "
+                  "(float/double/long double). Integer weights lose precision silently.");
+    std::normal_distribution<T> dist(mean, std::sqrt(variance));
+    return dist(engine_);
 }
