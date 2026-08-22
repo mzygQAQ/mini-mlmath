@@ -1,0 +1,27 @@
+# ============================================================================
+# .gitattributes —— 仓库级换行符规则（比每台机器设 core.autocrlf 更可靠：
+# 规则随仓库走，所有协作者 / 未来克隆都生效，而 autocrlf 只管本机）
+#
+# 目标：仓库内统一存 LF（干净、无混合换行），checkout 时按平台自动转换
+#   - Windows 工作区 -> CRLF（记事本/旧工具友好）
+#   - Linux / macOS  -> LF（本来就是）
+# 做法：* text=auto 让 Git 自动识别文本文件；特殊文件再单独声明 eol。
+# 注意：.gitattributes 不支持行尾注释，# 只能写在行首。
+# ============================================================================
+
+# 文本文件统一走自动检测：仓库内 LF，checkout 按平台转换
+* text=auto
+
+# ---- 例外：某些文件必须钉死换行符，转错了直接坏 ----
+
+# shell 脚本：CR 会让 shebang / 命令解析出错
+*.sh    text eol=lf
+# make 依赖真正的 tab，CRLF 会直接报错
+Makefile text eol=lf
+# Windows 批处理：部分解释器要求 CRLF
+*.bat   text eol=crlf
+
+# ---- 二进制文件：Git 自动检测，一般不用写；写出来更明确 ----
+*.png   binary
+*.jpg   binary
+*.exe   binary
