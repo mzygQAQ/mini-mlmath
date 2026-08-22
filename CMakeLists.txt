@@ -10,6 +10,7 @@
 #   ./build/matrix_test      # 矩阵乘法：正确性 + 性能对比
 #   ./build/softmax_test     # softmax：数值稳定性 + 按行归一化
 #   ./build/vector_test      # 向量：点积 / 模长 / 余弦相似度
+#   ./build/logic_gate       # 感知机学逻辑门（AND/OR 可学，XOR 线性不可分）
 #
 # 用法二（挂进已有项目，推荐）：
 #   本库做成 INTERFACE target（无编译产物，纯传播头文件路径和 C++ 标准），

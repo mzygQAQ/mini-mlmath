@@ -17,13 +17,20 @@ mini-mlmath/
 │       ├── matrix.h          #   Matrix<T>：动态大小、行主序 + 三种乘法
 │       ├── vector.h          #   Vector<T>：点积 / 模长 / 余弦相似度
 │       ├── softmax.h         #   数值稳定的 softmax（一维 + 按行矩阵版）
-│       └── feature_selection/    # 特征选择模块
-│           └── variance_threshold.h  # 基于方差的特征选择（VarianceThreshold）
+│       ├── activation.h      #   激活函数：sigmoid（标量 + 逐元素矩阵版）
+│       ├── random.h          #   类似 numpy.random：均匀/正态随机标量与矩阵
+│       ├── check.h           #   glog 风格 CHECK(pred) << "msg" 断言
+│       ├── feature_selection/    # 特征选择模块（有监督/无监督）
+│       │   ├── variance_threshold.h   # 方差法：方差低于阈值的列删掉（无监督）
+│       │   └── correlation_selector.h # 相关系数法：|r| 低于阈值的列删掉（有监督）
+│       └── ml/                   # 机器学习模型模块
+│           └── perceptron.h      #   感知机：线性二分类器，w·x + b 取符号
 └── tests/                    # 测试程序，每个模块一个
     ├── CMakeLists.txt        #   每个 *_test.cpp 一个可执行 + 编译优化选项
     ├── matrix_test.cpp       #   矩阵乘法正确性验证 + 三版性能对比
     ├── softmax_test.cpp      #   softmax 数值稳定性 / 归一化验证
-    └── vector_test.cpp       #   点积 / 模长 / 余弦相似度验证
+    ├── vector_test.cpp       #   点积 / 模长 / 余弦相似度验证
+    └── logic_gate.cpp        #   感知机学逻辑门（AND/OR 可学，XOR 学不会）
 ```
 
 头文件引用统一写 `<mini_mlmath/xxx.h>`，`include/` 是头文件搜索根。

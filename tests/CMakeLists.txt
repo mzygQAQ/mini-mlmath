@@ -6,8 +6,9 @@
 add_executable(matrix_test matrix_test.cpp)
 add_executable(softmax_test softmax_test.cpp)
 add_executable(vector_test vector_test.cpp)
+add_executable(logic_gate logic_gate.cpp)
 
-foreach(tgt matrix_test softmax_test vector_test)
+foreach(tgt matrix_test softmax_test vector_test logic_gate)
   target_link_libraries(${tgt} PRIVATE mini_mlmath)
 
 # =====================================================================

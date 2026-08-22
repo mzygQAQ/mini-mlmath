@@ -41,6 +41,12 @@
 #include <stdexcept>
 #include <vector>
 
+// CHECK 宏是本库唯一的宏例外（见 check.h 头注释）——它要拿到条件原文和
+// 调用点文件/行号，本质是编译期文本处理，只能靠宏。文件里 multiply_*
+// 用的是裸 throw，两种写法等价；operator* 这里选 CHECK 是因为错误消息
+// 会把「条件原文 + 实际值」都打出来，对使用者更友好。
+#include "mini_mlmath/check.h"
+
 // 分块大小：所有分块算法共用的块边长。
 // 为什么是 64？
 //   - 一个 64×64 的 double 块正好是 64*64*8 = 32 KB，正好等于现代 x86
@@ -163,6 +169,23 @@ public:
         for (size_type i = 0; i < rows_; ++i)
             for (size_type j = 0; j < cols_; ++j)
                 r(j, i) = (*this)(i, j);
+        return r;
+    }
+
+    // ---- 追加全 1 列（bias folding 的增广：x -> [x, 1]）----
+    // 机器学习里给设计矩阵右边并一列恒 1，配合「权重最后一个分量 = bias」，
+    // 就能把 y = w·x + b 写成纯矩阵乘 y = [w,b]·[x,1]（感知机的 bias
+    // folding，见 ml/perceptron.h 注释）。对应 numpy 的
+    //   np.hstack([X, np.ones((n, 1))])
+    // 返回新矩阵（n × (d+1)），不修改原矩阵（eager，同 transposed()）。
+    // 0 行的矩阵没有行可增广，拒绝。
+    Matrix with_ones_column() const {
+        CHECK(rows() > 0) << "cannot append a ones column to an empty matrix";
+        Matrix r(rows_, cols_ + 1);
+        for (size_type i = 0; i < rows_; ++i) {
+            for (size_type j = 0; j < cols_; ++j) r(i, j) = (*this)(i, j);
+            r(i, cols_) = T(1);   // 最后一列恒 1，喂给 bias
+        }
         return r;
     }
 
@@ -453,6 +476,36 @@ Matrix<T> multiply_packed(const Matrix<T>& A, const Matrix<T>& B,
         }
     }
     return C;
+}
+
+// ============================================================================
+//  operator* —— 矩阵 × 矩阵（对应 numpy 的 A @ B）
+//
+//  为什么有了三种 multiply_* 还要再补一个 operator*？
+//    三种乘法用命名函数是为了教学：让你显式挑选算法、对比性能。
+//    但日常写代码时「A * B 就是矩阵乘」才是直觉 —— 数学记号 A·B、
+//    numpy 的 A @ B 都是这个意思。所以补一个便捷入口，
+//    默认委托最快的 multiply_packed。
+//
+//  和「标量乘法 operator*」不冲突：
+//    重载决议按参数签名区分 —— (Matrix, Matrix) 走这里，
+//    (Matrix, scalar) 走上面那个，编译器自动挑对。
+//
+//  语义对照（防混淆，重要）：
+//    numpy  A @ B   ==  本库 A * B      （真正的矩阵乘法）
+//    numpy  A * B   ==  逐元素乘        （本库没有这个运算符！）
+//  也就是说：本库的 * 对应 numpy 的 @，千万别和 numpy 的 * 混为一谈。
+//
+//  教学代价（一句话说清楚）：
+//    有了 A * B，调用处就看不到「底层用哪个算法」了。想对比三种实现的
+//    性能差异，仍然请显式调用 multiply_naive / multiply_blocked /
+//    multiply_packed。
+// ============================================================================
+template <typename T>
+Matrix<T> operator*(const Matrix<T>& a, const Matrix<T>& b) {
+    CHECK(a.cols() == b.rows()) << "A.cols() must equal B.rows(), got "
+                                << a.cols() << " vs " << b.rows();
+    return multiply_packed(a, b);   // 默认走最快的版本
 }
 
 // ============================================================================
