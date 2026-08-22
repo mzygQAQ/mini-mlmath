@@ -111,6 +111,42 @@ public:
         return Matrix(init);
     }
 
+    // ---- 静态工厂 ----
+
+    // 从 std::vector 构造一列（n×1）。典型用途：感知机 fit 里把
+    //   [w_1, ..., w_d, b]  这一维数组直接变成 (d+1)×1 的列向量，
+    // 配合 X.with_ones_column() 就能用一次矩阵乘算出 w·x + b
+    //（详见 ml/perceptron.h 头注释里的「bias folding」）。
+    // 空 vector → 0×1 矩阵。
+    static Matrix from_column(const std::vector<T> &v) {
+        Matrix r(v.size(), 1);
+        std::copy(v.begin(), v.end(), r.data());
+        return r;
+    }
+
+    // 从 std::vector 构造一行（1×n）。典型用途：单个样本是
+    // 1×d 行向量时直接转。
+    static Matrix from_row(const std::vector<T> &v) {
+        Matrix r(1, v.size());
+        std::copy(v.begin(), v.end(), r.data());
+        return r;
+    }
+
+    // 全 0 矩阵。其实就是 (rows, cols) 构造（默认填 0），但用静态工厂
+    // 名字更显意图。numpy 的 np.zeros。
+    static Matrix zeros(size_type rows, size_type cols) {
+        return Matrix(rows, cols);
+    }
+
+    // 全 1 矩阵。numpy 的 np.ones。和 with_ones_column() 配合：
+    //   X.with_ones_column()  等价于  hstack(X, ones(X.rows(), 1))
+    // 区别是 ones 是通用工厂，with_ones_column 是「给自己加一列 1」的快捷。
+    static Matrix ones(size_type rows, size_type cols) {
+        Matrix r(rows, cols);
+        std::fill(r.data(), r.data() + r.rows() * r.cols(), T(1));
+        return r;
+    }
+
     // ---- 形状查询 ----
     size_type rows() const noexcept { return rows_; }
     size_type cols() const noexcept { return cols_; }
