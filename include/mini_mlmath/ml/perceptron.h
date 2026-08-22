@@ -138,6 +138,7 @@ template<typename T>
 Perceptron<T> &Perceptron<T>::fit(const Matrix<T> &X, const std::vector<T> &y) {
     //  1) 校验：X 至少 1 行 1 列；y.size() == X.rows()（用 CHECK，见 check.h）；
     CHECK(y.size() == X.rows());
+    CHECK(X.cols() >= 1) << "Perceptron::fit: need at least 1 feature column";
 
     //  2) 初始化：bias_ = 0；weights_ 长度 d = X.cols()，每个元素 ~ U(-0.5, 0.5)
     //     （用成员里的 Random rand_：默认种子 42，实验可复现）
@@ -147,38 +148,71 @@ Perceptron<T> &Perceptron<T>::fit(const Matrix<T> &X, const std::vector<T> &y) {
         weights_[j] = rand_.uniform<T>(T(-0.5), T(0.5));
     }
 
-    //  3) 外层循环 max_iter_ 轮，内层遍历每个样本 i：
-    //        score = w·x_i + b
-    //        若 y_i * score <= 0（预测错了）就更新：
-    //           weights_[j] += learning_rate_ * y_i * X(i, j)   （对每个 j）
-    //           bias_        += learning_rate_ * y_i
-    //     （经典感知机：只在出错时更新，见文件头）
-    // TODO(你)：实现感知机训练，建议步骤：
-    for (size_type epoch = 0; epoch < max_iter_; epoch++) {
+    //  3) Bias folding：把 weights_ 和 bias_ 拼成 (d+1) 维的「增广权重」，
+    //     同时给 X 右边拼一列 1（with_ones_column）。这样：
+    //       - 算分数 = features * w_aug，一次矩阵乘搞定
+    //       - bias 更新自动并入 w_aug[d]（因为 features(i, d) = 1）
+    //       - 不再需要单独管 bias，代码更干净
+    std::vector<T> w_aug = weights_;
+    w_aug.push_back(bias_);                                // 长度 d+1，最后一个是 bias
+    Matrix<T> features = X.with_ones_column();             // n × (d+1)
 
+    //  4) 外层循环 max_iter_ 轮。每轮：
+    //       - 用当前 w_aug 算所有样本的分数（一次矩阵乘）
+    //       - 逐样本检查 y_i * score_i > 0 是否成立
+    //           - > 0：正确，啥也不做
+    //           - <= 0：错，更新 w_aug 的所有 d+1 个分量
+    //       - 更新规则对所有 j 统一：w_aug[j] += lr * y_i * features(i, j)
+    //         j=d 时 features(i, d) = 1，所以 bias 更新自动包含在内
+    for (size_type epoch = 0; epoch < max_iter_; ++epoch) {
+        Matrix<T> scores = features * Matrix<T>::from_column(w_aug);  // n×1
+        for (size_type i = 0; i < X.rows(); ++i) {
+            // y_i × score_i > 0 → 正确；<= 0 → 错
+            if (y[i] * scores(i, 0) <= T(0)) {
+                for (size_type j = 0; j < features.cols(); ++j) {
+                    w_aug[j] += learning_rate_ * y[i] * features(i, j);
+                }
+            }
+        }
     }
 
-    //  4) 设置训练完毕
+    //  5) 训练完，把 w_aug 拆回 weights_ 和 bias_（最后一位是 bias）
+    bias_ = w_aug.back();
+    w_aug.pop_back();
+    weights_ = w_aug;
+
+    //  6) 设置训练完毕
     fitted_ = true;
     return *this;
 }
 
 template<typename T>
 std::vector<T> Perceptron<T>::decision_function(const Matrix<T> &X) const {
-    // TODO(你)：实现决策函数，建议步骤：
-    //  1) 校验：fitted_ 必须为 true（先 fit 再推理）；
-    //     X.cols() == weights_.size()（列数必须和 fit 时一致）；
-    //  2) 对每一行算 w·x_i + b，返回长度 = X.rows() 的分数向量。
-    throw std::logic_error("Perceptron::decision_function() not implemented yet");
+    CHECK(fitted_) << "must call fit() before decision_function()";
+    CHECK(X.cols() == weights_.size())
+            << "Perceptron::decision_function: feature count mismatch, got "
+            << X.cols() << " cols but trained on " << weights_.size();
+
+    // 用 bias folding 一次矩阵乘算所有分数（复用 fit 里的模式）
+    std::vector<T> w_aug = weights_;
+    w_aug.push_back(bias_);
+    Matrix<T> features = X.with_ones_column();
+    Matrix<T> scores = features * Matrix<T>::from_column(w_aug);  // n×1
+
+    // 拉平 n×1 → std::vector
+    std::vector<T> result(X.rows());
+    for (size_type i = 0; i < X.rows(); ++i) result[i] = scores(i, 0);
+    return result;
 }
 
 template<typename T>
 std::vector<T> Perceptron<T>::predict(const Matrix<T> &X) const {
-    CHECK(fitted_) << "must call fit() before predict()";
-
-    // TODO(你)：实现预测，建议步骤：
-    //  1) 先调用 decision_function(X) 拿到每行分数（或直接复用其逻辑）；
-    //  2) 对每个分数取符号：score > 0 判 +1，否则判 -1
-    //     （score == 0 恰好落在平面上，归到哪类自己定，注释里写清楚即可）。
-    throw std::logic_error("Perceptron::predict() not implemented yet");
+    // 取 decision_function 的符号。score == 0 落在平面上，归 -1
+    // （和 sklearn 的 Perceptron 行为一致：默认 0 归负类）
+    std::vector<T> scores = decision_function(X);
+    std::vector<T> result(X.rows());
+    for (size_type i = 0; i < X.rows(); ++i) {
+        result[i] = scores[i] > T(0) ? T(1) : T(-1);
+    }
+    return result;
 }

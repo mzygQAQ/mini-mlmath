@@ -8,8 +8,9 @@ add_executable(softmax_test softmax_test.cpp)
 add_executable(vector_test vector_test.cpp)
 add_executable(logic_gate logic_gate.cpp)
 add_executable(random_check random_check.cpp)   # int 离散均匀抽样 smoke test
+add_executable(perceptron_test perceptron_test.cpp)   # 端到端测 Perceptron 类
 
-foreach(tgt matrix_test softmax_test vector_test logic_gate random_check)
+foreach(tgt matrix_test softmax_test vector_test logic_gate random_check perceptron_test)
   target_link_libraries(${tgt} PRIVATE mini_mlmath)
 
 # =====================================================================
