@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 320" font-family="sans-serif">
+  <!-- 标题 -->
+  <text x="230" y="26" text-anchor="middle" font-size="18" font-weight="bold">sigmoid(z) = 1 / (1 + e⁻ᶻ)</text>
+
+  <!-- 渐近线 y=1 和 y=0（虚线） -->
+  <line x1="60" y1="40"  x2="400" y2="40"  stroke="#ccc" stroke-width="1" stroke-dasharray="6,5"/>
+  <text x="396" y="34" text-anchor="end" font-size="12" fill="#999">y = 1（渐近线）</text>
+  <line x1="60" y1="260" x2="400" y2="260" stroke="#ccc" stroke-width="1" stroke-dasharray="6,5"/>
+  <text x="396" y="274" text-anchor="end" font-size="12" fill="#999">y = 0（渐近线）</text>
+
+  <!-- 坐标轴 -->
+  <line x1="60" y1="260" x2="400" y2="260" stroke="#999" stroke-width="1.5"/>
+  <line x1="60" y1="260" x2="60" y2="40" stroke="#999" stroke-width="1.5"/>
+  <!-- z 轴刻度 -->
+  <text x="60"  y="276" text-anchor="middle" font-size="12" fill="#666">-6</text>
+  <text x="145" y="276" text-anchor="middle" font-size="12" fill="#666">-3</text>
+  <text x="230" y="276" text-anchor="middle" font-size="12" fill="#666">0</text>
+  <text x="315" y="276" text-anchor="middle" font-size="12" fill="#666">3</text>
+  <text x="400" y="276" text-anchor="middle" font-size="12" fill="#666">6</text>
+  <text x="408" y="276" font-size="14" fill="#333" font-style="italic">z</text>
+  <!-- y 轴刻度 -->
+  <text x="50" y="152" text-anchor="end" font-size="12" fill="#666">0.5</text>
+  <text x="50" y="54"  text-anchor="end" font-size="12" fill="#666">1</text>
+  <text x="46" y="30"  font-size="14" fill="#333" font-style="italic">y</text>
+
+  <!-- sigmoid 曲线（多段线逼近，13 个采样点） -->
+  <polyline points="60,259.5 88.3,258.5 116.7,256.1 145,249.6 173.3,233.8 201.7,200.9 230,150 258.3,99.2 286.7,66.2 315,50.4 343.3,44 371.7,41.5 400,40.5"
+            fill="none" stroke="#1e88e5" stroke-width="3"/>
+
+  <!-- 关键点：z=0 -> y=0.5 -->
+  <circle cx="230" cy="150" r="6" fill="#e53935"/>
+  <text x="240" y="140" font-size="13" fill="#c62828">z=0 → y=0.5</text>
+
+  <!-- 特性标注 -->
+  <text x="130" y="175" font-size="13" fill="#555">平滑、处处可导</text>
+  <text x="130" y="192" font-size="13" fill="#555">值域 (0, 1)，可当概率</text>
+  <text x="290" y="60" font-size="13" fill="#555">z 很大 → 趋近 1</text>
+  <text x="80"  y="245" font-size="13" fill="#555">z 很负 → 趋近 0</text>
+</svg>

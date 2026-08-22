@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 380" font-family="sans-serif">
+  <!-- 标题 -->
+  <text x="230" y="26" text-anchor="middle" font-size="18" font-weight="bold">阶跃 sign vs 平滑 sigmoid</text>
+
+  <!-- 坐标轴（y 轴范围 -1 ~ 1，中线 y=0） -->
+  <line x1="60" y1="300" x2="400" y2="300" stroke="#999" stroke-width="1.5"/>
+  <line x1="60" y1="300" x2="60" y2="40" stroke="#999" stroke-width="1.5"/>
+  <line x1="60" y1="180" x2="400" y2="180" stroke="#ccc" stroke-width="1" stroke-dasharray="6,5"/>
+  <!-- z 轴刻度 -->
+  <text x="60"  y="316" text-anchor="middle" font-size="12" fill="#666">-6</text>
+  <text x="145" y="316" text-anchor="middle" font-size="12" fill="#666">-3</text>
+  <text x="230" y="316" text-anchor="middle" font-size="12" fill="#666">0</text>
+  <text x="315" y="316" text-anchor="middle" font-size="12" fill="#666">3</text>
+  <text x="400" y="316" text-anchor="middle" font-size="12" fill="#666">6</text>
+  <text x="408" y="316" font-size="14" fill="#333" font-style="italic">z</text>
+  <!-- y 轴刻度 -->
+  <text x="50" y="84"  text-anchor="end" font-size="12" fill="#666">1</text>
+  <text x="50" y="184" text-anchor="end" font-size="12" fill="#666">0</text>
+  <text x="50" y="284" text-anchor="end" font-size="12" fill="#666">-1</text>
+  <text x="46" y="50"  font-size="14" fill="#333" font-style="italic">y</text>
+
+  <!-- sign：红色阶梯（z<0 在 -1，z>0 在 +1，z=0 处垂直跳变） -->
+  <polyline points="60,280 230,280 230,80 400,80"
+            fill="none" stroke="#e53935" stroke-width="3"/>
+  <text x="330" y="70" font-size="13" fill="#c62828">sign：硬跳变</text>
+  <text x="330" y="86" font-size="12" fill="#c62828">z=0 处不可导</text>
+
+  <!-- sigmoid：蓝色平滑曲线（值域 0~1，映射到同一坐标系） -->
+  <polyline points="60,179.75 88.3,179.3 116.7,178.2 145,175.3 173.3,168.1 201.7,153.1 230,130 258.3,106.9 286.7,91.9 315,84.7 343.3,81.8 371.7,80.7 400,80.25"
+            fill="none" stroke="#1e88e5" stroke-width="3"/>
+  <text x="86" y="100" font-size="13" fill="#1565c0">sigmoid：平滑过渡</text>
+  <text x="86" y="116" font-size="12" fill="#1565c0">处处可导</text>
+
+  <!-- 图例 -->
+  <line x1="90" y1="345" x2="140" y2="345" stroke="#e53935" stroke-width="3"/>
+  <text x="148" y="350" font-size="13" fill="#333">阶跃 sign（感知机）</text>
+  <line x1="300" y1="345" x2="350" y2="345" stroke="#1e88e5" stroke-width="3"/>
+  <text x="358" y="350" font-size="13" fill="#333">sigmoid（MLP）</text>
+
+  <!-- 结论 -->
+  <text x="230" y="372" text-anchor="middle" font-size="13" font-weight="bold" fill="#b71c1c">
+    多层训练要反向传播（链式法则）→ 每层必须可导 → 只能用 sigmoid 这类平滑激活
+  </text>
+</svg>

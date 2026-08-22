@@ -30,6 +30,7 @@ mini-mlmath/
 ├── docs/                      # 文档：原理讲解 + 配图
 │   ├── perceptron.md          #   感知机原理（结构 / 学习规则 / 收敛定理）
 │   ├── logic_gates.md         #   逻辑门：AND / OR / NAND 权重推导 + XOR 不可分
+│   ├── activation.md          #   激活函数：sigmoid vs 阶跃、数值稳定性
 │   └── images/                #   配图（手写 SVG，零依赖）
 └── tests/                    # 测试程序，每个模块一个
     ├── CMakeLists.txt        #   每个 *_test.cpp 一个可执行 + 编译优化选项
@@ -45,6 +46,7 @@ mini-mlmath/
 
 - [感知机原理](docs/perceptron.md) —— 结构、学习规则、收敛定理、bias folding
 - [逻辑门与决策边界](docs/logic_gates.md) —— AND / OR / NAND 的权重推导（不等式组法）、XOR 为什么线性不可分
+- [激活函数](docs/activation.md) —— sigmoid vs 阶跃、为什么多层必须可导、数值稳定性
 
 ## 三种乘法（越往后越接近真实 BLAS）
 
