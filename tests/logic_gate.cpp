@@ -53,6 +53,41 @@ auto and_gate(const Matrix<float> &dataset) -> Matrix<float> {
     return pred;
 }
 
+auto or_gate(const Matrix<float> &dataset) -> Matrix<float> {
+    CHECK(dataset.cols() == 2) << "OR gate expects 2 inputs per row";
+    CHECK(dataset.rows() > 0) << "dataset must not be empty";
+
+    const Matrix<float> feature = dataset.with_ones_column();
+    const Matrix<float> weight = {{0.5, 0.5, -0.4}};
+    const Matrix<float> scores = feature * weight.transposed();
+
+    // sign：分数 > 0 判 1，否则 0（分数恰好为 0 落在决策线上，归 0）
+    Matrix<float> pred(dataset.rows(), 1);
+    for (std::size_t i = 0; i < dataset.rows(); ++i)
+        pred(i, 0) = scores(i, 0) > 0.0f ? 1.0f : 0.0f;
+    return pred;
+}
+
+// NOT AND，就是 AND 的输出取反：只有两个输入都是 1 时输出 0，其余三种情况都输出 1。
+// 0 0 -> 1
+// 0 1 -> 1
+// 1 0 -> 1
+// 1 1 -> 0
+auto nand_gate(const Matrix<float> &dataset) -> Matrix<float> {
+    CHECK(dataset.cols() == 2) << "NAND gate expects 2 inputs per row";
+    CHECK(dataset.rows() > 0) << "dataset must not be empty";
+
+    const Matrix<float> feature = dataset.with_ones_column();
+    const Matrix<float> weight = {{-1.0f, -1.0f, 1.1f}};
+    const Matrix<float> scores = feature * weight.transposed();
+
+    // sign：分数 > 0 判 1，否则 0（分数恰好为 0 落在决策线上，归 0）
+    Matrix<float> pred(dataset.rows(), 1);
+    for (std::size_t i = 0; i < dataset.rows(); ++i)
+        pred(i, 0) = scores(i, 0) > 0.0f ? 1.0f : 0.0f;
+    return pred;
+}
+
 int main() {
     // test_and：真值表全 4 个组合
     Matrix<float> dataset = {
@@ -61,9 +96,23 @@ int main() {
             {1, 0},
             {1, 1}
     };
+
+    // AND
     const auto pred = and_gate(dataset);
     for (std::size_t i = 0; i < dataset.rows(); ++i)
         std::cout << "AND(" << dataset(i, 0) << ", " << dataset(i, 1)
                   << ") = " << pred(i, 0) << "\n";
+
+    // OR
+    const auto or_pred = or_gate(dataset);
+    for (std::size_t i = 0; i < dataset.rows(); ++i)
+        std::cout << "OR(" << dataset(i, 0) << ", " << dataset(i, 1)
+                  << ") = " << or_pred(i, 0) << "\n";
+
+    // NAND
+    const auto nand_pred = nand_gate(dataset);
+    for (std::size_t i = 0; i < dataset.rows(); ++i)
+        std::cout << "NAND(" << dataset(i, 0) << ", " << dataset(i, 1)
+                  << ") = " << nand_pred(i, 0) << "\n";
     return 0;
 }
