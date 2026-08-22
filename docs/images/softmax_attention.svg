@@ -1,0 +1,193 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 520" font-family="sans-serif">
+  <defs>
+    <marker id="arr-attn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#444"/>
+    </marker>
+  </defs>
+
+  <text x="550" y="32" text-anchor="middle" font-size="20" font-weight="bold">
+    softmax 在注意力（attention）里的核心位置
+  </text>
+  <text x="550" y="56" text-anchor="middle" font-size="13" fill="#555">
+    Attention(Q, K, V) = softmax_rows(Q · Kᵀ / √d) · V
+  </text>
+
+  <!-- ============== Q 矩阵 ============== -->
+  <text x="90" y="105" text-anchor="middle" font-size="14" font-weight="bold" fill="#1565c0">Q（查询）</text>
+  <text x="90" y="123" text-anchor="middle" font-size="11" fill="#888">3 个 query</text>
+
+  <g transform="translate(40, 140)">
+    <!-- 表头 -->
+    <text x="60" y="0" text-anchor="middle" font-size="11" fill="#888">d=2</text>
+    <text x="100" y="0" text-anchor="middle" font-size="11" fill="#888">d=2</text>
+    <!-- 单元格：3x2，每格 40x40 -->
+    <rect x="40" y="10" width="40" height="40" fill="#e3f2fd" stroke="#1e88e5"/>
+    <text x="60" y="36" text-anchor="middle" font-size="14">1</text>
+    <rect x="80" y="10" width="40" height="40" fill="#e3f2fd" stroke="#1e88e5"/>
+    <text x="100" y="36" text-anchor="middle" font-size="14">0</text>
+    <text x="20" y="36" text-anchor="end" font-size="11" fill="#888">q₁</text>
+
+    <rect x="40" y="50" width="40" height="40" fill="#e3f2fd" stroke="#1e88e5"/>
+    <text x="60" y="76" text-anchor="middle" font-size="14">0</text>
+    <rect x="80" y="50" width="40" height="40" fill="#e3f2fd" stroke="#1e88e5"/>
+    <text x="100" y="76" text-anchor="middle" font-size="14">1</text>
+    <text x="20" y="76" text-anchor="end" font-size="11" fill="#888">q₂</text>
+
+    <rect x="40" y="90" width="40" height="40" fill="#e3f2fd" stroke="#1e88e5"/>
+    <text x="60" y="116" text-anchor="middle" font-size="14">1</text>
+    <rect x="80" y="90" width="40" height="40" fill="#e3f2fd" stroke="#1e88e5"/>
+    <text x="100" y="116" text-anchor="middle" font-size="14">1</text>
+    <text x="20" y="116" text-anchor="end" font-size="11" fill="#888">q₃</text>
+  </g>
+  <text x="90" y="300" text-anchor="middle" font-size="11" fill="#888">[3 × 2]</text>
+
+  <!-- ============== K 转置 ============== -->
+  <text x="280" y="105" text-anchor="middle" font-size="14" font-weight="bold" fill="#1565c0">Kᵀ（键转置）</text>
+  <text x="280" y="123" text-anchor="middle" font-size="11" fill="#888">3 个 key</text>
+
+  <g transform="translate(230, 140)">
+    <text x="60" y="0" text-anchor="middle" font-size="11" fill="#888">k₁</text>
+    <text x="100" y="0" text-anchor="middle" font-size="11" fill="#888">k₂</text>
+    <text x="140" y="0" text-anchor="middle" font-size="11" fill="#888">k₃</text>
+
+    <rect x="40" y="10" width="40" height="40" fill="#fff3e0" stroke="#fb8c00"/>
+    <text x="60" y="36" text-anchor="middle" font-size="14">1</text>
+    <text x="20" y="36" text-anchor="end" font-size="11" fill="#888">d=1</text>
+
+    <rect x="80" y="10" width="40" height="40" fill="#fff3e0" stroke="#fb8c00"/>
+    <text x="100" y="36" text-anchor="middle" font-size="14">0</text>
+
+    <rect x="120" y="10" width="40" height="40" fill="#fff3e0" stroke="#fb8c00"/>
+    <text x="140" y="36" text-anchor="middle" font-size="14">1</text>
+
+    <rect x="40" y="50" width="40" height="40" fill="#fff3e0" stroke="#fb8c00"/>
+    <text x="60" y="76" text-anchor="middle" font-size="14">1</text>
+    <text x="20" y="76" text-anchor="end" font-size="11" fill="#888">d=2</text>
+
+    <rect x="80" y="50" width="40" height="40" fill="#fff3e0" stroke="#fb8c00"/>
+    <text x="100" y="76" text-anchor="middle" font-size="14">1</text>
+
+    <rect x="120" y="50" width="40" height="40" fill="#fff3e0" stroke="#fb8c00"/>
+    <text x="140" y="76" text-anchor="middle" font-size="14">0</text>
+  </g>
+  <text x="280" y="230" text-anchor="middle" font-size="11" fill="#888">[2 × 3]</text>
+
+  <!-- Q * K^T 箭头 -->
+  <line x1="155" y1="190" x2="220" y2="190" stroke="#444" stroke-width="2.5" marker-end="url(#arr-attn)"/>
+  <text x="187" y="180" text-anchor="middle" font-size="12" font-weight="bold">×</text>
+
+  <!-- ============== 分数矩阵 ============== -->
+  <text x="450" y="105" text-anchor="middle" font-size="14" font-weight="bold" fill="#1565c0">分数 S = Q · Kᵀ</text>
+  <text x="450" y="123" text-anchor="middle" font-size="11" fill="#888">每行 = 1 个 query 对所有 key 的打分</text>
+
+  <g transform="translate(400, 140)">
+    <text x="60" y="0" text-anchor="middle" font-size="11" fill="#888">k₁</text>
+    <text x="100" y="0" text-anchor="middle" font-size="11" fill="#888">k₂</text>
+    <text x="140" y="0" text-anchor="middle" font-size="11" fill="#888">k₃</text>
+
+    <rect x="40" y="10" width="40" height="40" fill="#fff" stroke="#999"/>
+    <text x="60" y="36" text-anchor="middle" font-size="14">1</text>
+    <rect x="80" y="10" width="40" height="40" fill="#fff" stroke="#999"/>
+    <text x="100" y="36" text-anchor="middle" font-size="14">1</text>
+    <rect x="120" y="10" width="40" height="40" fill="#fff" stroke="#999"/>
+    <text x="140" y="36" text-anchor="middle" font-size="14">1</text>
+    <text x="20" y="36" text-anchor="end" font-size="11" fill="#888">q₁</text>
+
+    <rect x="40" y="50" width="40" height="40" fill="#fff" stroke="#999"/>
+    <text x="60" y="76" text-anchor="middle" font-size="14">1</text>
+    <rect x="80" y="50" width="40" height="40" fill="#fff" stroke="#999"/>
+    <text x="100" y="76" text-anchor="middle" font-size="14">1</text>
+    <rect x="120" y="50" width="40" height="40" fill="#fff" stroke="#999"/>
+    <text x="140" y="76" text-anchor="middle" font-size="14">0</text>
+    <text x="20" y="76" text-anchor="end" font-size="11" fill="#888">q₂</text>
+
+    <rect x="40" y="90" width="40" height="40" fill="#fff" stroke="#999"/>
+    <text x="60" y="116" text-anchor="middle" font-size="14">2</text>
+    <rect x="80" y="90" width="40" height="40" fill="#fff" stroke="#999"/>
+    <text x="100" y="116" text-anchor="middle" font-size="14">1</text>
+    <rect x="120" y="90" width="40" height="40" fill="#fff" stroke="#999"/>
+    <text x="140" y="116" text-anchor="middle" font-size="14">1</text>
+    <text x="20" y="116" text-anchor="end" font-size="11" fill="#888">q₃</text>
+  </g>
+  <text x="450" y="290" text-anchor="middle" font-size="11" fill="#888">[3 × 3]</text>
+  <text x="450" y="305" text-anchor="middle" font-size="11" fill="#c62828">和 ≠ 1（还不是概率）</text>
+
+  <!-- softmax_rows 箭头（最关键的一步） -->
+  <line x1="555" y1="190" x2="630" y2="190" stroke="#e91e63" stroke-width="3" marker-end="url(#arr-attn)"/>
+  <text x="592" y="180" text-anchor="middle" font-size="13" font-weight="bold" fill="#e91e63">softmax_rows</text>
+  <text x="592" y="220" text-anchor="middle" font-size="10" fill="#c62828">每行独立做 softmax</text>
+
+  <!-- ============== 注意力权重 ============== -->
+  <text x="770" y="105" text-anchor="middle" font-size="14" font-weight="bold" fill="#c62828">注意力权重 A</text>
+  <text x="770" y="123" text-anchor="middle" font-size="11" fill="#888">每行和 = 1（已是概率）</text>
+
+  <g transform="translate(720, 140)">
+    <text x="60" y="0" text-anchor="middle" font-size="11" fill="#888">k₁</text>
+    <text x="100" y="0" text-anchor="middle" font-size="11" fill="#888">k₂</text>
+    <text x="140" y="0" text-anchor="middle" font-size="11" fill="#888">k₃</text>
+
+    <!-- softmax({1,1,1}) = 1/3 ≈ 0.333 -->
+    <rect x="40" y="10" width="40" height="40" fill="#ffcdd2" stroke="#c62828" stroke-width="1.5"/>
+    <text x="60" y="36" text-anchor="middle" font-size="13" fill="#c62828">.333</text>
+    <rect x="80" y="10" width="40" height="40" fill="#ffcdd2" stroke="#c62828" stroke-width="1.5"/>
+    <text x="100" y="36" text-anchor="middle" font-size="13" fill="#c62828">.333</text>
+    <rect x="120" y="10" width="40" height="40" fill="#ffcdd2" stroke="#c62828" stroke-width="1.5"/>
+    <text x="140" y="36" text-anchor="middle" font-size="13" fill="#c62828">.333</text>
+    <text x="20" y="36" text-anchor="end" font-size="11" fill="#c62828" font-weight="bold">q₁</text>
+
+    <!-- softmax({1,1,0}) = {0.422, 0.422, 0.155} -->
+    <rect x="40" y="50" width="40" height="40" fill="#ffcdd2" stroke="#c62828" stroke-width="1.5"/>
+    <text x="60" y="76" text-anchor="middle" font-size="13" fill="#c62828">.422</text>
+    <rect x="80" y="50" width="40" height="40" fill="#ffcdd2" stroke="#c62828" stroke-width="1.5"/>
+    <text x="100" y="76" text-anchor="middle" font-size="13" fill="#c62828">.422</text>
+    <rect x="120" y="50" width="40" height="40" fill="#ffcdd2" stroke="#c62828" stroke-width="1.5"/>
+    <text x="140" y="76" text-anchor="middle" font-size="13" fill="#c62828">.155</text>
+    <text x="20" y="76" text-anchor="end" font-size="11" fill="#c62828" font-weight="bold">q₂</text>
+
+    <!-- softmax({2,1,1}) = {0.576, 0.212, 0.212} -->
+    <rect x="40" y="90" width="40" height="40" fill="#ffcdd2" stroke="#c62828" stroke-width="1.5"/>
+    <text x="60" y="116" text-anchor="middle" font-size="13" fill="#c62828">.576</text>
+    <rect x="80" y="90" width="40" height="40" fill="#ffcdd2" stroke="#c62828" stroke-width="1.5"/>
+    <text x="100" y="116" text-anchor="middle" font-size="13" fill="#c62828">.212</text>
+    <rect x="120" y="90" width="40" height="40" fill="#ffcdd2" stroke="#c62828" stroke-width="1.5"/>
+    <text x="140" y="116" text-anchor="middle" font-size="13" fill="#c62828">.212</text>
+    <text x="20" y="116" text-anchor="end" font-size="11" fill="#c62828" font-weight="bold">q₃</text>
+  </g>
+  <text x="770" y="290" text-anchor="middle" font-size="11" fill="#888">[3 × 3]</text>
+  <text x="770" y="305" text-anchor="middle" font-size="11" fill="#2e7d32" font-weight="bold">每行和 = 1 ✓</text>
+
+  <!-- × V -->
+  <line x1="870" y1="190" x2="935" y2="190" stroke="#444" stroke-width="2.5" marker-end="url(#arr-attn)"/>
+  <text x="902" y="180" text-anchor="middle" font-size="12" font-weight="bold">× V</text>
+
+  <!-- 输出 -->
+  <g transform="translate(940, 140)">
+    <text x="60" y="0" text-anchor="middle" font-size="14" font-weight="bold" fill="#2e7d32">输出</text>
+    <text x="60" y="20" text-anchor="middle" font-size="11" fill="#888">[3 × 2]</text>
+    <text x="60" y="80" text-anchor="middle" font-size="12" fill="#333">A · V</text>
+    <text x="60" y="100" text-anchor="middle" font-size="11" fill="#888">每行 =</text>
+    <text x="60" y="116" text-anchor="middle" font-size="11" fill="#888">V 的加权和</text>
+  </g>
+
+  <!-- ============== 底部说明 ============== -->
+  <rect x="50" y="350" width="1000" height="150" fill="#fff8e1" stroke="#fb8c00" stroke-width="1.5" rx="6"/>
+  <text x="80" y="378" font-size="14" font-weight="bold" fill="#e65100">
+    为什么必须是 softmax_rows（按行归一化）？
+  </text>
+
+  <text x="80" y="404" font-size="12" fill="#333">
+    • 每一行 = 一个 query 对全部 key 的「关注分布」—— 这一行加起来必须 = 1（100% 的注意力被分配）
+  </text>
+  <text x="80" y="425" font-size="12" fill="#333">
+    • 不同 query 独立做 softmax：query q₁ 看 key₁/k₂/k₃ 的权重和 query q₂ 看它们的权重可以完全不同
+  </text>
+  <text x="80" y="446" font-size="12" fill="#333">
+    • 整列归一化是错的——会把不同 query 的权重混在一起，丢失「每个 query 自己决定关注什么」的语义
+  </text>
+  <text x="80" y="475" font-size="12" fill="#c62828" font-weight="bold">
+    本库的 softmax_rows(Matrix) 就是这件事：行内独立做 max-subtract-exp-normalize
+  </text>
+  <text x="80" y="495" font-size="11" fill="#888" font-style="italic">
+    KV cache 场景下，Q 长度通常只有 1（每生成一个新 token）—— 此时 softmax_rows 退化为对一维向量做 softmax
+  </text>
+</svg>

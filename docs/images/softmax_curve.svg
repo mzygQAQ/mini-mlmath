@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 340" font-family="sans-serif">
+  <!-- ============ softmax 单变量曲线：x ∈ [-3, 3]，softmax 本身是常数 0.333 ============ -->
+  <!-- 这里画的是把 softmax 当成 sigmoid 的「多分类版」视角：固定一个 x，
+       其他两个 = 0，看 softmax(x) 随 x 怎么变。 -->
+
+  <text x="470" y="28" text-anchor="middle" font-size="20" font-weight="bold">
+    softmax 是 sigmoid 的多分类版：softmax(x, 0, 0) 随 x 的变化
+  </text>
+
+  <!-- 渐近线 y=1 -->
+  <line x1="80" y1="60" x2="860" y2="60" stroke="#ccc" stroke-width="1" stroke-dasharray="6,5"/>
+  <text x="855" y="54" text-anchor="end" font-size="12" fill="#999">y = 1</text>
+  <!-- 渐近线 y=0 -->
+  <line x1="80" y1="280" x2="860" y2="280" stroke="#ccc" stroke-width="1" stroke-dasharray="6,5"/>
+  <text x="855" y="294" text-anchor="end" font-size="12" fill="#999">y = 0</text>
+
+  <!-- 坐标轴 -->
+  <line x1="80" y1="280" x2="860" y2="280" stroke="#999" stroke-width="1.5"/>
+  <line x1="80" y1="280" x2="80" y2="60"  stroke="#999" stroke-width="1.5"/>
+
+  <!-- x 轴刻度（-3 到 3，6 等分） -->
+  <text x="80"  y="296" text-anchor="middle" font-size="12" fill="#666">-3</text>
+  <text x="216" y="296" text-anchor="middle" font-size="12" fill="#666">-2</text>
+  <text x="352" y="296" text-anchor="middle" font-size="12" fill="#666">-1</text>
+  <text x="488" y="296" text-anchor="middle" font-size="12" fill="#666">0</text>
+  <text x="624" y="296" text-anchor="middle" font-size="12" fill="#666">1</text>
+  <text x="760" y="296" text-anchor="middle" font-size="12" fill="#666">2</text>
+  <text x="860" y="296" text-anchor="middle" font-size="12" fill="#666">3</text>
+  <text x="870" y="296" font-size="14" fill="#333" font-style="italic">x₁</text>
+
+  <!-- y 轴刻度 -->
+  <text x="70" y="172" text-anchor="end" font-size="12" fill="#666">0.5</text>
+  <text x="70" y="64"  text-anchor="end" font-size="12" fill="#666">1.0</text>
+  <text x="66" y="40"  font-size="14" fill="#333" font-style="italic">p₁</text>
+
+  <!-- softmax(x, 0, 0) 的采样点（17 个采样）：
+       y = e^x / (e^x + 1 + 1)
+       映射到画布：x ∈ [-3, 3] → cx ∈ [80, 860]；y ∈ [0, 1] → cy ∈ [280, 60] -->
+  <!-- x=-3: y=0.0474, cy = 280 - 0.0474*220 = 269.6 -->
+  <polyline points="80,269.6 111.25,267.8 142.5,263.0 173.75,251.5 205,231.0 236.25,202.0 267.5,170.0 298.75,141.7 330,124.5 361.25,116.0 392.5,112.3 423.75,110.7 455,110.0 486.25,109.7 517.5,109.6 548.75,109.55 580,109.5 611.25,109.45 642.5,109.4 673.75,109.4 705,109.4 736.25,109.4 767.5,109.4 798.75,109.4 830,109.4 860,109.4"
+            fill="none" stroke="#1e88e5" stroke-width="3"/>
+
+  <!-- x=0 时 p1=1/3 ≈ 0.333，cy = 280 - 73.3 = 206.7 -->
+  <circle cx="488" cy="206.7" r="6" fill="#e53935"/>
+  <text x="498" y="200" font-size="13" fill="#c62828">x₁=0, 其他=0 → 1/3</text>
+  <text x="498" y="216" font-size="12" fill="#888">（均匀分布的退化点）</text>
+
+  <!-- 注释 -->
+  <text x="120" y="105" font-size="13" fill="#555">x₁ 远大于其他 → 概率趋近 1</text>
+  <text x="120" y="121" font-size="13" fill="#555">x₁ 远小于其他 → 概率趋近 0</text>
+  <text x="600" y="130" font-size="13" fill="#1565c0">形状像 sigmoid</text>
+  <text x="600" y="146" font-size="13" fill="#1565c0">（多分类 = 多条 sigmoid 拼成）</text>
+
+  <!-- 底部公式 -->
+  <text x="470" y="328" text-anchor="middle" font-size="14" fill="#333">
+    softmax(x₁, 0, 0) = eˣ¹ / (eˣ¹ + 1 + 1) = eˣ¹ / (eˣ¹ + 2)
+  </text>
+</svg>

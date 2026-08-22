@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 380" font-family="sans-serif">
+  <defs>
+    <marker id="arr-soft" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#444"/>
+    </marker>
+  </defs>
+
+  <text x="450" y="30" text-anchor="middle" font-size="20" font-weight="bold">
+    softmax 把「任意实数分数」变成「和为 1 的概率分布」
+  </text>
+
+  <!-- ============== 左侧：输入分数 ============== -->
+  <text x="200" y="64" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">
+    输入：原始分数
+  </text>
+  <text x="200" y="84" text-anchor="middle" font-size="12" fill="#888">任意实数，无约束</text>
+
+  <!-- y 轴（仅左侧） -->
+  <line x1="70" y1="100" x2="70" y2="300" stroke="#999" stroke-width="1.5"/>
+  <line x1="70" y1="300" x2="370" y2="300" stroke="#999" stroke-width="1.5"/>
+  <!-- y 刻度 -->
+  <text x="60" y="114" text-anchor="end" font-size="11" fill="#666">3</text>
+  <text x="60" y="174" text-anchor="end" font-size="11" fill="#666">2</text>
+  <text x="60" y="234" text-anchor="end" font-size="11" fill="#666">1</text>
+  <text x="60" y="304" text-anchor="end" font-size="11" fill="#666">0</text>
+
+  <!-- 3 根柱：score = 3.0, 1.0, 0.2
+       高度 = score / 3.2 * 200 → 188, 62.5, 12.5
+       柱宽 60, 间隔 30, 起点 x=100 -->
+  <rect x="100" y="112" width="60" height="188" fill="#bbdefb" stroke="#1e88e5" stroke-width="2"/>
+  <text x="130" y="105" text-anchor="middle" font-size="13" fill="#1565c0" font-weight="bold">3.0</text>
+
+  <rect x="190" y="237.5" width="60" height="62.5" fill="#bbdefb" stroke="#1e88e5" stroke-width="2"/>
+  <text x="220" y="230" text-anchor="middle" font-size="13" fill="#1565c0" font-weight="bold">1.0</text>
+
+  <rect x="280" y="287.5" width="60" height="12.5" fill="#bbdefb" stroke="#1e88e5" stroke-width="2"/>
+  <text x="310" y="280" text-anchor="middle" font-size="13" fill="#1565c0" font-weight="bold">0.2</text>
+
+  <!-- 类别标签 -->
+  <text x="130" y="320" text-anchor="middle" font-size="13" fill="#333">cat</text>
+  <text x="220" y="320" text-anchor="middle" font-size="13" fill="#333">dog</text>
+  <text x="310" y="320" text-anchor="middle" font-size="13" fill="#333">fish</text>
+
+  <!-- 求和说明 -->
+  <text x="220" y="354" text-anchor="middle" font-size="12" fill="#c62828" font-style="italic">
+    和 = 4.2（无意义）
+  </text>
+
+  <!-- ============== 中间：softmax 箭头 ============== -->
+  <line x1="400" y1="200" x2="510" y2="200" stroke="#444" stroke-width="2.5" marker-end="url(#arr-soft)"/>
+  <text x="455" y="190" text-anchor="middle" font-size="16" font-weight="bold" fill="#e91e63">softmax</text>
+  <text x="455" y="226" text-anchor="middle" font-size="11" fill="#888">逐元素 exp → 归一化</text>
+
+  <!-- ============== 右侧：输出概率 ============== -->
+  <text x="690" y="64" text-anchor="middle" font-size="16" font-weight="bold" fill="#c62828">
+    输出：概率分布
+  </text>
+  <text x="690" y="84" text-anchor="middle" font-size="12" fill="#888">每项 ∈ (0,1)，和 = 1</text>
+
+  <!-- y 轴 -->
+  <line x1="540" y1="100" x2="540" y2="300" stroke="#999" stroke-width="1.5"/>
+  <line x1="540" y1="300" x2="840" y2="300" stroke="#999" stroke-width="1.5"/>
+  <text x="530" y="114" text-anchor="end" font-size="11" fill="#666">1.0</text>
+  <text x="530" y="164" text-anchor="end" font-size="11" fill="#666">0.7</text>
+  <text x="530" y="214" text-anchor="end" font-size="11" fill="#666">0.4</text>
+  <text x="530" y="264" text-anchor="end" font-size="11" fill="#666">0.1</text>
+  <text x="530" y="304" text-anchor="end" font-size="11" fill="#666">0</text>
+
+  <!-- softmax({3, 1, 0.2}) = {0.836, 0.113, 0.051}
+       高度 = prob / 1.0 * 200 → 167.2, 22.6, 10.2 -->
+  <rect x="570" y="132.8" width="60" height="167.2" fill="#ffcdd2" stroke="#e53935" stroke-width="2"/>
+  <text x="600" y="125" text-anchor="middle" font-size="13" fill="#c62828" font-weight="bold">0.836</text>
+
+  <rect x="660" y="277.4" width="60" height="22.6" fill="#ffcdd2" stroke="#e53935" stroke-width="2"/>
+  <text x="690" y="270" text-anchor="middle" font-size="13" fill="#c62828" font-weight="bold">0.113</text>
+
+  <rect x="750" y="289.8" width="60" height="10.2" fill="#ffcdd2" stroke="#e53935" stroke-width="2"/>
+  <text x="780" y="282" text-anchor="middle" font-size="13" fill="#c62828" font-weight="bold">0.051</text>
+
+  <text x="600" y="320" text-anchor="middle" font-size="13" fill="#333">cat</text>
+  <text x="690" y="320" text-anchor="middle" font-size="13" fill="#333">dog</text>
+  <text x="780" y="320" text-anchor="middle" font-size="13" fill="#333">fish</text>
+
+  <text x="690" y="354" text-anchor="middle" font-size="12" fill="#2e7d32" font-style="italic">
+    和 = 0.836 + 0.113 + 0.051 = 1.000 ✓
+  </text>
+</svg>

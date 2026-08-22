@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" font-family="sans-serif">
+  <defs>
+    <marker id="arr-soft2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#444"/>
+    </marker>
+  </defs>
+
+  <text x="450" y="32" text-anchor="middle" font-size="20" font-weight="bold">
+    数值稳定性：exp 是个「碰一下就爆」的家伙
+  </text>
+  <text x="450" y="56" text-anchor="middle" font-size="13" fill="#555">
+    输入 x = {1000, 999, 998} —— 大数值在注意力分数里司空见惯
+  </text>
+
+  <!-- ============== 上半：naive 写法（直接 exp） ============== -->
+  <rect x="20" y="80" width="860" height="190" fill="#ffebee" stroke="#e53935" stroke-width="1.5" rx="6"/>
+  <text x="40" y="105" font-size="15" font-weight="bold" fill="#c62828">
+    ✗ naive：直接 exp → 全部上溢 → 结果 NaN（全废）
+  </text>
+
+  <!-- 流程节点 -->
+  <rect x="50"  y="140" width="140" height="50" fill="#fff" stroke="#999" stroke-width="1.5" rx="4"/>
+  <text x="120" y="162" text-anchor="middle" font-size="13" font-weight="bold">原始分数</text>
+  <text x="120" y="180" text-anchor="middle" font-size="12" fill="#1565c0">{1000, 999, 998}</text>
+
+  <line x1="195" y1="165" x2="245" y2="165" stroke="#444" stroke-width="2" marker-end="url(#arr-soft2)"/>
+
+  <rect x="250" y="140" width="140" height="50" fill="#fff" stroke="#999" stroke-width="1.5" rx="4"/>
+  <text x="320" y="162" text-anchor="middle" font-size="13" font-weight="bold">逐个 exp()</text>
+  <text x="320" y="180" text-anchor="middle" font-size="12" fill="#c62828">{inf, inf, inf}</text>
+
+  <line x1="395" y1="165" x2="445" y2="165" stroke="#444" stroke-width="2" marker-end="url(#arr-soft2)"/>
+
+  <rect x="450" y="140" width="140" height="50" fill="#fff" stroke="#999" stroke-width="1.5" rx="4"/>
+  <text x="520" y="162" text-anchor="middle" font-size="13" font-weight="bold">求和</text>
+  <text x="520" y="180" text-anchor="middle" font-size="12" fill="#c62828">inf</text>
+
+  <line x1="595" y1="165" x2="645" y2="165" stroke="#444" stroke-width="2" marker-end="url(#arr-soft2)"/>
+
+  <rect x="650" y="140" width="200" height="50" fill="#ffcdd2" stroke="#c62828" stroke-width="2" rx="4"/>
+  <text x="750" y="162" text-anchor="middle" font-size="13" font-weight="bold" fill="#c62828">归一化 inf/inf</text>
+  <text x="750" y="180" text-anchor="middle" font-size="14" font-weight="bold" fill="#c62828">= NaN, NaN, NaN</text>
+
+  <!-- 上半解释 -->
+  <text x="450" y="225" text-anchor="middle" font-size="12" fill="#c62828" font-style="italic">
+    exp(1000) ≈ 10⁴³⁴，远超 double 极限（≈1.8×10³⁰⁸），溢出成 +inf；inf - inf = NaN
+  </text>
+  <text x="450" y="248" text-anchor="middle" font-size="13" font-weight="bold" fill="#c62828">
+    全废了 —— 整行概率都拿不到
+  </text>
+
+  <!-- ============== 下半：稳定写法（先减 max） ============== -->
+  <rect x="20" y="290" width="860" height="220" fill="#e8f5e9" stroke="#43a047" stroke-width="1.5" rx="6"/>
+  <text x="40" y="315" font-size="15" font-weight="bold" fill="#2e7d32">
+    ✓ 标准写法：先减最大值 → exp 范围回到 (0, 1] → 永远不会爆
+  </text>
+
+  <!-- 流程节点（更长的 5 步） -->
+  <rect x="40"  y="350" width="130" height="50" fill="#fff" stroke="#999" stroke-width="1.5" rx="4"/>
+  <text x="105" y="372" text-anchor="middle" font-size="13" font-weight="bold">原始分数</text>
+  <text x="105" y="390" text-anchor="middle" font-size="12" fill="#1565c0">{1000, 999, 998}</text>
+
+  <line x1="175" y1="375" x2="205" y2="375" stroke="#444" stroke-width="2" marker-end="url(#arr-soft2)"/>
+
+  <rect x="210" y="350" width="130" height="50" fill="#fff3e0" stroke="#fb8c00" stroke-width="2" rx="4"/>
+  <text x="275" y="372" text-anchor="middle" font-size="12" font-weight="bold" fill="#e65100">求 max</text>
+  <text x="275" y="390" text-anchor="middle" font-size="13" font-weight="bold" fill="#e65100">1000</text>
+
+  <line x1="345" y1="375" x2="375" y2="375" stroke="#444" stroke-width="2" marker-end="url(#arr-soft2)"/>
+
+  <rect x="380" y="350" width="160" height="50" fill="#fff3e0" stroke="#fb8c00" stroke-width="2" rx="4"/>
+  <text x="460" y="370" text-anchor="middle" font-size="12" font-weight="bold" fill="#e65100">整体平移 -max</text>
+  <text x="460" y="390" text-anchor="middle" font-size="12" fill="#2e7d32">{0, -1, -2}</text>
+
+  <line x1="545" y1="375" x2="575" y2="375" stroke="#444" stroke-width="2" marker-end="url(#arr-soft2)"/>
+
+  <rect x="580" y="350" width="120" height="50" fill="#fff" stroke="#999" stroke-width="1.5" rx="4"/>
+  <text x="640" y="370" text-anchor="middle" font-size="12" font-weight="bold">逐个 exp</text>
+  <text x="640" y="390" text-anchor="middle" font-size="12" fill="#2e7d32">{1, 0.368, 0.135}</text>
+
+  <line x1="705" y1="375" x2="735" y2="375" stroke="#444" stroke-width="2" marker-end="url(#arr-soft2)"/>
+
+  <rect x="740" y="350" width="125" height="50" fill="#c8e6c9" stroke="#2e7d32" stroke-width="2" rx="4"/>
+  <text x="802" y="370" text-anchor="middle" font-size="12" font-weight="bold">求和 / 归一化</text>
+  <text x="802" y="390" text-anchor="middle" font-size="11" fill="#2e7d32">{0.665, 0.245, 0.090}</text>
+
+  <!-- 下半解释 -->
+  <text x="450" y="430" text-anchor="middle" font-size="12" fill="#2e7d32" font-style="italic">
+    数学上 e^(x-max) = e^x / e^max，分子分母同除以 e^max，结果完全一致；只是「先平移再 exp」就把爆炸掐了
+  </text>
+  <text x="450" y="453" text-anchor="middle" font-size="12" fill="#555">
+    数学恒等式：softmax(x) = softmax(x - max(x))，对任意 x 都成立
+  </text>
+  <text x="450" y="482" text-anchor="middle" font-size="14" font-weight="bold" fill="#2e7d32">
+    工业界标准做法 —— PyTorch、TensorFlow、flash-attn 全都这样写
+  </text>
+  <text x="450" y="502" text-anchor="middle" font-size="12" fill="#888">
+    一行代码：`maxVal = *std::max_element(x.begin(), x.end());` 然后所有 exp 都传 `x[i] - maxVal`
+  </text>
+</svg>

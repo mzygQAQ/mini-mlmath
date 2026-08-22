@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 460" font-family="sans-serif">
+  <text x="450" y="30" text-anchor="middle" font-size="20" font-weight="bold">
+    「减 max」的几何直觉：把整条数轴往下推，softmax 结果不变
+  </text>
+  <text x="450" y="54" text-anchor="middle" font-size="13" fill="#555">
+    数学恒等：softmax(x) = softmax(x - c)，c 任意
+  </text>
+
+  <!-- ============== 上半：原始分数 ============== -->
+  <text x="80" y="90" font-size="15" font-weight="bold" fill="#1565c0">原始 x</text>
+  <text x="180" y="90" font-size="13" fill="#555">= {3, 1, 0.2}</text>
+
+  <!-- 指数映射后的「高度」：exp(3) ≈ 20.1, exp(1) ≈ 2.72, exp(0.2) ≈ 1.22 -->
+  <text x="80" y="108" font-size="11" fill="#888">exp 之后</text>
+
+  <!-- 数轴（x 在 -1 到 4 之间） -->
+  <line x1="100" y1="280" x2="800" y2="280" stroke="#999" stroke-width="1.5"/>
+  <line x1="100" y1="280" x2="100" y2="120" stroke="#999" stroke-width="1.5"/>
+  <!-- 刻度：每个单位 50 像素，起点 100 -->
+  <text x="100" y="296" text-anchor="middle" font-size="11" fill="#666">-1</text>
+  <text x="200" y="296" text-anchor="middle" font-size="11" fill="#666">0</text>
+  <text x="300" y="296" text-anchor="middle" font-size="11" fill="#666">1</text>
+  <text x="400" y="296" text-anchor="middle" font-size="11" fill="#666">2</text>
+  <text x="500" y="296" text-anchor="middle" font-size="11" fill="#666">3</text>
+  <text x="600" y="296" text-anchor="middle" font-size="11" fill="#666">4</text>
+
+  <!-- 三个分数在数轴上的位置（y = 280；x 像素 = 200 + score*100）：
+       x0=3  → 500
+       x1=1  → 300
+       x2=0.2 → 220 -->
+
+  <!-- 指数柱（用 y 表示 exp 值；映射：exp ∈ [0, 22] → y ∈ [280, 130]） -->
+  <!-- exp(3)=20.1, y = 280 - 20.1/22*150 = 280 - 137 = 143 -->
+  <line x1="500" y1="280" x2="500" y2="143" stroke="#e53935" stroke-width="3"/>
+  <circle cx="500" cy="280" r="5" fill="#e53935"/>
+  <text x="500" y="295" text-anchor="middle" font-size="11" fill="#c62828">3.0</text>
+  <text x="510" y="135" font-size="11" fill="#c62828">exp ≈ 20.1</text>
+
+  <line x1="300" y1="280" x2="300" y2="261.4" stroke="#fb8c00" stroke-width="3"/>
+  <circle cx="300" cy="280" r="5" fill="#fb8c00"/>
+  <text x="300" y="295" text-anchor="middle" font-size="11" fill="#e65100">1.0</text>
+  <text x="310" y="265" font-size="11" fill="#e65100">exp ≈ 2.72</text>
+
+  <line x1="220" y1="280" x2="220" y2="271.7" stroke="#43a047" stroke-width="3"/>
+  <circle cx="220" cy="280" r="5" fill="#43a047"/>
+  <text x="220" y="295" text-anchor="middle" font-size="11" fill="#2e7d32">0.2</text>
+  <text x="230" y="275" font-size="11" fill="#2e7d32">exp ≈ 1.22</text>
+
+  <!-- 虚线箭头：把整条数轴往左推 3 个单位（减 max） -->
+  <line x1="540" y1="320" x2="240" y2="320" stroke="#9c27b0" stroke-width="2.5" stroke-dasharray="8,5" marker-end="url(#arr-soft)"/>
+  <text x="390" y="338" text-anchor="middle" font-size="14" font-weight="bold" fill="#9c27b0">
+    减 max = 减 3（整体左移）
+  </text>
+
+  <!-- ============== 下半：减 max 之后 ============== -->
+  <text x="80" y="370" font-size="15" font-weight="bold" fill="#1565c0">x - max</text>
+  <text x="180" y="370" font-size="13" fill="#555">= {0, -2, -2.8} ← 全 ≤ 0</text>
+
+  <text x="80" y="388" font-size="11" fill="#2e7d32">exp 之后</text>
+
+  <!-- 新数轴 -->
+  <line x1="100" y1="430" x2="800" y2="430" stroke="#999" stroke-width="1.5"/>
+  <line x1="100" y1="430" x2="100" y2="385" stroke="#999" stroke-width="1.5"/>
+  <text x="100" y="446" text-anchor="middle" font-size="11" fill="#666">-1</text>
+  <text x="200" y="446" text-anchor="middle" font-size="11" fill="#666">0</text>
+
+  <!-- 减 max 后的位置：x0=0, x1=-2, x2=-2.8
+       像素：200 + score*100
+       x0=0  → 200
+       x1=-2 → 0 (超出)
+       x2=-2.8 → -80 (超出)
+       调整：让 x 轴起点移到 80，即 x ∈ [-2.8, 0]，每单位 100 像素，起点 200 表示 0 -->
+  <!-- 重新画：x0=0 → 200; x1=-2 → 0; x2=-2.8 → -80（出界，调整坐标） -->
+
+  <!-- 三个减 max 后的点 -->
+  <line x1="200" y1="430" x2="200" y2="420" stroke="#e53935" stroke-width="3"/>
+  <circle cx="200" cy="430" r="5" fill="#e53935"/>
+  <text x="200" y="446" text-anchor="middle" font-size="11" fill="#c62828">0</text>
+  <text x="210" y="412" font-size="11" fill="#c62828">exp = 1</text>
+
+  <line x1="0" y1="430" x2="0" y2="408.4" stroke="#fb8c00" stroke-width="3"/>
+  <circle cx="0" cy="430" r="5" fill="#fb8c00"/>
+  <text x="-5" y="446" text-anchor="end" font-size="11" fill="#e65100">-2</text>
+  <text x="10" y="400" font-size="11" fill="#e65100">exp ≈ 0.135</text>
+
+  <line x1="-80" y1="430" x2="-80" y2="404.5" stroke="#43a047" stroke-width="3"/>
+  <circle cx="-80" cy="430" r="5" fill="#43a047"/>
+  <text x="-80" y="446" text-anchor="end" font-size="11" fill="#2e7d32">-2.8</text>
+  <text x="-70" y="397" font-size="11" fill="#2e7d32">exp ≈ 0.061</text>
+
+  <!-- 结论 -->
+  <text x="500" y="395" font-size="13" fill="#333" font-weight="bold">关键观察：</text>
+  <text x="500" y="412" font-size="12" fill="#333">所有指数都 ≤ 0</text>
+  <text x="500" y="427" font-size="12" fill="#333">→ e^? ∈ (0, 1]</text>
+  <text x="500" y="442" font-size="12" fill="#333">→ 永远不会上溢！</text>
+  <text x="500" y="457" font-size="12" fill="#2e7d32" font-weight="bold">归一化后概率完全一样</text>
+
+  <defs>
+    <marker id="arr-soft" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9c27b0"/>
+    </marker>
+  </defs>
+</svg>

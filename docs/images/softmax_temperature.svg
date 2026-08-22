@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 380" font-family="sans-serif">
+  <text x="470" y="30" text-anchor="middle" font-size="20" font-weight="bold">
+    温度 T：softmax(x/T) 控制分布的「尖锐程度」
+  </text>
+  <text x="470" y="54" text-anchor="middle" font-size="13" fill="#555">
+    输入固定 x = {3, 1, 0.2}，调 T 改变概率分布形状
+  </text>
+
+  <!-- ============== Panel 1: T=0.5 ============== -->
+  <text x="125" y="92" text-anchor="middle" font-size="16" font-weight="bold" fill="#c62828">T = 0.5</text>
+  <text x="125" y="110" text-anchor="middle" font-size="11" fill="#888">「更尖锐」→ 接近 one-hot</text>
+
+  <line x1="35" y1="135" x2="35" y2="305" stroke="#999" stroke-width="1.2"/>
+  <line x1="35" y1="305" x2="230" y2="305" stroke="#999" stroke-width="1.2"/>
+  <text x="28" y="148" text-anchor="end" font-size="10" fill="#666">1.0</text>
+  <text x="28" y="240" text-anchor="end" font-size="10" fill="#666">0.5</text>
+  <text x="28" y="307" text-anchor="end" font-size="10" fill="#666">0</text>
+
+  <!-- probs: 0.978, 0.018, 0.004 → 高度: 165.6, 3.1, 0.7 -->
+  <rect x="55"  y="139.4" width="40" height="165.6" fill="#bbdefb" stroke="#1e88e5" stroke-width="1.5"/>
+  <text x="75"  y="132" text-anchor="middle" font-size="11" fill="#1565c0" font-weight="bold">0.978</text>
+  <rect x="105" y="301.9" width="40" height="3.1"   fill="#ffcdd2" stroke="#e53935" stroke-width="1.5"/>
+  <text x="125" y="295" text-anchor="middle" font-size="10" fill="#c62828">0.018</text>
+  <rect x="155" y="304.3" width="40" height="0.7"   fill="#fff3e0" stroke="#fb8c00" stroke-width="1.5"/>
+  <text x="175" y="297" text-anchor="middle" font-size="10" fill="#e65100">0.004</text>
+
+  <text x="75"  y="320" text-anchor="middle" font-size="11" fill="#333">cat</text>
+  <text x="125" y="320" text-anchor="middle" font-size="11" fill="#333">dog</text>
+  <text x="175" y="320" text-anchor="middle" font-size="11" fill="#333">fish</text>
+  <text x="125" y="345" text-anchor="middle" font-size="11" fill="#c62828" font-style="italic">
+    T 小 → 自信，强者越强
+  </text>
+
+  <!-- ============== Panel 2: T=1 ============== -->
+  <text x="360" y="92" text-anchor="middle" font-size="16" font-weight="bold" fill="#c62828">T = 1.0（默认）</text>
+  <text x="360" y="110" text-anchor="middle" font-size="11" fill="#888">标准 softmax</text>
+
+  <line x1="270" y1="135" x2="270" y2="305" stroke="#999" stroke-width="1.2"/>
+  <line x1="270" y1="305" x2="465" y2="305" stroke="#999" stroke-width="1.2"/>
+  <text x="263" y="148" text-anchor="end" font-size="10" fill="#666">1.0</text>
+  <text x="263" y="240" text-anchor="end" font-size="10" fill="#666">0.5</text>
+  <text x="263" y="307" text-anchor="end" font-size="10" fill="#666">0</text>
+
+  <!-- probs: 0.836, 0.113, 0.051 → 高度: 142.1, 19.2, 8.7 -->
+  <rect x="290" y="162.9" width="40" height="142.1" fill="#bbdefb" stroke="#1e88e5" stroke-width="1.5"/>
+  <text x="310" y="155" text-anchor="middle" font-size="11" fill="#1565c0" font-weight="bold">0.836</text>
+  <rect x="340" y="285.8" width="40" height="19.2"  fill="#ffcdd2" stroke="#e53935" stroke-width="1.5"/>
+  <text x="360" y="279" text-anchor="middle" font-size="10" fill="#c62828">0.113</text>
+  <rect x="390" y="296.3" width="40" height="8.7"   fill="#fff3e0" stroke="#fb8c00" stroke-width="1.5"/>
+  <text x="410" y="289" text-anchor="middle" font-size="10" fill="#e65100">0.051</text>
+
+  <text x="310" y="320" text-anchor="middle" font-size="11" fill="#333">cat</text>
+  <text x="360" y="320" text-anchor="middle" font-size="11" fill="#333">dog</text>
+  <text x="410" y="320" text-anchor="middle" font-size="11" fill="#333">fish</text>
+  <text x="360" y="345" text-anchor="middle" font-size="11" fill="#555" font-style="italic">
+    训练时常用 T=1
+  </text>
+
+  <!-- ============== Panel 3: T=2 ============== -->
+  <text x="595" y="92" text-anchor="middle" font-size="16" font-weight="bold" fill="#c62828">T = 2.0</text>
+  <text x="595" y="110" text-anchor="middle" font-size="11" fill="#888">「更平缓」</text>
+
+  <line x1="505" y1="135" x2="505" y2="305" stroke="#999" stroke-width="1.2"/>
+  <line x1="505" y1="305" x2="700" y2="305" stroke="#999" stroke-width="1.2"/>
+  <text x="498" y="148" text-anchor="end" font-size="10" fill="#666">1.0</text>
+  <text x="498" y="240" text-anchor="end" font-size="10" fill="#666">0.5</text>
+  <text x="498" y="307" text-anchor="end" font-size="10" fill="#666">0</text>
+
+  <!-- probs: 0.619, 0.228, 0.153 → 高度: 105.2, 38.8, 26.0 -->
+  <rect x="525" y="199.8" width="40" height="105.2" fill="#bbdefb" stroke="#1e88e5" stroke-width="1.5"/>
+  <text x="545" y="192" text-anchor="middle" font-size="11" fill="#1565c0" font-weight="bold">0.619</text>
+  <rect x="575" y="266.2" width="40" height="38.8"  fill="#ffcdd2" stroke="#e53935" stroke-width="1.5"/>
+  <text x="595" y="259" text-anchor="middle" font-size="10" fill="#c62828">0.228</text>
+  <rect x="625" y="279" width="40" height="26"     fill="#fff3e0" stroke="#fb8c00" stroke-width="1.5"/>
+  <text x="645" y="272" text-anchor="middle" font-size="10" fill="#e65100">0.153</text>
+
+  <text x="545" y="320" text-anchor="middle" font-size="11" fill="#333">cat</text>
+  <text x="595" y="320" text-anchor="middle" font-size="11" fill="#333">dog</text>
+  <text x="645" y="320" text-anchor="middle" font-size="11" fill="#333">fish</text>
+  <text x="595" y="345" text-anchor="middle" font-size="11" fill="#555" font-style="italic">
+    蒸馏常用 T > 1
+  </text>
+
+  <!-- ============== Panel 4: T=10 ============== -->
+  <text x="830" y="92" text-anchor="middle" font-size="16" font-weight="bold" fill="#c62828">T = 10</text>
+  <text x="830" y="110" text-anchor="middle" font-size="11" fill="#888">「接近均匀」</text>
+
+  <line x1="740" y1="135" x2="740" y2="305" stroke="#999" stroke-width="1.2"/>
+  <line x1="740" y1="305" x2="935" y2="305" stroke="#999" stroke-width="1.2"/>
+  <text x="733" y="148" text-anchor="end" font-size="10" fill="#666">1.0</text>
+  <text x="733" y="240" text-anchor="end" font-size="10" fill="#666">0.5</text>
+  <text x="733" y="307" text-anchor="end" font-size="10" fill="#666">0</text>
+
+  <!-- probs: 0.388, 0.318, 0.294 → 高度: 65.9, 54.0, 50.0 -->
+  <rect x="760" y="239.1" width="40" height="65.9" fill="#bbdefb" stroke="#1e88e5" stroke-width="1.5"/>
+  <text x="780" y="232" text-anchor="middle" font-size="11" fill="#1565c0" font-weight="bold">0.388</text>
+  <rect x="810" y="251" width="40" height="54"    fill="#ffcdd2" stroke="#e53935" stroke-width="1.5"/>
+  <text x="830" y="244" text-anchor="middle" font-size="10" fill="#c62828">0.318</text>
+  <rect x="860" y="255" width="40" height="50"    fill="#fff3e0" stroke="#fb8c00" stroke-width="1.5"/>
+  <text x="880" y="248" text-anchor="middle" font-size="10" fill="#e65100">0.294</text>
+
+  <text x="780" y="320" text-anchor="middle" font-size="11" fill="#333">cat</text>
+  <text x="830" y="320" text-anchor="middle" font-size="11" fill="#333">dog</text>
+  <text x="880" y="320" text-anchor="middle" font-size="11" fill="#333">fish</text>
+  <text x="830" y="345" text-anchor="middle" font-size="11" fill="#555" font-style="italic">
+    T → ∞ 时 → 均匀分布
+  </text>
+
+  <!-- 底部公式 -->
+  <text x="470" y="370" text-anchor="middle" font-size="14" fill="#333">
+    softmax(x/T)_i = e^(xᵢ/T) / Σⱼ e^(xⱼ/T)   ←  T 越大，指数差距被压平，分布越均匀
+  </text>
+</svg>
