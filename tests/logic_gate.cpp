@@ -122,9 +122,9 @@ auto nand_gate(const Matrix<float> &dataset) -> Matrix<float> {
 //   隐藏层两个神经元分别学 OR 和 NAND，输出层用 AND 组合 ——
 //   隐藏层先把输入非线性地「掰」到可分的位置，多层网络的意义就在这。
 auto xor_gate(const Matrix<float> &dataset) -> Matrix<float> {
-
-    Matrix<float> res;
-    return res;
+    Matrix<float> input1 = or_gate(dataset);
+    Matrix<float> input2 = nand_gate(dataset);
+    return and_gate(input1.hstack(input2));
 }
 
 int main() {
@@ -153,5 +153,11 @@ int main() {
     for (std::size_t i = 0; i < dataset.rows(); ++i)
         std::cout << "NAND(" << dataset(i, 0) << ", " << dataset(i, 1)
                   << ") = " << nand_pred(i, 0) << "\n";
+
+    // XOR
+    const auto xor_pred = xor_gate(dataset);
+    for (std::size_t i = 0; i < dataset.rows(); ++i)
+        std::cout << "XOR(" << dataset(i, 0) << ", " << dataset(i, 1)
+                  << ") = " << xor_pred(i, 0) << "\n";
     return 0;
 }

@@ -27,6 +27,10 @@ mini-mlmath/
 │       │   └── correlation_selector.h # 相关系数法：|r| 低于阈值的列删掉（有监督）
 │       └── ml/                   # 机器学习模型模块
 │           └── perceptron.h      #   感知机：线性二分类器，w·x + b 取符号
+├── docs/                      # 文档：原理讲解 + 配图
+│   ├── perceptron.md          #   感知机原理（结构 / 学习规则 / 收敛定理）
+│   ├── logic_gates.md         #   逻辑门：AND / OR / NAND 权重推导 + XOR 不可分
+│   └── images/                #   配图（手写 SVG，零依赖）
 └── tests/                    # 测试程序，每个模块一个
     ├── CMakeLists.txt        #   每个 *_test.cpp 一个可执行 + 编译优化选项
     ├── matrix_test.cpp       #   矩阵乘法正确性验证 + 三版性能对比
@@ -36,6 +40,11 @@ mini-mlmath/
 ```
 
 头文件引用统一写 `<mini_mlmath/xxx.h>`，`include/` 是头文件搜索根。
+
+## 文档
+
+- [感知机原理](docs/perceptron.md) —— 结构、学习规则、收敛定理、bias folding
+- [逻辑门与决策边界](docs/logic_gates.md) —— AND / OR / NAND 的权重推导（不等式组法）、XOR 为什么线性不可分
 
 ## 三种乘法（越往后越接近真实 BLAS）
 

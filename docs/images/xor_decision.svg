@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 480" font-family="sans-serif">
+  <!-- 标题 -->
+  <text x="230" y="30" text-anchor="middle" font-size="20" font-weight="bold">XOR 门：线性不可分</text>
+  <text x="230" y="52" text-anchor="middle" font-size="13" fill="#666">0 类在对角 ((0,0),(1,1))，1 类在另一对角 —— 一条直线做不到</text>
+
+  <!-- 坐标轴 -->
+  <line x1="60" y1="380" x2="400" y2="380" stroke="#999" stroke-width="1.5"/>
+  <line x1="60" y1="380" x2="60" y2="40" stroke="#999" stroke-width="1.5"/>
+  <text x="60"  y="398" text-anchor="middle" font-size="12" fill="#666">0</text>
+  <text x="160" y="398" text-anchor="middle" font-size="12" fill="#666">0.5</text>
+  <text x="260" y="398" text-anchor="middle" font-size="12" fill="#666">1</text>
+  <text x="360" y="398" text-anchor="middle" font-size="12" fill="#666">1.5</text>
+  <text x="405" y="398" font-size="14" fill="#333" font-style="italic">x₁</text>
+  <text x="50" y="285" text-anchor="end" font-size="12" fill="#666">0.5</text>
+  <text x="50" y="185" text-anchor="end" font-size="12" fill="#666">1</text>
+  <text x="50" y="85"  text-anchor="end" font-size="12" fill="#666">1.5</text>
+  <text x="48" y="48"  font-size="14" fill="#333" font-style="italic">x₂</text>
+
+  <!-- 两条虚线：任意一条直线都只能切开一对对角，另一对必然混在一起 -->
+  <line x1="160" y1="40"  x2="160" y2="380" stroke="#f57c00" stroke-width="2" stroke-dasharray="8,6"/>
+  <text x="168" y="56" font-size="12" fill="#e65100">x₁ = 0.5</text>
+  <line x1="60"  y1="280" x2="400" y2="280" stroke="#f57c00" stroke-width="2" stroke-dasharray="8,6"/>
+  <text x="330" y="272" font-size="12" fill="#e65100">x₂ = 0.5</text>
+
+  <!-- 四个样本点 -->
+  <circle cx="60"  cy="380" r="11" fill="#1e88e5" stroke="#0d47a1" stroke-width="1.5"/>
+  <text x="60"  y="404" text-anchor="middle" font-size="12" fill="#333">(0,0) → 0</text>
+  <circle cx="60"  cy="180" r="11" fill="#e53935" stroke="#b71c1c" stroke-width="1.5"/>
+  <text x="76"  y="175" font-size="12" fill="#333">(0,1) → 1</text>
+  <circle cx="260" cy="380" r="11" fill="#e53935" stroke="#b71c1c" stroke-width="1.5"/>
+  <text x="260" y="404" text-anchor="middle" font-size="12" fill="#333">(1,0) → 1</text>
+  <circle cx="260" cy="180" r="11" fill="#1e88e5" stroke="#0d47a1" stroke-width="1.5"/>
+  <text x="276" y="175" font-size="12" fill="#333">(1,1) → 0</text>
+
+  <!-- 结论 -->
+  <text x="230" y="440" text-anchor="middle" font-size="15" font-weight="bold" fill="#b71c1c">
+    任意一条直线都会把一红一蓝留在同侧 → 感知机（单层）学不会
+  </text>
+</svg>

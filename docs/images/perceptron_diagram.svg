@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 300" font-family="sans-serif">
+  <!-- ============ 感知机结构图：x1,x2,+1 -> w -> Σ -> sign -> ŷ ============ -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#444"/>
+    </marker>
+  </defs>
+
+  <!-- 标题 -->
+  <text x="470" y="28" text-anchor="middle" font-size="20" font-weight="bold">感知机：单个神经元</text>
+
+  <!-- 输入层：x1, x2, bias -->
+  <circle cx="80" cy="70" r="28" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="80" y="76" text-anchor="middle" font-size="19">x₁</text>
+  <circle cx="80" cy="150" r="28" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="80" y="156" text-anchor="middle" font-size="19">x₂</text>
+  <circle cx="80" cy="230" r="28" fill="#fff3e0" stroke="#fb8c00" stroke-width="2"/>
+  <text x="80" y="236" text-anchor="middle" font-size="19">+1</text>
+  <text x="80" y="270" text-anchor="middle" font-size="12" fill="#888">bias 输入（恒为 1）</text>
+
+  <!-- 权重连线（带箭头） -->
+  <line x1="108" y1="70" x2="394" y2="132" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="238" y="82" font-size="16" fill="#1e88e5">w₁</text>
+  <line x1="108" y1="150" x2="392" y2="150" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="238" y="140" font-size="16" fill="#1e88e5">w₂</text>
+  <line x1="108" y1="230" x2="394" y2="168" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="238" y="214" font-size="16" fill="#fb8c00">b</text>
+
+  <!-- 求和节点 Σ -->
+  <circle cx="430" cy="150" r="38" fill="#e8f5e9" stroke="#43a047" stroke-width="2.5"/>
+  <text x="430" y="162" text-anchor="middle" font-size="30">Σ</text>
+  <text x="430" y="218" text-anchor="middle" font-size="14" fill="#555">z = w·x + b</text>
+  <text x="430" y="236" text-anchor="middle" font-size="12" fill="#888">（线性组合 / 加权求和）</text>
+
+  <!-- Σ -> 激活 -->
+  <line x1="468" y1="150" x2="584" y2="150" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 激活函数 -->
+  <rect x="590" y="105" width="150" height="90" rx="10" fill="#fce4ec" stroke="#e91e63" stroke-width="2.5"/>
+  <text x="665" y="148" text-anchor="middle" font-size="19">sign()</text>
+  <text x="665" y="170" text-anchor="middle" font-size="13" fill="#c62828">阶跃激活</text>
+  <text x="665" y="228" text-anchor="middle" font-size="12" fill="#888">把分数压成 ±1</text>
+
+  <!-- 激活 -> 输出 -->
+  <line x1="740" y1="150" x2="784" y2="150" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 输出 -->
+  <circle cx="830" cy="150" r="32" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2.5"/>
+  <text x="830" y="158" text-anchor="middle" font-size="22">ŷ</text>
+  <text x="830" y="206" text-anchor="middle" font-size="12" fill="#888">预测 ∈ {+1, −1}</text>
+</svg>
