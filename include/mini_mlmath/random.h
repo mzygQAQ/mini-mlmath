@@ -7,13 +7,17 @@
 //    - 初始化权重（机器学习里 W ~ N(0, 1) 之类的）
 //
 //  和 numpy 的对应关系：
-//    numpy.random.uniform(low, high, size)  ->  rng.uniform(a, b)
-//    numpy.random.normal(loc, scale, size)  ->  rng.normal(mean, variance)
-//    numpy.random.rand(d0, d1)              ->  rng.uniform_matrix(rows, cols)
-//    numpy.random.randn(d0, d1)             ->  rng.normal_matrix(rows, cols)
+//    numpy.random.uniform(low, high, size)  ->  rng.uniform<T>(a, b)
+//    numpy.random.normal(loc, scale, size)  ->  rng.normal<T>(mean, variance)
+//    numpy.random.rand(d0, d1)              ->  rng.uniform_matrix<T>(rows, cols)
+//    numpy.random.randn(d0, d1)             ->  rng.normal_matrix<T>(rows, cols)
 //    注意：numpy 的 normal 第 2 个参数是标准差 scale（std），而本库直接给
 //    **方差** variance —— 因为方差才是更常用、也更直观的说法
 //    （var = std²，内部实现里会 sqrt 回去）。
+//
+//  标量版是模板：rng.uniform<T>(lo, hi) 的 T 从 lo/hi 实参推导，
+//  返回类型 = T。矩阵版同理。这样 Perceptron<float> / Perceptron<double>
+//  都能直接调用，不用手动 static_cast。
 //
 //  为什么用「类」？
 //    随机数生成是典型的有状态运算：mt19937 引擎要记住上一次的输出才能产生
@@ -46,18 +50,16 @@ public:
     // 重新播种，之后重新生成（可复现实验的标准操作）
     void seed(std::uint64_t s) { engine_.seed(s); }
 
-    // ---- 标量 ----
+    // ---- 标量（模板：T 从实参推导，例 rng.uniform<double>(-1, 1)）----
 
-    // [low, high) 内均匀分布的一个标量（numpy 的 uniform）
-    double uniform(double low = 0.0, double high = 1.0) {
-        return std::uniform_real_distribution<double>(low, high)(engine_);
-    }
+    // [low, high) 内均匀分布的一个标量 T（numpy 的 uniform）
+    template <typename T>
+    T uniform(T low = T(0), T high = T(1));
 
-    // 高斯分布的一个标量：均值 mean、方差 variance
+    // 高斯分布的一个标量 T：均值 mean、方差 variance
     // （内部取 std::sqrt(variance) 转成 normal_distribution 需要的标准差）
-    double normal(double mean = 0.0, double variance = 1.0) {
-        return std::normal_distribution<double>(mean, std::sqrt(variance))(engine_);
-    }
+    template <typename T>
+    T normal(T mean = T(0), T variance = T(1));
 
     // ---- Matrix 生成器（模板，T 从 low/high 或 mean/variance 实参推导）----
 
@@ -99,4 +101,24 @@ Matrix<T> Random::normal_matrix(std::size_t rows, std::size_t cols,
     T* d = m.data();
     for (std::size_t i = 0; i < rows * cols; ++i) d[i] = static_cast<T>(dist(engine_));
     return m;
+}
+
+// ----------------------------------------------------------------------------
+// 标量版实现（同样模板化留在头文件）。两个版本都走「先转 double 给标准库
+// 分布对象，再转回 T」的路线 —— 跟矩阵版完全一致：
+//   1) 标准库的分布对象只支持 float/double，自己实现 float 版本没收益；
+//   2) T=float 时精度损失 1 位（double→float），但 float 权重本来就是这个精度。
+// ----------------------------------------------------------------------------
+template <typename T>
+T Random::uniform(T low, T high) {
+    std::uniform_real_distribution<double> dist(static_cast<double>(low),
+                                                static_cast<double>(high));
+    return static_cast<T>(dist(engine_));
+}
+
+template <typename T>
+T Random::normal(T mean, T variance) {
+    std::normal_distribution<double> dist(static_cast<double>(mean),
+                                          std::sqrt(static_cast<double>(variance)));
+    return static_cast<T>(dist(engine_));
 }

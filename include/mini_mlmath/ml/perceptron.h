@@ -30,7 +30,13 @@
 //    - 数据布局：Matrix<T>，每行 = 一个样本，每列 = 一个特征
 //    - 标签：std::vector<T>，取值 **+1 / -1**（sign 的定义域；
 //      如果你的标签是 0/1，调用前先自行映射成 ±1）
-//    - 权重初始化为全 0（经典做法，sklearn 也默认从 0 开始）
+//    - 权重随机初始化：每个权重 ~ U(-0.5, 0.5)，用成员里的 Random 实例生成
+//      （默认种子 42，可复现；想换种子可改 Random rand_ 字段或外部传 seed）
+//    - 偏置 b 初始化为 0
+//    - 注：经典 Rosenblatt 感知机其实从 0 开始（更新规则 w += lr·y·x 是
+//      加性的，从 0 起步也能让算法收敛）；这里用随机初始化是为了在
+//      Perceptron 演进到 MLP / 深层模型时不需要再改代码 —— 深度学习里
+//      随机初始化是必要的（避免对称性），现在就把 API 摆好。
 //
 //  用法：
 //    Perceptron<double> p(/* learning_rate = */ 1.0, /* max_iter = */ 100);
@@ -51,6 +57,7 @@
 #include <vector>
 
 #include "mini_mlmath/check.h"
+#include "mini_mlmath/random.h"
 #include "mini_mlmath/matrix.h"
 
 template<typename T>
@@ -94,6 +101,7 @@ public:
     bool fitted() const { return fitted_; }
 
 private:
+    Random rand_;
     T learning_rate_ = T(1);    // 学习率
     size_type max_iter_ = 1000; // 最大迭代轮数
     std::vector<T> weights_;    // 权重，fit 后长度 = 特征数 d
@@ -116,9 +124,13 @@ Perceptron<T> &Perceptron<T>::fit(const Matrix<T> &X, const std::vector<T> &y) {
     //  1) 校验：X 至少 1 行 1 列；y.size() == X.rows()（用 CHECK，见 check.h）；
     CHECK(y.size() == X.rows());
 
-    //  2) 初始化：weights_ 清空后填 d 个 0（d = X.cols()），bias_ = 0；
-    bias_ = 0;
-    weights_.resize(X.cols(), T(0));
+    //  2) 初始化：bias_ = 0；weights_ 长度 d = X.cols()，每个元素 ~ U(-0.5, 0.5)
+    //     （用成员里的 Random rand_：默认种子 42，实验可复现）
+    bias_ = T(0);
+    weights_.resize(X.cols());
+    for (size_type j = 0; j < X.cols(); ++j) {
+        weights_[j] = rand_.uniform<T>(T(-0.5), T(0.5));
+    }
 
     //  3) 外层循环 max_iter_ 轮，内层遍历每个样本 i：
     //        score = w·x_i + b
@@ -127,7 +139,7 @@ Perceptron<T> &Perceptron<T>::fit(const Matrix<T> &X, const std::vector<T> &y) {
     //           bias_        += learning_rate_ * y_i
     //     （经典感知机：只在出错时更新，见文件头）
     // TODO(你)：实现感知机训练，建议步骤：
-    for(size_type epoch = 0; epoch < max_iter_; epoch++) {
+    for (size_type epoch = 0; epoch < max_iter_; epoch++) {
 
     }
 
