@@ -189,6 +189,25 @@ public:
         return r;
     }
 
+    // ---- 水平拼接（对应 numpy 的 np.hstack）----
+    // 把 rhs 并到本矩阵右边，要求**行数相等**；结果形状
+    //   (rows, cols + rhs.cols())，左边是本矩阵、右边是 rhs。
+    // 返回新矩阵，不修改入参（eager，同 transposed()）。
+    // 典型用途：MLP 里把隐藏层各神经元的输出拼成一整行样本
+    //   （xor_gate：OR 结果 4×1 拼 NAND 结果 4×1 -> 隐藏层 4×2）。
+    // 注意：列数不同没关系，行数相等是唯一约束。
+    Matrix hstack(const Matrix& rhs) const {
+        CHECK(rows() == rhs.rows()) << "hstack: row counts must match, got "
+                                    << rows() << " vs " << rhs.rows();
+        Matrix r(rows_, cols_ + rhs.cols_);
+        for (size_type i = 0; i < rows_; ++i) {
+            for (size_type j = 0; j < cols_; ++j) r(i, j) = (*this)(i, j);
+            for (size_type j = 0; j < rhs.cols_; ++j)
+                r(i, cols_ + j) = rhs(i, j);
+        }
+        return r;
+    }
+
 private:
     size_type rows_ = 0;
     size_type cols_ = 0;
