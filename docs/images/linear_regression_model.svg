@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 280" font-family="sans-serif">
+  <!-- ============ 线性回归模型结构图：x1,x2,+1 -> w -> Σ -> ŷ（无 sign） ============ -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#444"/>
+    </marker>
+  </defs>
+
+  <!-- 标题 -->
+  <text x="470" y="28" text-anchor="middle" font-size="20" font-weight="bold">线性回归：单输出神经元（无激活）</text>
+
+  <!-- 输入层：x1, x2, bias -->
+  <circle cx="80" cy="60" r="28" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="80" y="66" text-anchor="middle" font-size="19">x₁</text>
+  <circle cx="80" cy="140" r="28" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="80" y="146" text-anchor="middle" font-size="19">x₂</text>
+  <circle cx="80" cy="220" r="28" fill="#fff3e0" stroke="#fb8c00" stroke-width="2"/>
+  <text x="80" y="226" text-anchor="middle" font-size="19">+1</text>
+  <text x="80" y="260" text-anchor="middle" font-size="12" fill="#888">bias 输入（恒为 1）</text>
+
+  <!-- 权重连线（带箭头） -->
+  <line x1="108" y1="60"  x2="394" y2="122" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="238" y="72"  font-size="16" fill="#1e88e5">w₁</text>
+  <line x1="108" y1="140" x2="392" y2="140" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="238" y="130" font-size="16" fill="#1e88e5">w₂</text>
+  <line x1="108" y1="220" x2="394" y2="158" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="238" y="204" font-size="16" fill="#fb8c00">b</text>
+
+  <!-- 求和节点 Σ（重点：没有 sign 激活） -->
+  <circle cx="430" cy="140" r="40" fill="#e8f5e9" stroke="#43a047" stroke-width="2.5"/>
+  <text x="430" y="152" text-anchor="middle" font-size="30">Σ</text>
+  <text x="430" y="208" text-anchor="middle" font-size="14" fill="#555">z = w·x + b</text>
+  <text x="430" y="226" text-anchor="middle" font-size="12" fill="#888">线性组合 / 加权求和</text>
+
+  <!-- Σ -> 输出（无 sign 激活，直接输出连续值） -->
+  <line x1="470" y1="140" x2="600" y2="140" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="535" y="130" text-anchor="middle" font-size="13" fill="#c62828" font-weight="bold">无激活</text>
+  <text x="535" y="160" text-anchor="middle" font-size="12" fill="#888">（直接输出）</text>
+
+  <!-- 输出：连续值 ŷ ∈ R -->
+  <circle cx="650" cy="140" r="38" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2.5"/>
+  <text x="650" y="150" text-anchor="middle" font-size="26">ŷ</text>
+  <text x="650" y="200" text-anchor="middle" font-size="14" fill="#555">预测值（连续）</text>
+  <text x="650" y="218" text-anchor="middle" font-size="12" fill="#888">ŷ ∈ ℝ（不是 ±1）</text>
+
+  <!-- 对照感知机的提示框 -->
+  <rect x="720" y="100" width="200" height="100" rx="8" fill="#fff8e1" stroke="#ffa000" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <text x="820" y="125" text-anchor="middle" font-size="13" font-weight="bold" fill="#e65100">vs 感知机</text>
+  <text x="820" y="148" text-anchor="middle" font-size="12" fill="#555">感知机最后多一步</text>
+  <text x="820" y="166" text-anchor="middle" font-size="12" fill="#555">sign() 把分数压成 ±1</text>
+  <text x="820" y="184" text-anchor="middle" font-size="12" fill="#c62828">线性回归**没有这步**</text>
+</svg>

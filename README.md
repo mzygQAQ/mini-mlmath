@@ -1,7 +1,7 @@
 # mini-mlmath
 
 教学用迷你机器学习数学库：纯手写、零第三方依赖，从矩阵、向量一路写到 softmax、
-激活函数、特征选择、感知机，用来研究「数值计算和机器学习到底是怎么实现的」。
+激活函数、特征选择、感知机、线性回归，用来研究「数值计算和机器学习到底是怎么实现的」。
 
 对比 Eigen / numpy / sklearn 刻意保留三大简化：
 - **无宏**（唯一例外是 `check.h` 里的 `CHECK` 断言——它要拿条件原文和调用点
@@ -19,18 +19,20 @@ mini-mlmath/
 │       ├── matrix.h          #   Matrix<T>：动态大小、行主序 + 三种乘法
 │       ├── vector.h          #   Vector<T>：点积 / 模长 / 余弦相似度
 │       ├── softmax.h         #   数值稳定的 softmax → [讲解](docs/softmax.md)
-│       ├── activation.h      #   激活函数：sigmoid → [讲解](docs/activation.md)
+│       ├── activation.h      #   激活函数：sigmoid + ReLU → [讲解](docs/activation.md)
 │       ├── random.h          #   类似 numpy.random：均匀/正态随机标量与矩阵
 │       ├── check.h           #   glog 风格 CHECK(pred) << "msg" 断言
 │       ├── feature_selection/    # 特征选择模块（有监督/无监督）
 │       │   ├── variance_threshold.h   # 方差法：方差低于阈值的列删掉（无监督）
 │       │   └── correlation_selector.h # 相关系数法：|r| 低于阈值的列删掉（有监督）
 │       └── ml/                   # 机器学习模型模块
-│           └── perceptron.h      #   感知机 → [原理](docs/perceptron.md) / [逻辑门](docs/logic_gates.md)
+│           ├── perceptron.h         #   感知机 → [原理](docs/perceptron.md) / [逻辑门](docs/logic_gates.md)
+│           └── linear_regression.h  #   线性回归 → [原理](docs/linear_regression.md)
 ├── docs/                      # 文档：原理讲解 + 配图
 │   ├── perceptron.md          #   感知机原理（结构 / 学习规则 / 收敛定理）
 │   ├── logic_gates.md         #   逻辑门：AND / OR / NAND 权重推导 + XOR 不可分
-│   ├── activation.md          #   激活函数：sigmoid vs 阶跃、数值稳定性
+│   ├── activation.md          #   激活函数：sigmoid / ReLU vs 阶跃、ReLU 为什么成为现代默认
+│   ├── linear_regression.md   #   线性回归：模型、闭式解 / 梯度下降、R²、bias folding
 │   ├── softmax.md             #   softmax：减 max 数值稳定性、attention 用法、温度
 │   └── images/                #   配图（手写 SVG，零依赖）
 └── tests/                    # 测试程序，每个模块一个
@@ -47,7 +49,8 @@ mini-mlmath/
 
 - [感知机原理](docs/perceptron.md) —— 结构、学习规则、收敛定理、bias folding
 - [逻辑门与决策边界](docs/logic_gates.md) —— AND / OR / NAND 的权重推导（不等式组法）、XOR 为什么线性不可分
-- [激活函数](docs/activation.md) —— sigmoid vs 阶跃、为什么多层必须可导、数值稳定性
+- [激活函数](docs/activation.md) —— sigmoid vs 阶跃、ReLU 为什么成为现代默认、为什么多层必须可导、数值稳定性
+- [线性回归](docs/linear_regression.md) —— 模型、正规方程 / 梯度下降、R²、bias folding、和感知机的对照
 - [Softmax](docs/softmax.md) —— 减 max 救命符、按行归一化（attention 用法）、温度 T、KV cache 简化
 
 ## 三种乘法（越往后越接近真实 BLAS）

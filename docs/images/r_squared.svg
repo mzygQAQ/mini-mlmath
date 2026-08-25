@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 440" font-family="sans-serif">
+  <!-- ============ R² = 1 - SS_res / SS_tot：两条参考线 + 残差几何 ============ -->
+
+  <!-- 标题 + 公式 -->
+  <text x="310" y="28" text-anchor="middle" font-size="18" font-weight="bold">R² 几何：拟合线 vs 均值线</text>
+  <text x="310" y="52" text-anchor="middle" font-size="14" fill="#333" font-style="italic">R² = 1 - SS_res / SS_tot = 1 - Σ(y_i - ŷ_i)² / Σ(y_i - ȳ)²</text>
+
+  <!-- 坐标轴 -->
+  <line x1="80" y1="370" x2="560" y2="370" stroke="#999" stroke-width="1.5"/>
+  <line x1="80" y1="370" x2="80"  y2="80"  stroke="#999" stroke-width="1.5"/>
+
+  <!-- x 轴刻度 -->
+  <text x="80"  y="390" text-anchor="middle" font-size="12" fill="#666">0</text>
+  <text x="200" y="390" text-anchor="middle" font-size="12" fill="#666">1</text>
+  <text x="320" y="390" text-anchor="middle" font-size="12" fill="#666">2</text>
+  <text x="440" y="390" text-anchor="middle" font-size="12" fill="#666">3</text>
+  <text x="560" y="390" text-anchor="middle" font-size="12" fill="#666">4</text>
+  <text x="575" y="390" font-size="14" fill="#333" font-style="italic">x</text>
+
+  <!-- y 轴刻度 -->
+  <text x="70" y="374" text-anchor="end" font-size="12" fill="#666">0</text>
+  <text x="70" y="297" text-anchor="end" font-size="12" fill="#666">2</text>
+  <text x="70" y="220" text-anchor="end" font-size="12" fill="#666">4</text>
+  <text x="70" y="143" text-anchor="end" font-size="12" fill="#666">6</text>
+  <text x="70" y="85"  text-anchor="end" font-size="12" fill="#666">8</text>
+  <text x="50" y="80"  font-size="14" fill="#333" font-style="italic">y</text>
+
+  <!-- 均值线 ŷ = ȳ （y=4.2，水平线） -->
+  <!-- y=4.2 -> 370 - 4.2*46.5 = 370 - 195.3 = 174.7 -->
+  <line x1="80" y1="175" x2="560" y2="175" stroke="#999" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="555" y="170" text-anchor="end" font-size="12" fill="#888" font-style="italic">ŷ = ȳ（只猜均值）</text>
+
+  <!-- 拟合线 ŷ = 1.5x + 1.2 -->
+  <!-- x=0: y=1.2 -> 314.2 ; x=4: y=7.2 -> 35.2 -->
+  <line x1="80" y1="314" x2="560" y2="35" stroke="#1e88e5" stroke-width="3"/>
+  <text x="555" y="55" text-anchor="end" font-size="13" fill="#1e88e5" font-weight="bold">ŷ = w·x + b（拟合线）</text>
+
+  <!-- 数据点 + 双重残差线（每个点：到均值线 = SS_tot，到拟合线 = SS_res） -->
+  <!-- helper: x_px = 80 + x*120, y_px = 370 - y*46.5 -->
+
+  <!-- 点 1: x=0.3, y=2.0  -> px (116, 277) ; 拟合线 y=1.65 px=293; 均值线 px=175 -->
+  <line x1="116" y1="175" x2="116" y2="277" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="116" y1="277" x2="116" y2="293" stroke="#c62828" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <circle cx="116" cy="277" r="5" fill="#1e88e5" stroke="#0d47a1" stroke-width="1"/>
+
+  <!-- 点 2: x=0.6, y=1.4 -> px (152, 305); 拟合 y=2.10 px=272; 均值 px=175 -->
+  <line x1="152" y1="175" x2="152" y2="305" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="152" y1="272" x2="152" y2="305" stroke="#c62828" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <circle cx="152" cy="305" r="5" fill="#1e88e5" stroke="#0d47a1" stroke-width="1"/>
+
+  <!-- 点 3: x=1.0, y=3.5 -> px (200, 207); 拟合 y=2.70 px=244; 均值 px=175 -->
+  <line x1="200" y1="175" x2="200" y2="207" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="200" y1="207" x2="200" y2="244" stroke="#c62828" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <circle cx="200" cy="207" r="5" fill="#1e88e5" stroke="#0d47a1" stroke-width="1"/>
+
+  <!-- 点 4: x=1.5, y=3.0 -> px (260, 230); 拟合 y=3.45 px=210; 均值 px=175 -->
+  <line x1="260" y1="175" x2="260" y2="230" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="260" y1="210" x2="260" y2="230" stroke="#c62828" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <circle cx="260" cy="230" r="5" fill="#1e88e5" stroke="#0d47a1" stroke-width="1"/>
+
+  <!-- 点 5: x=2.0, y=4.8 -> px (320, 147); 拟合 y=4.20 px=175; 均值 px=175 -->
+  <line x1="320" y1="147" x2="320" y2="175" stroke="#999" stroke-width="1" stroke-dasharray="2,2" visibility="hidden"/>
+  <line x1="320" y1="147" x2="320" y2="175" stroke="#c62828" stroke-width="1.5" stroke-dasharray="3,2" visibility="hidden"/>
+  <circle cx="320" cy="147" r="5" fill="#1e88e5" stroke="#0d47a1" stroke-width="1"/>
+
+  <!-- 点 6: x=2.5, y=4.5 -> px (380, 161); 拟合 y=4.95 px=140; 均值 px=175 -->
+  <line x1="380" y1="161" x2="380" y2="175" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="380" y1="140" x2="380" y2="161" stroke="#c62828" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <circle cx="380" cy="161" r="5" fill="#1e88e5" stroke="#0d47a1" stroke-width="1"/>
+
+  <!-- 点 7: x=3.2, y=6.5 -> px (464, 68); 拟合 y=6.00 px=91; 均值 px=175 -->
+  <line x1="464" y1="68" x2="464" y2="175" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="464" y1="68" x2="464" y2="91" stroke="#c62828" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <circle cx="464" cy="68" r="5" fill="#1e88e5" stroke="#0d47a1" stroke-width="1"/>
+
+  <!-- 点 8: x=3.8, y=6.4 -> px (536, 73); 拟合 y=6.90 px=49; 均值 px=175 -->
+  <line x1="536" y1="73" x2="536" y2="175" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="536" y1="49" x2="536" y2="73" stroke="#c62828" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <circle cx="536" cy="73" r="5" fill="#1e88e5" stroke="#0d47a1" stroke-width="1"/>
+
+  <!-- 图例 -->
+  <rect x="380" y="395" width="220" height="42" rx="6" fill="#fafafa" stroke="#bbb" stroke-width="1"/>
+  <circle cx="395" cy="412" r="4" fill="#1e88e5" stroke="#0d47a1" stroke-width="1"/>
+  <text x="406" y="416" font-size="12" fill="#333">数据点</text>
+  <line x1="450" y1="412" x2="468" y2="412" stroke="#c62828" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="473" y="416" font-size="12" fill="#333">SS_res（到拟合线）</text>
+  <line x1="318" y1="429" x2="336" y2="429" stroke="#999" stroke-width="1" stroke-dasharray="2,2"/>
+  <text x="340" y="433" font-size="12" fill="#333">SS_tot（到均值线）</text>
+</svg>
