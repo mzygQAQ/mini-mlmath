@@ -91,7 +91,7 @@ class LinearRegression {
 
 public:
     using value_type = T;
-    using size_type  = std::size_t;
+    using size_type = std::size_t;
 
     // ---- 构造 ----
     // 始终学偏置 b（bias folding 并入权重一起解）；无参数。
@@ -118,14 +118,14 @@ public:
     // ---- 查询（命名和 Perceptron 统一：weights / bias）----
     // fit 之前调用行为未定义（看 fitted() 自己判）。
     std::vector<T> weights() const { return weights_; }     // 长度 d
-    T             bias()    const { return bias_; }         // 标量
+    T bias() const { return bias_; }         // 标量
 
     bool fitted() const { return fitted_; }                  // 是否已 fit
 
 private:
-    std::vector<T>  weights_;          // 权重 w，fit 后长度 = d
-    T               bias_ = T(0);      // 偏置 b
-    bool            fitted_ = false;   // 是否已 fit 过
+    std::vector<T> weights_;          // 权重 w，fit 后长度 = d
+    T bias_ = T(0);      // 偏置 b
+    bool fitted_ = false;   // 是否已 fit 过
 };
 
 // ============================================================================
@@ -142,13 +142,13 @@ LinearRegression<T> &LinearRegression<T>::fit(const Matrix<T> &X,
                                               const std::vector<T> &y) {
     // ---- 1) 参数校验（用 check.h 的 CHECK，习惯和 Perceptron 一致） ----
     CHECK(y.size() == X.rows())
-            << "LinearRegression::fit: y.size() (" << y.size()
-            << ") must equal X.rows() (" << X.rows() << ")";
+        << "LinearRegression::fit: y.size() (" << y.size()
+        << ") must equal X.rows() (" << X.rows() << ")";
     CHECK(X.cols() >= 1) << "LinearRegression::fit: need at least 1 feature column";
     CHECK(X.rows() >= static_cast<size_type>(X.cols() + 1))
-            << "LinearRegression::fit: n_samples (" << X.rows()
-            << ") must be >= n_features + 1 (for intercept) to solve the "
-            << "normal equation (otherwise X^T X is singular)";
+        << "LinearRegression::fit: n_samples (" << X.rows()
+        << ") must be >= n_features + 1 (for intercept) to solve the "
+        << "normal equation (otherwise X^T X is singular)";
 
     // ---- 2) 准备设计矩阵 X_design：永远在 X 右边拼一列 1（bias folding）----
     // 把偏置 b 并入权重一起解，最后一位 = b。这样：
@@ -198,17 +198,23 @@ std::vector<T> LinearRegression<T>::predict(const Matrix<T> &X) const {
     // ---- 校验：必须先 fit；列数必须等于训练时的特征数 d ----
     CHECK(fitted_) << "LinearRegression::predict: must call fit() before predict()";
     CHECK(X.cols() == weights_.size())
-            << "LinearRegression::predict: feature count mismatch, got "
-            << X.cols() << " cols but trained on " << weights_.size();
+        << "LinearRegression::predict: feature count mismatch, got "
+        << X.cols() << " cols but trained on " << weights_.size();
 
-    // ---- 推理 ----
-    //   TODO —— 核心推理代码留给你写：
-    //     思路：算 ŷ = X · weights_ + bias_  （逐元素加偏置）
-    //     想省一次循环可继续用 bias folding：把 weights_ 末尾补上 bias_
-    //     得到 (d+1) 维 w_aug，给 X 拼一列 1 后一次矩阵乘得到 ŷ 的列向量，
-    //     再把 n×1 拉平成 std::vector<T> 返回。
-    //   实现完把下面这行替换掉：
-    std::vector<T> result(X.rows(), T(0));  // TODO: 替换为真正的预测
+    // 思路：算 ŷ = X · weights_ + bias_  （逐元素加偏置）
+    // 想省一次循环可继续用 bias folding：把 weights_ 末尾补上 bias_
+    // 得到 (d+1) 维 w_aug，给 X 拼一列 1 后一次矩阵乘得到 ŷ 的列向量，
+    // 再把 n×1 拉平成 std::vector<T> 返回。
+    std::vector<T> weights = weights_;
+    weights.push_back(bias_);
+    Matrix<T> w_aug = Matrix<T>::from_row(weights);
+    Matrix<T> features = X.with_ones_column();
+
+    std::vector<T> result(X.rows(), T(0));
+    Matrix<T> result_mat = features * w_aug.transposed();
+    for (auto row = 0; row < result_mat.rows(); row++) {
+        result[row] = result_mat(row, 0);
+    }
     return result;
 }
 
@@ -224,6 +230,7 @@ T LinearRegression<T>::score(const Matrix<T> &X, const std::vector<T> &y) const 
     //   表示「完美拟合常数」也行 —— 这是个值得思考的设计点）。
     //
     //   实现完把下面这行替换掉：
-    (void)X; (void)y;  // TODO: 删掉这一行
+    (void) X;
+    (void) y;  // TODO: 删掉这一行
     return T(0);       // TODO: 替换为真正的 R²
 }
