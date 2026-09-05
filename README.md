@@ -28,12 +28,14 @@ mini-mlmath/
 │       │   └── correlation_selector.h # 相关系数法：|r| 低于阈值的列删掉（有监督）
 │       └── ml/                   # 机器学习模型模块
 │           ├── perceptron.h         #   感知机 → [原理](docs/perceptron.md) / [逻辑门](docs/logic_gates.md)
-│           └── linear_regression.h  #   线性回归 → [原理](docs/linear_regression.md)
+│           ├── linear_regression.h  #   线性回归 → [原理](docs/linear_regression.md)
+│           └── knn.h               #   K 近邻 → [原理](docs/knn.md)
 ├── docs/                      # 文档：原理讲解 + 配图
 │   ├── perceptron.md          #   感知机原理（结构 / 学习规则 / 收敛定理）
 │   ├── logic_gates.md         #   逻辑门：AND / OR / NAND 权重推导 + XOR 不可分
 │   ├── activation.md          #   激活函数：sigmoid / ReLU vs 阶跃、ReLU 为什么成为现代默认
 │   ├── linear_regression.md   #   线性回归：模型、闭式解 / 梯度下降、R²、bias folding
+│   ├── knn.md                 #   KNN：常见 metric、搜索策略（暴力/KDTree/BallTree）
 │   ├── softmax.md             #   softmax：减 max 数值稳定性、attention 用法、温度
 │   └── images/                #   配图（手写 SVG，零依赖）
 └── tests/                    # 测试程序，每个模块一个
@@ -41,6 +43,7 @@ mini-mlmath/
     ├── matrix_test.cpp       #   矩阵乘法正确性验证 + 三版性能对比
     ├── softmax_test.cpp      #   softmax 数值稳定性 / 归一化验证 → [讲解](docs/softmax.md)
     ├── vector_test.cpp       #   点积 / 模长 / 余弦相似度验证
+    ├── knn_test.cpp          #   KNN：多数投票 + metric / strategy 扩展点
     └── logic_gate.cpp        #   感知机学逻辑门 → [讲解](docs/logic_gates.md) / [原理](docs/perceptron.md)
 ```
 
@@ -52,6 +55,7 @@ mini-mlmath/
 - [逻辑门与决策边界](docs/logic_gates.md) —— AND / OR / NAND 的权重推导（不等式组法）、XOR 为什么线性不可分
 - [激活函数](docs/activation.md) —— sigmoid vs 阶跃、ReLU 为什么成为现代默认、为什么多层必须可导、数值稳定性
 - [线性回归](docs/linear_regression.md) —— 模型、正规方程 / 梯度下降、R²、bias folding、和感知机的对照
+- [KNN](docs/knn.md) —— 常见 metric（L1/L2/L∞/余弦/汉明…）、搜索策略（暴力/KDTree/BallTree）、k 与投票
 - [Softmax](docs/softmax.md) —— 减 max 救命符、按行归一化（attention 用法）、温度 T、KV cache 简化
 
 ## 三种乘法（越往后越接近真实 BLAS）
