@@ -22,6 +22,14 @@
 #include "mini_mlmath/ml/knn.h"
 #include "mini_mlmath/matrix.h"
 
+// 内置度量在 detail::distance、策略在 detail::search（见 knn.h 头注释）。
+// using 只是缩短前缀 —— 想验证限定名写法的话，直接把下面注释掉再改用
+// KNN<..., detail::distance::ManhattanDistance> 这种全限定名即可。
+using detail::distance::EuclideanDistance;
+using detail::distance::ManhattanDistance;
+using detail::distance::ChebyshevDistance;
+using detail::search::KDTreeSearch;
+
 // ----------------------------------------------------------------------------
 // 用「3 簇清晰可分」的数据：标签用字符串，顺带验证 Label 模板参数是泛型的
 // 簇 A：围绕 (1,1)，标签 "A"；簇 B：围绕 (5,5)，标签 "B"；簇 C：围绕 (9,1)

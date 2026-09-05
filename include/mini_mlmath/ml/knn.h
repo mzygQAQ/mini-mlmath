@@ -19,20 +19,25 @@
 //        ② 近邻搜索策略 strategy（BruteForce，预留 KDTree 位置）
 //
 //  两个扩展点是怎么设计的（请带着这个视角读代码）：
-//    A. Metric（度量）：写成「函数对象 functor」。
+//    A. Metric（度量）：写成「函数对象 functor」，全部放在
+//       namespace detail::distance 下（detail = 实现细节，本库只有 KNN 用）。
 //       一个 metric 就是一个定义了 operator() 的结构体，签名统一为
 //            T operator()(const T* a, const T* b, size_t dim) const
 //       传入两个点的内存首地址和维数，返回一个「越小越近」的距离标量。
 //       好处：调换度量只改 KNN 的一个模板实参，不用动任何计算代码；要自定义
-//       距离（比如「只看第 0 维」），照抄这个签名写个结构体塞进去即可。
-//    B. Strategy（搜索策略）：编译期策略模板。
-//       KNN 把「找 k 个最近邻居」这件脏活外包给一个独立类，默认是 BruteForce
-//       （全量线性扫描，见 knn.h 里 BruteForce 类的头注释）。所有策略类必须
-//       暴露同一组方法（build / query / sample_count / feature_count，见下），
+//       距离（比如「只看第 0 维」），照抄这个签名写个结构体塞进去即可
+//       （自定义 functor 放你自己的命名空间就行，不必进 detail::distance）。
+//    B. Strategy（搜索策略）：编译期策略模板，放在
+//       namespace detail::search 下（同是实现细节）。
+//       KNN 把「找 k 个最近邻居」这件脏活外包给一个独立类，默认是
+//       detail::search::BruteForce（全量线性扫描，见 knn.h 里 BruteForce 类的
+//       头注释）。所有策略类必须暴露同一组方法
+//       （build / query / sample_count / feature_count，见下），
 //       KNN 只通过这组接口调它，完全不知道内部是「全量扫」还是「KDTree 剪枝」。
-//       本文件已用 KDTreeSearch 骨架占好位：接口和 BruteForce 一字不差，方法体
-//       暂时 throw「not implemented」（见文件里的 3b 节）。将来做 KDTree 时把
-//       build 换成建树、query 换成剪枝搜索即可 —— 一个字符都不用动 KNN。
+//       本文件已用 detail::search::KDTreeSearch 骨架占好位：接口和 BruteForce
+//       一字不差，方法体暂时 throw「not implemented」（见文件里的 3b 节）。
+//       将来做 KDTree 时把 build 换成建树、query 换成剪枝搜索即可 —— 一个字符
+//       都不用动 KNN。
 //
 //  数学定义（多数投票）：
 //    给定训练集 {x_1..x_n}、标签 {y_1..y_n}、正整数 k、距离度量 d(·,·)。
@@ -67,10 +72,12 @@
 //    auto nbrs = knn.kneighbors(X_test);            // 想看最近邻居长啥样时
 //
 //  换度量 / 换策略（本文件两个扩展点的用法示范）：
-//    KNN<int, float, ManhattanDistance>  knn_l1(5);      // L1 曼哈顿距离
-//    KNN<int, float, ChebyshevDistance>  knn_linf(5);    // L∞ 切比雪夫距离
-//    KNN<int, float, EuclideanDistance,
-//        KDTreeSearch>                    knn_fast(5);   // 切 KDTree：当前是 throw 骨架
+//    内置度量都在 detail::distance，内置策略在 detail::search，例：
+//    KNN<int, float, detail::distance::ManhattanDistance>  knn_l1(5);
+//    KNN<int, float, detail::distance::ChebyshevDistance>  knn_linf(5);
+//    KNN<int, float, detail::distance::EuclideanDistance,
+//        detail::search::KDTreeSearch>            knn_fast(5); // 当前是 throw 骨架
+//    嫌前缀长可以在自己代码里 using detail::distance::ManhattanDistance;
 //    自定义度量：struct MyMetric { template<typename T>
 //        T operator()(const T* a, const T* b, size_t d) const { ... } };
 //    然后 KNN<int, float, MyMetric> 即可。
@@ -80,8 +87,8 @@
 //  留给你扩展的（不影响当前可用，标在注释里）：
 //    - distance 权重投票（weights='distance'）
 //    - 回归模式 KNeighborsRegressor（取 k 近邻标签的均值而非投票）
-//    - KDTreeSearch：接口骨架已在文件里占位（见 3b），把 build / query 从
-//      throw 换成建树 + 剪枝搜索即可；BallTreeSearch 同理照抄接口。
+//    - detail::search::KDTreeSearch：接口骨架已在文件里占位（见 3b），把
+//      build / query 从 throw 换成建树 + 剪枝搜索即可；BallTreeSearch 同理照抄接口。
 // ============================================================================
 #pragma once
 
@@ -106,7 +113,8 @@ struct NeighborHit {
 };
 
 // 邻居排序规则：先比距离（小 = 近），距离相同再比行号（保证确定性）。
-// BruteForce::query 里用它把邻居按「距离近 → 远」排好交给 KNN 投票。
+// detail::search::BruteForce::query 里用它把邻居按「距离近 → 远」排好交给
+// KNN 投票。放在全局：它是查询结果 NeighborHit 的配套比较器，不属于某个算法。
 template <typename T>
 struct NeighborHitLess {
     bool operator()(const NeighborHit<T>& a, const NeighborHit<T>& b) const {
@@ -123,9 +131,13 @@ struct NeighborHitLess {
 //  a / b 是两个样本的首地址（可直接指向 Matrix 行：X.data() + i*X.cols()），
 //  dim 是维数。返回值越小表示两个点越「近」。
 //
+//  全部放在 namespace detail::distance 下（detail = 实现细节，仅供 KNN 使用）。
 //  本文件预置三个最常用度量，更多度量（余弦距离、Mahalanobis、自定义）只需
 //  照抄这个签名新增一个 struct 即可 —— 三个预置品本身就是模板示范。
+//  自定义 functor 放你自己的命名空间即可，不必进 detail::distance。
 // ============================================================================
+namespace detail {
+namespace distance {
 
 // L2 欧氏距离（默认）：sqrt( Σ_i (a_i - b_i)² )
 // 几何意义是「直线距离」，最直观、默认选它。注意内部先累加平方、最后才开方，
@@ -171,6 +183,9 @@ struct ChebyshevDistance {
     }
 };
 
+}   // namespace distance
+}   // namespace detail
+
 // ============================================================================
 //  3. 近邻搜索策略（Strategy）—— 扩展点 B，编译期策略模板
 //
@@ -187,7 +202,12 @@ struct ChebyshevDistance {
 //  本文件先实现最朴素的 BruteForce：不建任何索引，query 时把 p 和全部 n 个
 //  训练样本逐一算距离，再挑出最小的 k 个 —— 保证正确、零代码量。
 //  将来 KDTreeSearch 满足同一组签名就能无缝替换（见文件头「扩展点 B」）。
+//
+//  全部放在 namespace detail::search 下（detail = 实现细节，仅供 KNN 使用）。
 // ============================================================================
+namespace detail {
+namespace search {
+
 template <typename T, typename Metric>
 class BruteForce {
 public:
@@ -292,6 +312,9 @@ private:
     Metric metric_{};   // 距离度量实例（实现剪枝时算边界盒距离要用，先留着）
 };
 
+}   // namespace search
+}   // namespace detail
+
 // ============================================================================
 //  4. KNN 分类器本体
 //
@@ -301,12 +324,16 @@ private:
 //    Metric   距离度量 functor 类型，默认欧氏（扩展点 A）
 //    Search   近邻搜索策略类模板，默认暴力扫描（扩展点 B，可选 KDTreeSearch）
 //
+//  默认 Metric / Search 引用的是 detail 命名空间里的实现（KNN 是这两个
+//  detail 类型的唯一使用者）；想换度量/策略时按文件头注释的用法，把模板实参
+//  换成 detail::distance::xxx / detail::search::xxx 或你自己的类型即可。
+//
 //  用法见文件头注释。
 // ============================================================================
 template <typename Label = int,
           typename T = float,
-          typename Metric = EuclideanDistance,
-          template <typename, typename> class Search = BruteForce>
+          typename Metric = detail::distance::EuclideanDistance,
+          template <typename, typename> class Search = detail::search::BruteForce>
 class KNN {
     static_assert(std::is_floating_point_v<T>,
                   "KNN<T> requires floating-point feature type T "
