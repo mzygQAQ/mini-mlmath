@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 520" font-family="sans-serif">
+  <!-- ============ 曼哈顿 vs 欧氏：同一对点 A→B 的三条路 ============ -->
+  <!-- 网格从 0..5 各 6 条线；cell = 70px。原点画布坐标：px = 130 + k*70，py = 470 - k*70 -->
+  <!-- 网格 k = 0..5：px:130,200,270,340,410,480 ；py:470,400,330,260,190,120 -->
+  <!-- A=(1,1) → (200,400)；B=(4,4) → (410,190) -->
+  <!-- 曼哈顿 = |Δx₁|+|Δx₂| = 6（210px 横 + 210px 竖）；欧氏 = √(3²+3²) ≈ 4.24 -->
+
+  <text x="470" y="36" text-anchor="middle" font-size="20" font-weight="bold">
+    同一对点 (1,1)→(4,4)：曼哈顿只能走「棋盘格路」，欧氏直接走直线
+  </text>
+
+  <!-- 网格线（x=0..5 竖线、y=0..5 横线） -->
+  <g stroke="#e4e7eb" stroke-width="1">
+    <line x1="130" y1="120" x2="130" y2="470"/>
+    <line x1="200" y1="120" x2="200" y2="470"/>
+    <line x1="270" y1="120" x2="270" y2="470"/>
+    <line x1="340" y1="120" x2="340" y2="470"/>
+    <line x1="410" y1="120" x2="410" y2="470"/>
+    <line x1="480" y1="120" x2="480" y2="470"/>
+    <line x1="130" y1="120" x2="480" y2="120"/>
+    <line x1="130" y1="190" x2="480" y2="190"/>
+    <line x1="130" y1="260" x2="480" y2="260"/>
+    <line x1="130" y1="330" x2="480" y2="330"/>
+    <line x1="130" y1="400" x2="480" y2="400"/>
+    <line x1="130" y1="470" x2="480" y2="470"/>
+  </g>
+
+  <!-- 坐标轴（加粗 x/y 轴） -->
+  <line x1="130" y1="470" x2="480" y2="470" stroke="#999" stroke-width="1.6"/>
+  <line x1="130" y1="470" x2="130" y2="120" stroke="#999" stroke-width="1.6"/>
+
+  <!-- x 轴刻度标签 0..5 -->
+  <text x="130" y="490" text-anchor="middle" font-size="12" fill="#666">0</text>
+  <text x="200" y="490" text-anchor="middle" font-size="12" fill="#666">1</text>
+  <text x="270" y="490" text-anchor="middle" font-size="12" fill="#666">2</text>
+  <text x="340" y="490" text-anchor="middle" font-size="12" fill="#666">3</text>
+  <text x="410" y="490" text-anchor="middle" font-size="12" fill="#666">4</text>
+  <text x="480" y="490" text-anchor="middle" font-size="12" fill="#666">5</text>
+  <!-- y 轴刻度标签 0..5（从下往上画在轴左侧） -->
+  <text x="122" y="475" text-anchor="end" font-size="12" fill="#666">0</text>
+  <text x="122" y="405" text-anchor="end" font-size="12" fill="#666">1</text>
+  <text x="122" y="335" text-anchor="end" font-size="12" fill="#666">2</text>
+  <text x="122" y="265" text-anchor="end" font-size="12" fill="#666">3</text>
+  <text x="122" y="195" text-anchor="end" font-size="12" fill="#666">4</text>
+  <text x="122" y="125" text-anchor="end" font-size="12" fill="#666">5</text>
+
+  <!-- 红实线：曼哈顿走法① 先横 3 格再竖 3 格：A(200,400) → (410,400) → (410,190) -->
+  <polyline points="200,400 410,400 410,190"
+            fill="none" stroke="#e53935" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 红虚线：曼哈顿走法② 先竖 3 格再横 3 格：A → (200,190) → (410,190) -->
+  <polyline points="200,400 200,190 410,190"
+            fill="none" stroke="#e53935" stroke-width="3" stroke-dasharray="9,7" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 蓝：欧氏直线 A → B -->
+  <line x1="200" y1="400" x2="410" y2="190" stroke="#1e88e5" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- 起终点 -->
+  <circle cx="200" cy="400" r="8" fill="#1565c0"/>
+  <text x="160" y="432" font-size="15" fill="#333">A = (1,1)</text>
+  <circle cx="410" cy="190" r="8" fill="#1565c0"/>
+  <text x="424" y="172" font-size="15" fill="#333">B = (4,4)</text>
+
+  <!-- 曼哈顿步长标注 -->
+  <text x="305" y="392" text-anchor="middle" font-size="13" fill="#c62828">3 格</text>
+  <text x="428" y="290" text-anchor="middle" font-size="13" fill="#c62828" transform="rotate(90 428 290)">3 格</text>
+
+  <!-- 图例 -->
+  <rect x="530" y="140" width="330" height="210" rx="8" fill="#fafafa" stroke="#ddd"/>
+  <line x1="550" y1="175" x2="600" y2="175" stroke="#e53935" stroke-width="4"/>
+  <text x="612" y="181" font-size="14" fill="#333">曼哈顿距离 = 6（横平竖直，两条路径等长）</text>
+  <line x1="550" y1="220" x2="600" y2="220" stroke="#e53935" stroke-width="3" stroke-dasharray="9,7"/>
+  <text x="612" y="226" font-size="14" fill="#333">走法 ②：先竖再横，同样是 6</text>
+  <line x1="550" y1="265" x2="600" y2="265" stroke="#1e88e5" stroke-width="4"/>
+  <text x="612" y="271" font-size="14" fill="#333">欧氏直线 ≈ 4.24（最短）</text>
+  <text x="550" y="325" font-size="13" fill="#555">曼哈顿只认「格子数」：不能斜穿街区，</text>
+  <text x="550" y="345" font-size="13" fill="#555">所以比直线长 —— 这正是城市街区的走法。</text>
+
+  <!-- 公式 -->
+  <text x="305" y="475" text-anchor="middle" font-size="15" fill="#333">d₁ = |4−1| + |4−1| = 6</text>
+  <text x="305" y="500" text-anchor="middle" font-size="15" fill="#333">d₂ = √(3² + 3²) = √18 ≈ 4.24</text>
+</svg>

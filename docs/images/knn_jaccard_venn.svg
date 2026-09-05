@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 460" font-family="sans-serif">
+  <!-- ============ 杰卡德距离：交并比 ============ -->
+  <!-- A = {猫, 狗, 鱼}（3 个），B = {猫, 鱼, 鸟}（3 个） -->
+  <!-- 两个半透明圆交叠 → 中间区域自然变深 = 交集 A∩B -->
+  <!-- A 圆中心 (350,250) r135，B 圆中心 (590,250) r135 → 交叠带在 x≈470 附近 -->
+
+  <text x="470" y="38" text-anchor="middle" font-size="20" font-weight="bold">
+    杰卡德相似度 = |A ∩ B| / |A ∪ B|：重叠越多越相似
+  </text>
+
+  <!-- 集合圆（先画 A 再画 B，重叠处颜色加深 = 交集） -->
+  <circle cx="350" cy="250" r="135" fill="#42a5f5" fill-opacity="0.30" stroke="#1e88e5" stroke-width="2.5"/>
+  <circle cx="590" cy="250" r="135" fill="#ef6c00" fill-opacity="0.30" stroke="#ef6c00" stroke-width="2.5"/>
+
+  <!-- 集合标签 -->
+  <text x="260" y="110" text-anchor="middle" font-size="15" fill="#0d47a1" font-weight="bold">A</text>
+  <text x="680" y="110" text-anchor="middle" font-size="15" fill="#bf360c" font-weight="bold">B</text>
+
+  <!-- A 独有：狗（圆 A 左端） -->
+  <text x="268" y="255" text-anchor="middle" font-size="17" fill="#0d47a1">狗</text>
+  <!-- B 独有：鸟（圆 B 右端） -->
+  <text x="672" y="255" text-anchor="middle" font-size="17" fill="#bf360c">鸟</text>
+  <!-- 交集：猫、鱼 -->
+  <text x="470" y="235" text-anchor="middle" font-size="17" fill="#4a148c">猫</text>
+  <text x="470" y="260" text-anchor="middle" font-size="17" fill="#4a148c">鱼</text>
+
+  <!-- 计数标注 -->
+  <text x="260" y="150" text-anchor="middle" font-size="13" fill="#555">|A| = 3</text>
+  <text x="680" y="150" text-anchor="middle" font-size="13" fill="#555">|B| = 3</text>
+  <text x="470" y="195" text-anchor="middle" font-size="13" fill="#6a1b9a">A∩B = 2 个</text>
+
+  <!-- 底部说明 -->
+  <text x="470" y="430" text-anchor="middle" font-size="16" fill="#333">
+    Jaccard = |A∩B| / |A∪B| = 2 / (3 + 3 − 2) = 2/4 = 0.5   →   杰卡德距离 = 1 − 0.5 = 0.5
+  </text>
+  <text x="470" y="452" text-anchor="middle" font-size="13" fill="#999">
+    分子是「两个集合都有的」，分母是「加起来总共有多少」——重叠占比越高越相似
+  </text>
+</svg>

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 530" font-family="sans-serif">
+  <!-- ============ 余弦相似度：只看方向，不看长度 ============ -->
+  <!-- 左：长度差 ~2 倍但方向相同（θ=0）→ cos = 1 -->
+  <!-- 右：夹角 25° vs 85° → cos = cos(60°) = 0.5 -->
+
+  <text x="470" y="34" text-anchor="middle" font-size="20" font-weight="bold">
+    余弦相似度：只看方向夹角 θ，不看向量长度
+  </text>
+
+  <!-- 分隔线 -->
+  <line x1="470" y1="66" x2="470" y2="360" stroke="#ddd" stroke-width="1.5"/>
+
+  <!-- ============ 左半：同方向、不同长度 ============ -->
+  <g>
+    <circle cx="235" cy="250" r="90" fill="none" stroke="#cfd8dc" stroke-width="1.5" stroke-dasharray="5,5"/>
+    <line x1="60"  y1="250" x2="420" y2="250" stroke="#bbb" stroke-width="1"/>
+    <line x1="235" y1="70"  x2="235" y2="420" stroke="#bbb" stroke-width="1"/>
+
+    <!-- 方向 40°，单位向量 u：端=(235+90cos40, 250−90sin40)=(303.9,192.2) -->
+    <line x1="235" y1="250" x2="304" y2="192" stroke="#1e88e5" stroke-width="4"/>
+    <circle cx="304" cy="192" r="5" fill="#1e88e5"/>
+    <text x="310" y="176" font-size="13" fill="#1565c0">u（在圆上）</text>
+
+    <!-- 2.1u 端=(235+2.1*68.9, 250−2.1*57.8)=(379.8,128.6) -->
+    <line x1="235" y1="250" x2="380" y2="129" stroke="#e53935" stroke-width="4"/>
+    <circle cx="380" cy="129" r="5" fill="#e53935"/>
+    <text x="332" y="112" font-size="13" fill="#c62828">2.1·u</text>
+
+    <text x="235" y="458" text-anchor="middle" font-size="15" fill="#333">方向相同：θ = 0°，cos = 1</text>
+    <text x="235" y="482" text-anchor="middle" font-size="13" fill="#888">长度差再多倍，余弦都不变 ——</text>
+    <text x="235" y="501" text-anchor="middle" font-size="13" fill="#888">它只看方向，不看长短</text>
+  </g>
+
+  <!-- ============ 右半：夹角 60° ============ -->
+  <g>
+    <circle cx="705" cy="250" r="120" fill="none" stroke="#cfd8dc" stroke-width="1.5" stroke-dasharray="5,5"/>
+    <line x1="535" y1="250" x2="875" y2="250" stroke="#bbb" stroke-width="1"/>
+    <line x1="705" y1="80"  x2="705" y2="420" stroke="#bbb" stroke-width="1"/>
+
+    <!-- a：角 25°：端=(705+120cos25, 250−120sin25)=(813.8,199.3) -->
+    <line x1="705" y1="250" x2="814" y2="199" stroke="#1e88e5" stroke-width="4"/>
+    <text x="818" y="188" font-size="14" fill="#1565c0">a</text>
+
+    <!-- b：角 85°：端=(705+120cos85, 250−120sin85)=(715.5,130.5) -->
+    <line x1="705" y1="250" x2="716" y2="131" stroke="#e53935" stroke-width="4"/>
+    <text x="700" y="116" font-size="14" fill="#c62828">b</text>
+
+    <!-- 弧 θ∈[25°,85°] 半径 55，采样每 5° -->
+    <polyline points="754.8,226.8 752.6,222.5 750.0,218.4 747.1,214.6 743.9,211.1 740.4,207.9 736.6,205.0 732.5,202.4 728.2,200.2 723.8,198.3 719.2,196.9 714.6,195.8 709.8,195.2"
+              fill="none" stroke="#7b1fa2" stroke-width="2.5"/>
+    <!-- θ 标注放弧外侧 -->
+    <text x="750" y="178" text-anchor="middle" font-size="14" fill="#7b1fa2">θ = 60°</text>
+  </g>
+
+  <!-- 右半底部说明 -->
+  <text x="705" y="458" text-anchor="middle" font-size="15" fill="#333">cos(60°) = 0.5</text>
+  <text x="705" y="482" text-anchor="middle" font-size="13" fill="#888">夹角越大 cos 越小 → 余弦距离 1−cos 越大</text>
+
+  <!-- ============ cos 对照条 ============ -->
+  <g>
+    <rect x="60" y="378" width="820" height="2" fill="#eceff1"/>
+    <rect x="60" y="376" width="2" height="6" fill="#90a4ae"/>
+    <rect x="440" y="376" width="2" height="6" fill="#90a4ae"/>
+    <rect x="560" y="376" width="2" height="6" fill="#90a4ae"/>
+    <rect x="880" y="376" width="2" height="6" fill="#90a4ae"/>
+    <text x="60"  y="370" text-anchor="middle" font-size="13" fill="#333">cos 大（近）</text>
+    <text x="880" y="370" text-anchor="middle" font-size="13" fill="#333">cos 小（远）</text>
+    <text x="120" y="355" font-size="13" fill="#555">0° → 1</text>
+    <text x="300" y="355" font-size="13" fill="#555">60° → 0.5</text>
+    <text x="500" y="355" font-size="13" fill="#555">90° → 0</text>
+    <text x="790" y="355" font-size="13" fill="#555">180° → −1</text>
+  </g>
+</svg>

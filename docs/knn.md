@@ -25,7 +25,7 @@ predict(q)                        // 查询点 q，做三件事
   3. 多数投票    ŷ = N_k(q) 里出现次数最多的标签
 ```
 
-第 1、2 步外包给「搜索策略」（本库的 `BruteForce` / `KDTreeSearch`），第 3 步是 KNN 自己的「投票」。所谓两个扩展点，就是把这两件最容易变的事从算法里拆出去——**换 metric 只改一个模板实参，换搜索策略也只改一个模板实参**（详见 §6 代码对应）。
+第 1、2 步外包给「搜索策略」（本库 `detail::search::BruteForce` / `KDTreeSearch`），第 3 步是 KNN 自己的「投票」。所谓两个扩展点，就是把这两件最容易变的事从算法里拆出去——**换 metric 只改一个模板实参，换搜索策略也只改一个模板实参**（详见 §6 代码对应）。
 
 ## 2. 为什么它是「零训练」算法
 
@@ -67,16 +67,13 @@ p = 2   欧氏距离（L2，默认）   sqrt( Σ_i (a_i - b_i)² )
 p → ∞   切比雪夫距离（L∞）    max_i |a_i - b_i|
 ```
 
-三种几何直觉（d=2 时，「到原点距离 = 1」的点集）：
+三种几何直觉（d=2 时，「到原点距离 = 1」的点集）：L1 是菱形、L2 是圆、L∞ 是正方形，一个比一个「胖」：
 
-```
-L1 曼哈顿（菱形）           L2 欧氏（圆）            L∞ 切比雪夫（正方形）
-     │\                           ╭─╮                     ╭───╮
-     │  \                      ╭──╯   ╰──╮                 │   │
-   ──┼──────                  │    ●    │               ───│ ● │───
-     │  /                      ╰──╮   ╭──╯                 │   │
-     │/                           ╰─╯                     ╰───╯
-```
+![Lp 单位球：同一距离 L1（菱形）⊂ L2（圆）⊂ L∞（正方形）](images/knn_lp_unit_balls.svg)
+
+曼哈顿「只能横平竖直地走」和欧氏「直线最短」的差别，在网格上看得最清楚：
+
+![曼哈顿距离 vs 欧氏距离：红色棋盘格路 = 6，蓝色直线 ≈ 4.24](images/knn_manhattan_vs_euclidean.svg)
 
 - **L2（欧氏）**：两点间直线距离。最直观、默认选它。平方项让**大偏差被放大**——一个维差 10 的贡献是差 1 的 100 倍，对异常值敏感。
 - **L1（曼哈顿）**：只能「沿着坐标轴走」的路程。对每个维的偏差**线性**计费，不如 L2 那么被离群点绑架。特征维度较高、噪声较多时常比 L2 更稳（也常用在 Lasso 正则里）。
@@ -93,7 +90,11 @@ cos(a, b) = a·b / (|a|·|b|)         只看方向，不看长度
 cosine_distance(a, b) = 1 - cos(a, b)   取值 [0, 2]，越小越近
 ```
 
-几何意义：`{1,0}` 和 `{5,0}` 长度差 5 倍，但方向相同、余弦相似度 = 1。这对文档长度不一的 NLP 场景是**优点**（库的 `vector.h` 就实现了 `cosine_similarity`）。但当 KNN 的距离用时注意两点：① 余弦**不满足三角不等式**，严格说不是 metric（一般叫「半度量」/相似度）；② 它天然忽略向量的长度信息，若长度本身有意义（如某些数值特征），用余弦会丢掉它。工程上还有个常见变体**角距离** `arccos(cos(a,b))`，它满足三角不等式，可当 metric 用。
+几何意义：`{1,0}` 和 `{5,0}` 长度差 5 倍，但方向相同、余弦相似度 = 1。这对文档长度不一的 NLP 场景是**优点**（库的 `vector.h` 就实现了 `cosine_similarity`）。
+
+![余弦相似度：左 = 长度差 2 倍但方向相同（cos=1）；右 = 夹角 60°（cos=0.5）](images/knn_cosine_direction.svg)
+
+但当 KNN 的距离用时注意两点：① 余弦**不满足三角不等式**，严格说不是 metric（一般叫「半度量」/相似度）；② 它天然忽略向量的长度信息，若长度本身有意义（如某些数值特征），用余弦会丢掉它。工程上还有个常见变体**角距离** `arccos(cos(a,b))`，它满足三角不等式，可当 metric 用。
 
 **汉明距离**（Hamming，分类/二进制特征）：
 
@@ -102,6 +103,8 @@ hamming(a, b) = 有多少个位置 a_i ≠ b_i
 ```
 
 不比较数值大小，只数「不一样的位置」。典型用在 one-hot 编码、二进制指纹、纠错码上——`{猫,狗}` 和 `{猫,猪}` 的距离是 1（只有第 2 维不同）。
+
+![汉明距离：逐位比较，只有第 5、8 位不同 → 距离 = 2](images/knn_hamming_bits.svg)
 
 **杰卡德距离**（Jaccard，集合相似度）：
 
@@ -112,6 +115,8 @@ jaccard_distance = 1 - jaccard
 
 看「两个集合的重合程度」，常用于稀疏的 0/1 特征（推荐系统、基因数据）。
 
+![杰卡德距离：交集 2 / 并集 4 = 0.5，距离 = 0.5](images/knn_jaccard_venn.svg)
+
 **马氏距离**（Mahalanobis，带协方差统计）：
 
 ```
@@ -119,6 +124,8 @@ d(a, b) = sqrt( (a-b)ᵀ Σ⁻¹ (a-b) )       Σ = 特征协方差矩阵
 ```
 
 普通欧氏假设**每个维同等重要、互不相关**；马氏距离用协方差 Σ 给每个维「加权」，把特征的尺度差异和相关性能都考虑进去。代价是要先估 Σ、且不能直接套 §4 的空间索引（每个查询点要变换一次）。理解它的直觉：**在数据「拥挤/拉长」的方向上，同样欧氏距离其实更近**。
+
+![马氏距离：欧氏把等距画成圆，马氏按数据形状画成椭圆 —— P₁（密集方向）马氏近、P₂（稀疏方向）马氏远](images/knn_mahalanobis_ellipse.svg)
 
 ### 3.4 怎么选 metric——经验法则
 
@@ -169,6 +176,8 @@ query(q)：
      若 边界盒最短距离 > 当前已找到的第 k 近距离 → 整棵子树不可能有更近的，整块跳过
 ```
 
+![KDTree 剪枝：空间被切成轴对齐盒子，查询点只搜附近几格，其余整块跳过](images/knn_kdtree_pruning.svg)
+
 **为什么能跳过？** 靠的是「当前最远邻居距离」这个阈值（search radius）不断收缩。只要某子树的包围盒离 q 比阈值还远，盒子里任何点都不可能进前 k，直接放弃。数据分布越「聚集」（低维点云），下钻越深、剪枝越狠，查询越接近 O(log n)；反之退化。
 
 **局限**（两条都要记住）：
@@ -202,9 +211,11 @@ sklearn 的 `algorithm='auto'` 就是自动套这条规则：**样本太少直�
 
 ### 4.5 本库的现状与策略接口
 
-`knn.h` 把搜索策略抽成一个「邻居索引」概念，任何策略类只需实现四个方法，KNN 就能用：
+`knn.h` 把搜索策略抽成一个「邻居索引」概念，任何策略类只需实现四个方法，KNN 就能用。内置策略放在 `namespace detail::search` 下；你自己写的新策略也放进 `detail::search`（或用全限定名引用它）：
 
 ```cpp
+namespace detail { namespace search {
+
 template <typename T, typename Metric>
 class SomeSearch {
 public:
@@ -213,12 +224,17 @@ public:
     std::size_t sample_count() const;                   // 训练样本数 n
     std::size_t feature_count() const;                  // 特征维数 d
 };
+
+}}  // namespace detail::search
 ```
 
-- **`BruteForce`：已完整实现**（默认）。build = 存一份 X；query = 全量算距离 + `partial_sort` 挑前 k。
-- **`KDTreeSearch`：骨架占位**。接口一字不差，`build` / `query` 目前抛 `std::logic_error("not implemented")`——占位就该在 fit 时立刻失败，而不是拖到 predict 才炸。实现它的步骤就照 §4.2：建树时把点按维排序递归切分、query 用「到边界盒距离」剪枝。写完把 KNN 模板实参换掉即生效：
+- **`detail::search::BruteForce`：已完整实现**（默认）。build = 存一份 X；query = 全量算距离 + `partial_sort` 挑前 k。
+- **`detail::search::KDTreeSearch`：骨架占位**。接口一字不差，`build` / `query` 目前抛 `std::logic_error("not implemented")`——占位就该在 fit 时立刻失败，而不是拖到 predict 才炸。实现它的步骤就照 §4.2：建树时把点按维排序递归切分、query 用「到边界盒距离」剪枝。写完把 KNN 模板实参换掉即生效：
 
 ```cpp
+// 内置度量在 detail::distance、内置策略在 detail::search
+using detail::distance::EuclideanDistance;      // 嫌前缀长可以这样缩短
+using detail::search::KDTreeSearch;
 KNN<int, float, EuclideanDistance, KDTreeSearch> knn_fast(5);  // fit 目前会抛，实现后即用
 ```
 
@@ -250,6 +266,9 @@ auto pred = knn.predict(X_test);          // 每行一个多数投票结果
 double acc = knn.score(X_test, y_test);   // 分类准确率
 
 // 2) 换 metric（扩展点 A）—— 只改第三个模板实参
+//    内置度量在 detail::distance 下；用 using 缩短前缀或写全限定名
+using detail::distance::ManhattanDistance;
+using detail::distance::ChebyshevDistance;
 KNN<int, float, ManhattanDistance> knn_l1(5);     // 抗噪声用 L1
 KNN<int, float, ChebyshevDistance> knn_linf(5);   // 看最大偏差用 L∞
 
@@ -275,7 +294,7 @@ struct MyDistance {                                    // 自定义 metric
 KNN<int, float, MyDistance> knn(3);                    // 直接换入
 ```
 
-库里三个 Lp 距离（`EuclideanDistance` / `ManhattanDistance` / `ChebyshevDistance`）本身就是这个签名的示范；§3.3 的余弦 / 汉明 / 马氏想用，照抄这个结构体加进 `knn.h` 即可。**注意签名里只传指针和维数**——这正是为了能直接指向 `Matrix` 某一行（`X.data() + i*X.cols()`），不加容器依赖。
+库里三个 Lp 距离（都在 `detail::distance`：`EuclideanDistance` / `ManhattanDistance` / `ChebyshevDistance`）本身就是这个签名的示范；§3.3 的余弦 / 汉明 / 马氏想用，照抄这个结构体加进 `knn.h` 的 `detail::distance` 即可。**注意签名里只传指针和维数**——这正是为了能直接指向 `Matrix` 某一行（`X.data() + i*X.cols()`），不加容器依赖。
 
 ## 7. 局限与扩展
 
@@ -288,7 +307,7 @@ KNN<int, float, MyDistance> knn(3);                    // 直接换入
 **扩展路线**：
 - **distance 加权投票**（`weights='distance'`）：补 uniform 的盲区，sklearn 有、本库留作作业。
 - **KNeighborsRegressor**：不投票、取 k 近邻标签的**均值**，KNN 就从分类变回归（懒学习的回归版）。
-- **KDTreeSearch / BallTreeSearch**：接口已占好位（§4.5），填实现即获得 sub-linear 查询。
+- **`detail::search::KDTreeSearch` / `detail::search::BallTreeSearch`（后者的骨架没占位，照抄接口即可）**：填实现即获得 sub-linear 查询。
 - **近似最近邻（ANN）**：工业级超大库用 HNSW / IVF / LSH 等，牺牲一点精确率换百万级召回——那是另一个话题（和 KDTree 同属「邻居索引」族）。
 
 ## 8. 延伸阅读

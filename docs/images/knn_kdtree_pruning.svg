@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 470" font-family="sans-serif">
+  <!-- ============ KDTree 查询剪枝：边界盒思想 ============ -->
+  <!-- 一个 2D 空间被 x/y 交替切成轴对齐的盒子；查询点 q 沿树往下走，
+       只搜 q 所在的盒子附近，用「q 到盒子距离」剪掉远处整片区域 -->
+
+  <text x="470" y="34" text-anchor="middle" font-size="20" font-weight="bold">
+    KDTree：查询点只搜「附近几格」，用边界盒距离剪掉整片远区域
+  </text>
+
+  <!-- 画布坐标系：区域 60..880 x 90..420，用绝对像素 -->
+  <!-- 切分线（x=330 竖切 / y=255 横切 / x=470 竖切 / y=170 横切 …） -->
+
+  <!-- 背景大盒子 -->
+  <rect x="60" y="80" width="820" height="350" fill="#fafbfc" stroke="#b0bec5" stroke-width="2"/>
+
+  <!-- 第一刀 x=330（竖）：整空间分左右 -->
+  <line x1="330" y1="80" x2="330" y2="430" stroke="#455a64" stroke-width="3"/>
+  <!-- 第二刀：左盒 y=255（横） -->
+  <line x1="60"  y1="255" x2="330" y2="255" stroke="#455a64" stroke-width="2.5"/>
+  <!-- 第二刀：右盒 y=170（横） -->
+  <line x1="330" y1="170" x2="880" y2="170" stroke="#455a64" stroke-width="2.5"/>
+  <!-- 第三刀：左下 y 盒再竖切 x=190；右下 x 盒再竖切 x=560 -->
+  <line x1="190" y1="80"  x2="190" y2="255" stroke="#78909c" stroke-width="2"/>
+  <line x1="560" y1="80"  x2="560" y2="170" stroke="#78909c" stroke-width="2"/>
+  <line x1="700" y1="170" x2="700" y2="430" stroke="#78909c" stroke-width="2"/>
+
+  <!-- 训练点（深灰小点）散布在各盒子里 -->
+  <g fill="#546e7a">
+    <circle cx="120" cy="140" r="5"/>
+    <circle cx="240" cy="190" r="5"/>
+    <circle cx="150" cy="220" r="5"/>
+    <circle cx="280" cy="290" r="5"/>
+    <circle cx="150" cy="330" r="5"/>
+    <circle cx="240" cy="400" r="5"/>
+    <circle cx="420" cy="120" r="5"/>
+    <circle cx="490" cy="210" r="5"/>
+    <circle cx="680" cy="250" r="5"/>
+    <circle cx="600" cy="350" r="5"/>
+    <circle cx="760" cy="330" r="5"/>
+    <circle cx="820" cy="210" r="5"/>
+  </g>
+
+  <!-- 查询点 q（红色） -->
+  <circle cx="470" cy="300" r="8" fill="#e53935"/>
+  <text x="486" y="292" font-size="15" fill="#c62828">q（要预测的点）</text>
+
+  <!-- 高亮 q 真正需要搜索的盒子 + 当前第 k 近的距离圈 -->
+  <rect x="330" y="255" width="370" height="175" fill="none" stroke="#e53935" stroke-width="2.5" stroke-dasharray="6,5"/>
+  <circle cx="470" cy="300" r="60" fill="#e53935" fill-opacity="0.10"/>
+  <circle cx="470" cy="300" r="60" fill="none" stroke="#e53935" stroke-width="2"/>
+
+  <!-- 被剪掉的区域标记：打叉 -->
+  <text x="120" y="120" font-size="16" fill="#9e9e9e">✗ 跳过</text>
+  <text x="620" y="100" font-size="16" fill="#9e9e9e">✗ 跳过</text>
+  <text x="750" y="400" font-size="16" fill="#9e9e9e">✗ 跳过</text>
+
+  <!-- 文字箭头说明 -->
+  <text x="120" y="170" font-size="13" fill="#455a64">这些盒子离 q 太远：</text>
+  <text x="120" y="187" font-size="13" fill="#455a64">盒子最靠近 q 的边都比当前</text>
+  <text x="120" y="204" font-size="13" fill="#455a64">第 k 近邻居还远 → 整块剪掉</text>
+
+  <!-- 底部说明 -->
+  <text x="470" y="462" text-anchor="middle" font-size="14" fill="#333">
+    只需下钻到 q 所在的那一串盒子，沿途用「到未访问盒子边界的距离 ≥ 当前第 k 近」剪枝 —— 平均从 O(n) 降到 O(log n)
+  </text>
+</svg>
