@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" font-family="sans-serif">
+  <!-- ============ 变化量连乘：每段是一个放大倍数 ============ -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e88e5"/>
+    </marker>
+  </defs>
+
+  <text x="360" y="28" text-anchor="middle" font-size="20" font-weight="bold">为什么是相乘：每段都是一个"放大倍数"</text>
+
+  <!-- 链条 -->
+  <rect x="40"  y="90" width="90" height="60" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="85" y="125" text-anchor="middle" font-size="17" font-weight="bold">Δx</text>
+
+  <rect x="280" y="90" width="90" height="60" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="325" y="125" text-anchor="middle" font-size="17" font-weight="bold">Δu</text>
+
+  <rect x="520" y="90" width="90" height="60" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="565" y="125" text-anchor="middle" font-size="17" font-weight="bold">Δy</text>
+
+  <!-- 倍数箭头 -->
+  <line x1="130" y1="120" x2="278" y2="120" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="204" y="108" text-anchor="middle" font-size="14" fill="#2e7d32">×a</text>
+  <text x="204" y="152" text-anchor="middle" font-size="12" fill="#888">Δu = a·Δx</text>
+
+  <line x1="370" y1="120" x2="518" y2="120" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="444" y="108" text-anchor="middle" font-size="14" fill="#2e7d32">×b</text>
+  <text x="444" y="152" text-anchor="middle" font-size="12" fill="#888">Δy = b·Δu</text>
+
+  <!-- 连乘结论 -->
+  <text x="360" y="208" text-anchor="middle" font-size="15" fill="#333">Δy = b·Δu = b·(a·Δx) = (b·a)·Δx</text>
+  <rect x="120" y="228" width="480" height="52" rx="10" fill="#fff8e1" stroke="#fb8c00" stroke-width="2"/>
+  <text x="360" y="254" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">总放大倍数 = 两段倍数连乘：a × b</text>
+  <text x="360" y="272" text-anchor="middle" font-size="12" fill="#888">和"厘米→米→千米"的单位换算完全一样</text>
+</svg>

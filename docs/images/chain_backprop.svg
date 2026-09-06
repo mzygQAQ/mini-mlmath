@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 340" font-family="sans-serif">
+  <!-- ============ 反向传播：从后往前，每段乘一个局部导数 ============ -->
+  <defs>
+    <marker id="arrowF" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e88e5"/>
+    </marker>
+    <marker id="arrowR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e53935"/>
+    </marker>
+  </defs>
+
+  <text x="460" y="28" text-anchor="middle" font-size="20" font-weight="bold">反向传播：从后往前，把局部导数一段段乘起来</text>
+  <text x="460" y="50" text-anchor="middle" font-size="14" fill="#666">每个节点只算一次，梯度从 loss 一路传回所有参数 —— 这就是 autograd 的 backward()</text>
+
+  <!-- 前向链（值，蓝） -->
+  <rect x="30"  y="80" width="80" height="60" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="70" y="115" text-anchor="middle" font-size="17" font-weight="bold">x</text>
+
+  <rect x="220" y="80" width="90" height="60" rx="8" fill="#e8f5e9" stroke="#43a047" stroke-width="2"/>
+  <text x="265" y="109" text-anchor="middle" font-size="15" font-weight="bold">算子</text>
+  <text x="265" y="128" text-anchor="middle" font-size="11" fill="#2e7d32">局部导数 A</text>
+
+  <rect x="420" y="80" width="80" height="60" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="460" y="115" text-anchor="middle" font-size="17" font-weight="bold">y₁</text>
+
+  <rect x="610" y="80" width="90" height="60" rx="8" fill="#e8f5e9" stroke="#43a047" stroke-width="2"/>
+  <text x="655" y="109" text-anchor="middle" font-size="15" font-weight="bold">算子</text>
+  <text x="655" y="128" text-anchor="middle" font-size="11" fill="#2e7d32">局部导数 B</text>
+
+  <rect x="810" y="80" width="80" height="60" rx="8" fill="#fce4ec" stroke="#e53935" stroke-width="2"/>
+  <text x="850" y="115" text-anchor="middle" font-size="17" font-weight="bold">loss</text>
+
+  <!-- 前向箭头 -->
+  <line x1="110" y1="110" x2="218" y2="110" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="310" y1="110" x2="418" y2="110" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="500" y1="110" x2="608" y2="110" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="700" y1="110" x2="808" y2="110" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+
+  <!-- 反向（红），从后往前 -->
+  <line x1="810" y1="170" x2="702" y2="170" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="750" y="162" font-size="13" fill="#c62828">g=1</text>
+
+  <line x1="610" y1="170" x2="502" y2="170" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="545" y="162" font-size="13" fill="#c62828">1×B</text>
+
+  <line x1="420" y1="170" x2="312" y2="170" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="355" y="162" font-size="13" fill="#c62828">×B·A</text>
+
+  <line x1="220" y1="170" x2="112" y2="170" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="145" y="162" font-size="13" fill="#c62828">×B·A·...</text>
+
+  <!-- 结果标注 -->
+  <text x="460" y="212" text-anchor="middle" font-size="14" fill="#333">每走一段：新梯度 = 上游梯度 × 局部导数</text>
+  <text x="460" y="238" text-anchor="middle" font-size="14" fill="#333">走到参数 w 时，它拿到的是「从 loss 一路连乘」的总梯度</text>
+
+  <rect x="120" y="258" width="680" height="56" rx="10" fill="#fff8e1" stroke="#fb8c00" stroke-width="2"/>
+  <text x="460" y="282" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">∂loss/∂w = 局部导数A × 局部导数B × ...（一路连乘）</text>
+  <text x="460" y="304" text-anchor="middle" font-size="12" fill="#888">这就是链式法则在多层网络上的样子；autograd 负责自动执行它</text>
+</svg>

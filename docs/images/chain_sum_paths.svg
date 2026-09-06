@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 330" font-family="sans-serif">
+  <!-- ============ 路径相加法则：fan-out 的数学基础 ============ -->
+  <defs>
+    <marker id="arrowF" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e88e5"/>
+    </marker>
+    <marker id="arrowR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e53935"/>
+    </marker>
+  </defs>
+
+  <text x="350" y="28" text-anchor="middle" font-size="20" font-weight="bold">路径相加：一个量被多处使用</text>
+  <text x="350" y="50" text-anchor="middle" font-size="14" fill="#666">∂loss/∂w = 路径1的梯度 + 路径2的梯度（每条路径用链式法则）</text>
+
+  <!-- w（橙） -->
+  <rect x="30" y="130" width="100" height="70" rx="8" fill="#fff3e0" stroke="#fb8c00" stroke-width="2.5"/>
+  <text x="80" y="165" text-anchor="middle" font-size="18" font-weight="bold">w</text>
+  <text x="80" y="188" text-anchor="middle" font-size="11" fill="#888">参数</text>
+
+  <!-- 中间 y1 / y2（蓝） -->
+  <rect x="300" y="55" width="120" height="60" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="360" y="90" text-anchor="middle" font-size="16" font-weight="bold">y₁</text>
+
+  <rect x="300" y="215" width="120" height="60" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="360" y="250" text-anchor="middle" font-size="16" font-weight="bold">y₂</text>
+
+  <!-- loss -->
+  <rect x="560" y="130" width="100" height="70" rx="8" fill="#fce4ec" stroke="#e53935" stroke-width="2"/>
+  <text x="610" y="165" text-anchor="middle" font-size="18" font-weight="bold">loss</text>
+
+  <!-- 正向前向（蓝） -->
+  <line x1="130" y1="150" x2="298" y2="85"  stroke="#1e88e5" stroke-width="2" marker-end="url(#arrowF)"/>
+  <line x1="130" y1="180" x2="298" y2="240" stroke="#1e88e5" stroke-width="2" marker-end="url(#arrowF)"/>
+  <line x1="420" y1="85"  x2="558" y2="155" stroke="#1e88e5" stroke-width="2" marker-end="url(#arrowF)"/>
+  <line x1="420" y1="240" x2="558" y2="178" stroke="#1e88e5" stroke-width="2" marker-end="url(#arrowF)"/>
+
+  <!-- 反向（红）梯度 -->
+  <line x1="560" y1="205" x2="422" y2="100" stroke="#e53935" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="470" y="100" font-size="13" fill="#c62828">∂loss/∂y₁</text>
+
+  <line x1="560" y1="222" x2="422" y2="250" stroke="#e53935" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="470" y="285" font-size="13" fill="#c62828">∂loss/∂y₂</text>
+
+  <line x1="300" y1="80"  x2="132" y2="165" stroke="#e53935" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="205" y="75" font-size="13" fill="#c62828">∂y₁/∂w</text>
+
+  <line x1="300" y1="255" x2="132" y2="195" stroke="#e53935" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="205" y="292" font-size="13" fill="#c62828">∂y₂/∂w</text>
+
+  <!-- w 结果 -->
+  <text x="80" y="250" text-anchor="middle" font-size="14" font-weight="bold" fill="#c62828">
+    ∂loss/∂w = ∂loss/∂y₁·∂y₁/∂w + ∂loss/∂y₂·∂y₂/∂w
+  </text>
+  <text x="80" y="272" text-anchor="middle" font-size="12" fill="#888">两条路径贡献相加（这就是 autograd 里 += 的原因）</text>
+</svg>

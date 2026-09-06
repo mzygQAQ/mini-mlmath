@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 360" font-family="sans-serif">
+  <!-- ============ 导数 = 曲线某点的切线斜率 ============ -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#999"/>
+    </marker>
+  </defs>
+
+  <text x="260" y="28" text-anchor="middle" font-size="20" font-weight="bold">导数 = 曲线在某点的陡峭程度（切线斜率）</text>
+
+  <!-- 坐标轴 -->
+  <line x1="60" y1="260" x2="460" y2="260" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="60" y1="260" x2="60" y2="40"  stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="448" y="278" font-size="14" fill="#333" font-style="italic">x</text>
+  <text x="48"  y="52"  font-size="14" fill="#333" font-style="italic">y</text>
+
+  <!-- 上凸抛物线 y = x² 采样 -->
+  <polyline points="60,60 100,132 140,188 180,228 220,252 260,260 300,252 340,228 380,188 420,132 460,60"
+            fill="none" stroke="#1e88e5" stroke-width="3"/>
+  <text x="420" y="110" font-size="14" fill="#1e88e5">y = x²</text>
+
+  <!-- 切点（右侧上升支） -->
+  <circle cx="340" cy="228" r="6" fill="#e53935"/>
+  <text x="352" y="220" font-size="13" fill="#c62828">切点</text>
+
+  <!-- 切线 -->
+  <line x1="260" y1="292" x2="420" y2="164" stroke="#e53935" stroke-width="2.5"/>
+  <text x="300" y="315" font-size="13" fill="#c62828">切线（局部最像直线的那条）</text>
+
+  <!-- rise/run 三角形 -->
+  <line x1="300" y1="260" x2="380" y2="260" stroke="#fb8c00" stroke-width="2"/>
+  <line x1="380" y1="260" x2="380" y2="196" stroke="#fb8c00" stroke-width="2"/>
+  <text x="338" y="278" text-anchor="middle" font-size="13" fill="#fb8c00">Δx</text>
+  <text x="388" y="232" font-size="13" fill="#fb8c00">Δy</text>
+
+  <!-- 结论 -->
+  <text x="260" y="130" text-anchor="middle" font-size="14" fill="#444">斜率 = Δy / Δx ＝ 切线的陡峭程度</text>
+  <text x="260" y="152" text-anchor="middle" font-size="14" fill="#444">记号 dy/dx ＝「y 对 x 的导数」</text>
+  <text x="260" y="340" text-anchor="middle" font-size="13" fill="#777">x 动一点点，y 动多少 —— 就是这一点的导数</text>
+</svg>

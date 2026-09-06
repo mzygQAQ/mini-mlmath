@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" font-family="sans-serif">
+  <!-- ============ 复合函数：x → u → y 两层变换 ============ -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e88e5"/>
+    </marker>
+  </defs>
+
+  <text x="360" y="28" text-anchor="middle" font-size="20" font-weight="bold">复合函数：一座接一座的斜坡</text>
+  <text x="360" y="52" text-anchor="middle" font-size="14" fill="#666">f(x) = (2x + 1)² —— 拆成两步：u = 2x+1，然后 y = u²</text>
+
+  <!-- 输入 x（蓝） -->
+  <rect x="30" y="95" width="110" height="70" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="85" y="125" text-anchor="middle" font-size="18" font-weight="bold">x</text>
+  <text x="85" y="150" text-anchor="middle" font-size="12" fill="#555">输入</text>
+
+  <!-- 第一步：u = 2x+1（绿） -->
+  <rect x="250" y="80" width="160" height="100" rx="10" fill="#e8f5e9" stroke="#43a047" stroke-width="2.5"/>
+  <text x="330" y="118" text-anchor="middle" font-size="16" font-weight="bold">第一步</text>
+  <text x="330" y="144" text-anchor="middle" font-size="15" fill="#2e7d32">u = 2x + 1</text>
+  <text x="330" y="166" text-anchor="middle" font-size="11" fill="#888">中间量（中转站）</text>
+
+  <!-- 第二步：y = u²（绿） -->
+  <rect x="500" y="80" width="170" height="100" rx="10" fill="#e8f5e9" stroke="#43a047" stroke-width="2.5"/>
+  <text x="585" y="118" text-anchor="middle" font-size="16" font-weight="bold">第二步</text>
+  <text x="585" y="144" text-anchor="middle" font-size="15" fill="#2e7d32">y = u²</text>
+  <text x="585" y="166" text-anchor="middle" font-size="11" fill="#888">输出</text>
+
+  <!-- 箭头 -->
+  <line x1="140" y1="130" x2="248" y2="130" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="410" y1="130" x2="498" y2="130" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- 值流标注（x=1 例子） -->
+  <text x="194" y="120" text-anchor="middle" font-size="13" fill="#1e88e5">x=1</text>
+  <text x="454" y="120" text-anchor="middle" font-size="13" fill="#1e88e5">u=3</text>
+
+  <!-- 问题标注 -->
+  <text x="360" y="220" text-anchor="middle" font-size="14" fill="#c62828">问题：x 动一点，y 动多少？</text>
+  <text x="360" y="244" text-anchor="middle" font-size="13" fill="#777">中间隔着 u —— 不能直接看 x 和 y，必须经过 u 换算</text>
+</svg>
