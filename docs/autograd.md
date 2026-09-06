@@ -50,6 +50,13 @@
 
 `autograd.h` 里就是这么干的：`y = a * b` 时，`y` 的 `Impl::grad_fn` 指向一个 `MulNode`，节点里存着 `a`、`b` 两个句柄。
 
+![Tensor / Impl / GradNode 的关系：谁拥有谁，决定会不会泄漏](images/autograd_structure.svg)
+
+这张图把三个结构的关系画全了，重点看两处：
+
+1. **两个 Tensor 句柄可以指向同一个 Impl**（`b = a` 就是共享内核）——这就是"句柄语义"。
+2. **Impl 与 GradNode 之间是"单向拥有"**：`Impl.grad_fn` 用 `shared_ptr` 拥有节点，节点对**输出**只用裸指针（`out_`）、对**输入**用 `shared_ptr`（`inputs_`）。如果 `out_` 也用 `shared_ptr`，就会形成第 9 节说的循环引用泄漏。
+
 ## 3. 先看一个完整的小例子（手算一次反向）
 
 ```
