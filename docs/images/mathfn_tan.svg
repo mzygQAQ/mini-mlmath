@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 320" font-family="sans-serif">
+  <!-- ============ tan x：带垂直渐近线 ============ -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#999"/>
+    </marker>
+    <clipPath id="plot">
+      <rect x="45" y="35" width="440" height="260"/>
+    </clipPath>
+  </defs>
+
+  <text x="260" y="26" text-anchor="middle" font-size="19" font-weight="bold">三角函数：y = tan x（每 π 冲一次无穷）</text>
+
+  <!-- 渐近线 x = ±π/2 -->
+  <line x1="71" y1="40" x2="71" y2="290" stroke="#f9a825" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <text x="64" y="54" font-size="12" fill="#f9a825">x=−π/2</text>
+  <line x1="448" y1="40" x2="448" y2="290" stroke="#f9a825" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <text x="440" y="54" font-size="12" fill="#f9a825">x=π/2</text>
+
+  <!-- 坐标轴（x:±1.9→32/488，y:±4→30/270） -->
+  <line x1="40" y1="150" x2="480" y2="150" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="260" y1="300" x2="260" y2="30" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="468" y="168" font-size="13" fill="#333" font-style="italic">x</text>
+  <text x="248" y="44" font-size="13" fill="#333" font-style="italic">y</text>
+
+  <!-- 刻度 -->
+  <text x="140" y="164" text-anchor="middle" font-size="11" fill="#888">-1</text>
+  <text x="380" y="164" text-anchor="middle" font-size="11" fill="#888">1</text>
+  <text x="252" y="125" font-size="11" fill="#888">1</text>
+  <text x="252" y="185" font-size="11" fill="#888">-1</text>
+  <text x="252" y="65"  font-size="11" fill="#888">3</text>
+
+  <!-- tan x 曲线（clip 到坐标区） -->
+  <g clip-path="url(#plot)">
+    <!-- 中央支 -->
+    <polyline points="104,258 128,209 164,181 200,166 260,150 320,134 356,119 392,91 416,42"
+              fill="none" stroke="#1e88e5" stroke-width="2.5"/>
+    <!-- 左支 -->
+    <polyline points="32,241 44,279 54,330 62,450 68,600"
+              fill="none" stroke="#1e88e5" stroke-width="2.5"/>
+    <!-- 右支 -->
+    <polyline points="452,-300 458,-150 466,-30 476,21 488,59"
+              fill="none" stroke="#1e88e5" stroke-width="2.5"/>
+  </g>
+
+  <!-- 过原点说明 -->
+  <circle cx="260" cy="150" r="4" fill="#333"/>
+
+  <!-- 特性 -->
+  <text x="260" y="235" text-anchor="middle" font-size="13" fill="#444">周期是 π，值域是整个 R（无界）</text>
+  <text x="260" y="257" text-anchor="middle" font-size="13" fill="#444">靠近渐近线 x=±π/2 时冲向 ±∞</text>
+  <text x="260" y="295" text-anchor="middle" font-size="12" fill="#777">ML 里很少用它当激活（无界会爆），但它是理解"垂直渐近线"的经典例子</text>
+</svg>

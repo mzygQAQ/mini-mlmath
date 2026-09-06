@@ -41,6 +41,7 @@ mini-mlmath/
 │   ├── softmax.md             #   softmax：减 max 数值稳定性、attention 用法、温度
 │   ├── autograd.md            #   自动求导：反向图 + 梯度怎么算出来
 │   ├── chain_rule.md          #   链式法则：零基础入门（反向传播的地基）
+│   ├── math_functions.md      #   常见数学函数与图像（幂/指数/对数/三角 + 导数速查）
 │   └── images/                #   配图（手写 SVG，零依赖）
 ├── tests/                    # 测试程序，每个模块一个
     ├── CMakeLists.txt        #   每个 *_test.cpp 一个可执行 + 编译优化选项
@@ -66,6 +67,7 @@ mini-mlmath/
 - [Softmax](docs/softmax.md) —— 减 max 救命符、按行归一化（attention 用法）、温度 T、KV cache 简化
 - [链式法则](docs/chain_rule.md) —— 零基础入门：导数直觉、链式法则、路径相加、反向传播（autograd 的地基）
 - [自动求导](docs/autograd.md) —— Tensor + 反向图，梯度怎么在图上算出来（reverse-mode AD）
+- [常见数学函数与图像](docs/math_functions.md) —— 幂/指数/对数/三角函数图像 + 定义域/值域/导数速查表
 
 ## 三种乘法（越往后越接近真实 BLAS）
 

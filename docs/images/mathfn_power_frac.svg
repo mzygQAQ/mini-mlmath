@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 320" font-family="sans-serif">
+  <!-- ============ 分式幂与倒数：√x、x^(1/3)、1/x ============ -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#999"/>
+    </marker>
+  </defs>
+
+  <text x="260" y="26" text-anchor="middle" font-size="19" font-weight="bold">分式幂与倒数：√x、x^⅓、1/x</text>
+
+  <!-- 渐近线 -->
+  <line x1="260" y1="30" x2="260" y2="295" stroke="#f9a825" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <text x="268" y="44" font-size="12" fill="#f9a825">x=0 渐近线</text>
+
+  <!-- 坐标轴 -->
+  <line x1="40" y1="150" x2="480" y2="150" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="260" y1="300" x2="260" y2="20" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="470" y="168" font-size="13" fill="#333" font-style="italic">x</text>
+  <text x="248" y="34" font-size="13" fill="#333" font-style="italic">y</text>
+  <text x="80"  y="164" text-anchor="middle" font-size="11" fill="#888">-2</text>
+  <text x="440" y="164" text-anchor="middle" font-size="11" fill="#888">2</text>
+  <text x="252" y="105" font-size="11" fill="#888">1</text>
+  <text x="252" y="55"  font-size="11" fill="#888">2</text>
+  <text x="252" y="250" font-size="11" fill="#888">-2</text>
+
+  <!-- y = 1/x（绿双曲线） -->
+  <polyline points="32,241 80,175 100,165 130,205 170,200 200,250 215,253 228,293"
+            fill="none" stroke="#43a047" stroke-width="2.5"/>
+  <polyline points="292,7 305,50 320,80 350,100 380,112 410,119 440,125 488,130"
+            fill="none" stroke="#43a047" stroke-width="2.5"/>
+
+  <!-- y = x^(1/3)（蓝 S 形） -->
+  <polyline points="98,211 170,200 230,175 248,175 260,150 272,125 290,125 350,100 422,89"
+            fill="none" stroke="#1e88e5" stroke-width="2.5"/>
+
+  <!-- y = √x（红弧线，x≥0） -->
+  <polyline points="260,150 278,143 296,135 314,129 332,123 350,117 368,112 386,107 404,102 422,99 440,96"
+            fill="none" stroke="#e53935" stroke-width="2.5"/>
+
+  <!-- 图例 -->
+  <text x="40" y="52" font-size="14" fill="#1e88e5">y = x^⅓（全实数）</text>
+  <text x="40" y="74" font-size="14" fill="#e53935">y = √x（只定义在 x≥0）</text>
+  <text x="40" y="96" font-size="14" fill="#43a047">y = 1/x（两支，x≠0）</text>
+  <text x="40" y="126" font-size="12" fill="#888">1/x 逼近两条渐近线（x=0、y=0）</text>
+
+  <!-- 特性 -->
+  <text x="150" y="285" font-size="12" fill="#777">√x 是标准差里的开方；1/x 是"除零"风险的经典来源</text>
+</svg>

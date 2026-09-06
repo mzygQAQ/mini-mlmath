@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 320" font-family="sans-serif">
+  <!-- ============ 幂函数：x、x²、x³ ============ -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#999"/>
+    </marker>
+  </defs>
+
+  <text x="260" y="26" text-anchor="middle" font-size="19" font-weight="bold">幂函数：y = xⁿ（整数幂）</text>
+
+  <!-- 坐标轴（原点 260,150，x:±2→80/440，y:±3→0/300） -->
+  <line x1="40" y1="150" x2="480" y2="150" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="260" y1="300" x2="260" y2="20" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="470" y="168" font-size="13" fill="#333" font-style="italic">x</text>
+  <text x="248" y="34" font-size="13" fill="#333" font-style="italic">y</text>
+
+  <!-- 刻度 -->
+  <text x="80"  y="164" text-anchor="middle" font-size="11" fill="#888">-2</text>
+  <text x="170" y="164" text-anchor="middle" font-size="11" fill="#888">-1</text>
+  <text x="350" y="164" text-anchor="middle" font-size="11" fill="#888">1</text>
+  <text x="440" y="164" text-anchor="middle" font-size="11" fill="#888">2</text>
+  <text x="252" y="105" font-size="11" fill="#888">1</text>
+  <text x="252" y="55"  font-size="11" fill="#888">2</text>
+  <text x="252" y="250" font-size="11" fill="#888">-2</text>
+
+  <!-- y = x（蓝直线） -->
+  <line x1="80" y1="250" x2="440" y2="50" stroke="#1e88e5" stroke-width="2.5"/>
+
+  <!-- y = x²（红抛物线） -->
+  <polyline points="116,22 152,114 188,134 224,146 260,150 296,146 332,134 368,114 404,22"
+            fill="none" stroke="#e53935" stroke-width="2.5"/>
+
+  <!-- y = x³（绿 S 形） -->
+  <polyline points="138,273 179,187 220,155 260,150 300,145 341,113 382,27"
+            fill="none" stroke="#43a047" stroke-width="2.5"/>
+
+  <!-- 交点 (1,1) -->
+  <circle cx="350" cy="100" r="5" fill="#333"/>
+  <text x="362" y="96" font-size="12" fill="#333">(1, 1)</text>
+
+  <!-- 图例 -->
+  <text x="420" y="70" font-size="14" fill="#1e88e5">y = x</text>
+  <text x="420" y="90" font-size="14" fill="#e53935">y = x²</text>
+  <text x="420" y="110" font-size="14" fill="#43a047">y = x³</text>
+  <text x="420" y="138" font-size="12" fill="#888">三条线都过 (1,1)</text>
+
+  <!-- 特性 -->
+  <text x="150" y="280" font-size="12" fill="#777">x² 偶函数（左右对称），x³ 奇函数（中心对称）</text>
+  <text x="150" y="300" font-size="12" fill="#777">n 越大，|x|&gt;1 涨得越猛、|x|&lt;1 贴轴越平</text>
+</svg>

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 320" font-family="sans-serif">
+  <!-- ============ 对数函数族：ln x、log2 x、log10 x ============ -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#999"/>
+    </marker>
+  </defs>
+
+  <text x="260" y="26" text-anchor="middle" font-size="19" font-weight="bold">对数函数：y = logₐ x（只对 x &gt; 0 有定义）</text>
+
+  <!-- 渐近线 x=0 -->
+  <line x1="90" y1="30" x2="90" y2="295" stroke="#f9a825" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <text x="98" y="44" font-size="12" fill="#f9a825">x=0 渐近线</text>
+
+  <!-- 坐标轴（x∈[0.1,4]，y∈[-3,2.5]） -->
+  <line x1="40" y1="150" x2="480" y2="150" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="90" y1="300" x2="90" y2="30" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="468" y="168" font-size="13" fill="#333" font-style="italic">x</text>
+  <text x="78" y="44" font-size="13" fill="#333" font-style="italic">y</text>
+  <text x="171" y="164" text-anchor="middle" font-size="11" fill="#888">1</text>
+  <text x="260" y="164" text-anchor="middle" font-size="11" fill="#888">2</text>
+  <text x="345" y="164" text-anchor="middle" font-size="11" fill="#888">3</text>
+  <text x="430" y="164" text-anchor="middle" font-size="11" fill="#888">4</text>
+  <text x="82" y="105" font-size="11" fill="#888">1</text>
+  <text x="82" y="60"  font-size="11" fill="#888">2</text>
+  <text x="82" y="240" font-size="11" fill="#888">-2</text>
+
+  <!-- y = log10 x（绿） -->
+  <polyline points="98,195 107,181 124,168 141,160 158,154 171,150 227,136 260,136 292,128 345,128 387,123 430,123"
+            fill="none" stroke="#43a047" stroke-width="2.5"/>
+
+  <!-- y = ln x（蓝） -->
+  <polyline points="98,254 107,222 124,191 141,173 158,160 171,150 227,132 260,119 292,109 345,100 387,94 430,88"
+            fill="none" stroke="#1e88e5" stroke-width="2.5"/>
+
+  <!-- y = log2 x（红） -->
+  <polyline points="98,300 107,254 124,210 141,183 158,164 171,150 227,122 260,105 292,95 345,79 387,75 430,60"
+            fill="none" stroke="#e53935" stroke-width="2.5"/>
+
+  <!-- 都过 (1,0) -->
+  <circle cx="171" cy="150" r="6" fill="#333"/>
+  <text x="182" y="142" font-size="13" fill="#333">都过 (1, 0)</text>
+
+  <!-- 图例 -->
+  <text x="330" y="60" font-size="14" fill="#e53935">y = log₂x</text>
+  <text x="330" y="82" font-size="14" fill="#1e88e5">y = ln x</text>
+  <text x="330" y="104" font-size="14" fill="#43a047">y = log₁₀x</text>
+  <text x="330" y="134" font-size="12" fill="#888">形状一样，只差"底"</text>
+
+  <!-- 特性 -->
+  <text x="260" y="310" text-anchor="middle" font-size="12" fill="#777">x 越靠近 0，冲向 −∞ —— 这就是交叉熵里 softmax 输出必须严格 &gt; 0 的原因</text>
+</svg>

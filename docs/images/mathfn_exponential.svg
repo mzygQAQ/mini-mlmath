@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 320" font-family="sans-serif">
+  <!-- ============ 指数函数族：2^x、e^x、(1/2)^x ============ -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#999"/>
+    </marker>
+  </defs>
+
+  <text x="260" y="26" text-anchor="middle" font-size="19" font-weight="bold">指数函数：y = aˣ</text>
+
+  <!-- 坐标轴（原点 260,280，x:±2→80/440，y:8→60） -->
+  <line x1="40" y1="280" x2="480" y2="280" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="260" y1="300" x2="260" y2="30" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="470" y="298" font-size="13" fill="#333" font-style="italic">x</text>
+  <text x="248" y="44" font-size="13" fill="#333" font-style="italic">y</text>
+
+  <!-- 刻度 -->
+  <text x="80"  y="294" text-anchor="middle" font-size="11" fill="#888">-2</text>
+  <text x="170" y="294" text-anchor="middle" font-size="11" fill="#888">-1</text>
+  <text x="350" y="294" text-anchor="middle" font-size="11" fill="#888">1</text>
+  <text x="440" y="294" text-anchor="middle" font-size="11" fill="#888">2</text>
+  <text x="252" y="258" font-size="11" fill="#888">1</text>
+  <text x="252" y="230" font-size="11" fill="#888">2</text>
+  <text x="252" y="175" font-size="11" fill="#888">4</text>
+
+  <!-- 渐近线 y=0（就是 x 轴，淡红提示） -->
+  <text x="120" y="272" font-size="12" fill="#e57373">y → 0 渐近线（永远到不了）</text>
+
+  <!-- y = 2^x（蓝） -->
+  <polyline points="80,273 170,266 260,252 305,248 350,225 395,200 440,170"
+            fill="none" stroke="#1e88e5" stroke-width="2.5"/>
+  <!-- y = e^x（红） -->
+  <polyline points="80,276 125,274 170,270 215,263 260,252 305,235 350,205 395,157 440,77"
+            fill="none" stroke="#e53935" stroke-width="2.5"/>
+  <!-- y = (1/2)^x（绿递减） -->
+  <polyline points="80,170 125,200 170,225 215,248 260,252 305,266 350,266 395,273 440,273"
+            fill="none" stroke="#43a047" stroke-width="2.5"/>
+
+  <!-- 都过 (0,1) -->
+  <circle cx="260" cy="252" r="6" fill="#333"/>
+  <text x="272" y="246" font-size="13" fill="#333">都过 (0, 1)</text>
+
+  <!-- 图例 -->
+  <text x="40" y="52" font-size="14" fill="#1e88e5">y = 2ˣ（增长）</text>
+  <text x="40" y="74" font-size="14" fill="#e53935">y = eˣ（增长，e≈2.718）</text>
+  <text x="40" y="96" font-size="14" fill="#43a047">y = (½)ˣ（衰减）</text>
+  <text x="40" y="126" font-size="12" fill="#888">(½)ˣ = 2⁻ˣ，是 2ˣ 关于 y 轴对称</text>
+
+  <!-- 特性 -->
+  <text x="260" y="315" text-anchor="middle" font-size="12" fill="#777">指数"爆炸"：x 每加 1，函数值乘 a —— softmax/sigmoid 里 eˣ 的溢出源头</text>
+</svg>
