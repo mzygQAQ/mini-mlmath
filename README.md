@@ -1,7 +1,8 @@
 # mini-mlmath
 
 教学用迷你机器学习数学库：纯手写、零第三方依赖，从矩阵、向量一路写到 softmax、
-激活函数、特征选择、感知机、线性回归，用来研究「数值计算和机器学习到底是怎么实现的」。
+激活函数、特征选择、感知机、线性回归、KNN、自动求导，用来研究「数值计算和机器
+学习到底是怎么实现的」。
 
 对比 Eigen / numpy / sklearn 刻意保留三大简化：
 - **无宏**（唯一例外是 `check.h` 里的 `CHECK` 断言——它要拿条件原文和调用点
@@ -41,14 +42,16 @@ mini-mlmath/
 │   ├── autograd.md            #   自动求导：反向图 + 梯度怎么算出来
 │   ├── chain_rule.md          #   链式法则：零基础入门（反向传播的地基）
 │   └── images/                #   配图（手写 SVG，零依赖）
-└── tests/                    # 测试程序，每个模块一个
+├── tests/                    # 测试程序，每个模块一个
     ├── CMakeLists.txt        #   每个 *_test.cpp 一个可执行 + 编译优化选项
     ├── matrix_test.cpp       #   矩阵乘法正确性验证 + 三版性能对比
-    ├── autograd_test.cpp     #   自动求导：手算链式法则 + MLP 数值梯度对拍
     ├── softmax_test.cpp      #   softmax 数值稳定性 / 归一化验证 → [讲解](docs/softmax.md)
     ├── vector_test.cpp       #   点积 / 模长 / 余弦相似度验证
+    ├── random_check.cpp      #   随机数分布抽样 smoke test
+    ├── logic_gate.cpp        #   感知机学逻辑门 → [讲解](docs/logic_gates.md) / [原理](docs/perceptron.md)
+    ├── perceptron_test.cpp   #   端到端测 Perceptron 类
     ├── knn_test.cpp          #   KNN：多数投票 + metric / strategy 扩展点
-    └── logic_gate.cpp        #   感知机学逻辑门 → [讲解](docs/logic_gates.md) / [原理](docs/perceptron.md)
+    └── autograd_test.cpp     #   自动求导：手算链式法则 + MLP 数值梯度对拍
 ```
 
 头文件引用统一写 `<mini_mlmath/xxx.h>`，`include/` 是头文件搜索根。
@@ -81,10 +84,14 @@ mini-mlmath/
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
-./build/tests/matrix_test
-./build/tests/softmax_test
-./build/tests/vector_test
-./build/tests/logic_gate
+./build/tests/matrix_test       # 矩阵乘法：正确性 + 三版性能对比
+./build/tests/softmax_test      # softmax：数值稳定性 + 按行归一化
+./build/tests/vector_test       # 向量：点积 / 模长 / 余弦相似度
+./build/tests/random_check      # 随机数分布抽样 smoke test
+./build/tests/logic_gate        # 感知机学逻辑门（AND/OR 可学，XOR 线性不可分）
+./build/tests/perceptron_test   # 感知机：端到端测试
+./build/tests/knn_test          # KNN：多数投票 + metric / strategy 扩展点
+./build/tests/autograd_test     # 自动求导：手算链式法则 + MLP 数值梯度对拍
 ```
 
 Windows 直接用 VS2022「打开本地文件夹」指向本目录（切 Release、选 x64）。
