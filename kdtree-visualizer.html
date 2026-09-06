@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KD-Tree 交互式可视化</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fafafa;
+    --card: #ffffff;
+    --border: #e7e7ec;
+    --border-strong: #d4d4d8;
+    --text: #18181b;
+    --muted: #71717a;
+    --soft: #a1a1aa;
+    --primary: #6366f1;
+    --primary-2: #4f46e5;
+    --primary-soft: rgba(99, 102, 241, 0.12);
+    --accent: #f59e0b;
+    --accent-2: #b45309;
+    --accent-soft: rgba(245, 158, 11, 0.18);
+    --success: #10b981;
+    --danger: #ef4444;
+    --x-axis: #6366f1;
+    --y-axis: #ec4899;
+    --code-bg: #f4f4f5;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow:    0 2px 6px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Outfit', system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 28px 28px 64px;
+  }
+
+  /* ===== Header ===== */
+  header.page-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .title-block .eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 4px;
+  }
+  .title-block h1 {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+  }
+  .title-block .sub {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 720px;
+  }
+  .header-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--muted);
+    background: white;
+  }
+  .header-pill .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--success);
+  }
+
+  /* ===== Layout ===== */
+  main.layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 440px;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 1080px) {
+    main.layout { grid-template-columns: 1fr; }
+  }
+
+  /* ===== Card ===== */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card + .card { margin-top: 16px; }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(to bottom, rgba(0,0,0,0.01), transparent);
+  }
+  .card-head .title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .card-head .meta {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  /* ===== Toolbar ===== */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 14px;
+    flex-wrap: wrap;
+  }
+  .toolbar .group {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px;
+    background: var(--code-bg);
+    border-radius: 9px;
+  }
+  .toolbar .group button {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .toolbar .group button:hover { color: var(--text); }
+  .toolbar .group button.active {
+    background: white;
+    color: var(--primary);
+    box-shadow: var(--shadow-sm);
+  }
+  .toolbar .btn {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 13px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text);
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .toolbar .btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  .toolbar .btn.primary {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  .toolbar .btn.primary:hover {
+    background: var(--primary-2);
+    border-color: var(--primary-2);
+    color: white;
+  }
+  .toolbar .btn.subtle { background: transparent; border-color: transparent; color: var(--muted); }
+  .toolbar .btn.subtle:hover { color: var(--text); border-color: var(--border); background: white; }
+  .toolbar .divider { width: 1px; height: 22px; background: var(--border); margin: 0 6px; }
+  .toolbar .label { font-size: 12px; color: var(--soft); margin-right: 2px; }
+
+  /* ===== Canvas area ===== */
+  .canvas-wrap {
+    position: relative;
+    padding: 16px 16px 8px;
+  }
+  canvas#viz {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #fcfcfd;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  canvas#viz.search-mode { cursor: cell; }
+  .hint {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(4px);
+    color: var(--muted);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    pointer-events: none;
+    border: 1px dashed var(--border-strong);
+    z-index: 4;
+    transition: opacity 0.2s;
+  }
+  .hint strong { color: var(--primary); font-weight: 600; }
+  .hint.hidden { opacity: 0; }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 10px 4px 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--soft);
+  }
+  .legend .x-line {
+    background: transparent;
+    border-top: 2px dashed var(--x-axis);
+    height: 2px; width: 14px; border-radius: 0;
+  }
+  .legend .y-line {
+    background: transparent;
+    border-top: 2px dashed var(--y-axis);
+    height: 2px; width: 14px; border-radius: 0;
+  }
+  .legend .query-dot { background: var(--accent); box-shadow: 0 0 0 2px white, 0 0 0 3px var(--accent); }
+  .legend .best-dot  { background: var(--success); }
+  .legend .visit-dot { background: var(--primary); }
+  .legend .prune-dot { background: var(--danger); opacity: 0.6; }
+
+  /* ===== Right side cards ===== */
+  .right-stack { display: flex; flex-direction: column; gap: 16px; }
+  @media (max-width: 1080px) { .right-stack { gap: 16px; } }
+
+  #tree-svg {
+    display: block;
+    width: 100%;
+    height: 320px;
+  }
+  .tree-card .card-body { padding: 8px 8px 4px; }
+
+  .code-card .card-body {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .code-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--code-bg);
+  }
+  .code-tabs button {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 9px 12px;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  .code-tabs button.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: white;
+  }
+  pre#code-block {
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    padding: 12px 14px;
+    margin: 0;
+    overflow: auto;
+    background: #fafafa;
+    color: #27272a;
+  }
+  pre#code-block .line {
+    display: block;
+    padding: 0 8px;
+    border-radius: 4px;
+    border-left: 3px solid transparent;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+    white-space: pre;
+  }
+  pre#code-block .line.active {
+    background: var(--accent-soft);
+    border-left-color: var(--accent);
+    color: var(--accent-2);
+    font-weight: 500;
+  }
+  pre#code-block .line.dimmed { opacity: 0.45; }
+  pre#code-block .line .ln {
+    display: inline-block;
+    width: 22px;
+    color: var(--soft);
+    user-select: none;
+    text-align: right;
+    margin-right: 12px;
+  }
+
+  .step-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    background: white;
+    flex-wrap: wrap;
+  }
+  .step-controls button {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .step-controls button:hover:not(:disabled) {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  .step-controls button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .step-controls button.primary {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  .step-controls .step-info {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 4px 0 6px;
+  }
+  .step-controls .step-info b { color: var(--text); font-weight: 600; }
+  .step-controls .speed {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .step-controls input[type="range"] {
+    width: 90px;
+    accent-color: var(--primary);
+  }
+
+  /* ===== Tree node styling (SVG) ===== */
+  .tree-node-bg { transition: all 0.2s ease; }
+  .tree-node-bg.axis-x { fill: var(--x-axis); }
+  .tree-node-bg.axis-y { fill: var(--y-axis); }
+  .tree-node-bg.active { fill: var(--accent); }
+  .tree-node-bg.visited { fill: var(--primary); }
+  .tree-node-bg.pruned { fill: var(--danger); opacity: 0.45; }
+  .tree-node-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 10.5px;
+    fill: white;
+    pointer-events: none;
+    font-weight: 500;
+  }
+  .tree-node-text.dim { fill: var(--soft); }
+  .tree-link { stroke: var(--border-strong); stroke-width: 1.4; fill: none; }
+  .tree-link.active { stroke: var(--accent); stroke-width: 2.4; }
+  .tree-link.pruned { stroke: var(--danger); stroke-dasharray: 3 3; opacity: 0.6; }
+  .tree-depth-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    fill: var(--soft);
+  }
+
+  /* ===== Explanation box (bottom) ===== */
+  .explain {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    background: #fafafa;
+    font-size: 13px;
+    color: var(--text);
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .explain .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    background: var(--primary-soft);
+    color: var(--primary-2);
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+  .explain .text { color: var(--muted); }
+  .explain .text b { color: var(--text); font-weight: 600; }
+  .explain .text code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: white;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="page-head">
+    <div class="title-block">
+      <div class="eyebrow">INTERACTIVE · 空间数据结构</div>
+      <h1>KD-Tree 交互式可视化</h1>
+      <div class="sub">点一点、加一点，看 KD-Tree 怎么递归切分空间、怎么剪枝地找最近邻。左边画布，右边树结构 + 算法步骤同步高亮。</div>
+    </div>
+    <div class="header-pill"><span class="dot"></span><span id="status-text">就绪</span></div>
+  </header>
+
+  <main class="layout">
+
+    <!-- ============ LEFT: CANVAS ============ -->
+    <section class="card">
+      <div class="toolbar">
+        <div class="group" id="mode-group">
+          <button data-mode="add" class="active">✚ 加点</button>
+          <button data-mode="search">🎯 搜索</button>
+        </div>
+        <span class="divider"></span>
+        <button class="btn primary" id="build-btn">⚡ 建树</button>
+        <button class="btn subtle" id="reset-btn">清空</button>
+        <span class="divider"></span>
+        <span class="label">预设：</span>
+        <button class="btn subtle preset" data-preset="example">示例 6 点</button>
+        <button class="btn subtle preset" data-preset="random">随机 10 点</button>
+        <button class="btn subtle preset" data-preset="grid">网格</button>
+        <button class="btn subtle preset" data-preset="cluster">两簇</button>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="viz" width="560" height="560"></canvas>
+        <div class="hint" id="canvas-hint">
+          <strong>加点</strong> · 在画布上点击以添加数据点
+        </div>
+      </div>
+
+      <div class="legend">
+        <span><i class="x-line"></i> 沿 x 切分线</span>
+        <span><i class="y-line"></i> 沿 y 切分线</span>
+        <span><i class="query-dot"></i> 查询点</span>
+        <span><i class="best-dot"></i> 当前最近</span>
+        <span><i class="visit-dot"></i> 已访问节点</span>
+        <span><i class="prune-dot"></i> 已剪枝子树</span>
+      </div>
+    </section>
+
+    <!-- ============ RIGHT: TREE + CODE ============ -->
+    <aside class="right-stack">
+
+      <section class="card tree-card">
+        <div class="card-head">
+          <div class="title">树结构</div>
+          <div class="meta" id="tree-meta">未建树</div>
+        </div>
+        <div class="card-body">
+          <svg id="tree-svg" viewBox="0 0 420 320" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+      </section>
+
+      <section class="card code-card">
+        <div class="code-tabs" id="code-tabs">
+          <button data-pane="build" class="active">⚡ 建树算法</button>
+          <button data-pane="search">🎯 搜索算法</button>
+        </div>
+        <div class="card-body" id="code-pane-build">
+          <pre id="code-block"><code id="code-build"></code></pre>
+        </div>
+        <div class="card-body" id="code-pane-search" style="display:none">
+          <pre id="code-block"><code id="code-search"></code></pre>
+        </div>
+        <div class="step-controls">
+          <button id="prev-step" title="上一步">←</button>
+          <button id="play-step" class="primary" title="播放/暂停">▶ 播放</button>
+          <button id="next-step" title="下一步">→</button>
+          <span class="step-info">第 <b id="step-num">0</b> / <b id="step-total">0</b> 步</span>
+          <label class="speed">
+            速度
+            <input type="range" id="speed" min="0.25" max="3" step="0.25" value="1" />
+            <span id="speed-val">1.0×</span>
+          </label>
+        </div>
+        <div class="explain" id="explain">
+          <span class="badge">提示</span>
+          <span class="text">点击 <b>建树</b>，看 KD-Tree 如何把空间一刀一刀切下去。</span>
+        </div>
+      </section>
+
+    </aside>
+  </main>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ====================== CONFIG ======================
+  const CFG = {
+    canvasSize: 560,       // logical canvas size
+    padL: 40, padR: 24, padT: 24, padB: 40,
+    pointRadius: 6,
+  };
+
+  // ====================== STATE ======================
+  const state = {
+    points: [],            // {x, y, id}
+    nextPointId: 1,
+    tree: null,            // root node
+    nextNodeId: 1,
+    mode: 'add',           // 'add' | 'search'
+    isBuilt: false,
+
+    // Build animation
+    buildSteps: [],
+    buildStepIndex: -1,
+    builtNodes: {},        // id -> {axis, region, point}
+
+    // Search animation
+    searchSteps: [],
+    searchStepIndex: -1,
+    searchVisited: new Set(),  // node ids
+    searchPruned: new Set(),   // node ids
+    searchBest: null,          // {point, dist2}
+    queryPoint: null,
+    searchActive: false,
+
+    // Step playback
+    currentPane: 'build',  // 'build' | 'search'
+    isPlaying: false,
+    playTimer: null,
+    speed: 1.0,
+
+    // Misc
+    hint: 'add',
+  };
+
+  // ====================== ALGORITHMS ======================
+  function dist2(a, b) {
+    const dx = a.x - b.x, dy = a.y - b.y;
+    return dx*dx + dy*dy;
+  }
+
+  // Build tree and record steps
+  function buildTree(points, depth, region, steps) {
+    steps.push({ type: 'enter', depth, region: {...region}, count: points.length });
+
+    if (points.length === 0) {
+      steps.push({ type: 'return-null', depth, region: {...region} });
+      return null;
+    }
+
+    const axis = depth % 2;
+    const axisKey = axis === 0 ? 'x' : 'y';
+    steps.push({ type: 'choose-axis', axis, depth });
+
+    const sorted = [...points].sort((a, b) => a[axisKey] - b[axisKey]);
+    const mid = Math.floor(sorted.length / 2);
+    const median = sorted[mid];
+    steps.push({ type: 'choose-median', median, axis, mid, count: sorted.length });
+
+    const leftPoints = sorted.slice(0, mid);
+    const rightPoints = sorted.slice(mid + 1);
+    const splitValue = median[axisKey];
+
+    let leftRegion, rightRegion;
+    if (axis === 0) {
+      leftRegion  = { xmin: region.xmin, ymin: region.ymin, xmax: splitValue, ymax: region.ymax };
+      rightRegion = { xmin: splitValue,    ymin: region.ymin, xmax: region.xmax, ymax: region.ymax };
+    } else {
+      leftRegion  = { xmin: region.xmin, ymin: region.ymin, xmax: region.xmax, ymax: splitValue };
+      rightRegion = { xmin: region.xmin, ymin: splitValue,  xmax: region.xmax, ymax: region.ymax };
+    }
+
+    steps.push({ type: 'split', axis, value: splitValue, leftRegion, rightRegion, region: {...region} });
+
+    const node = {
+      id: state.nextNodeId++,
+      point: median,
+      axis,
+      depth,
+      region: {...region},
+      left: null,
+      right: null,
+    };
+
+    steps.push({ type: 'create-node', node });
+
+    steps.push({ type: 'recurse', side: 'left', node, region: leftRegion, count: leftPoints.length });
+    node.left = buildTree(leftPoints, depth + 1, leftRegion, steps);
+
+    steps.push({ type: 'recurse', side: 'right', node, region: rightRegion, count: rightPoints.length });
+    node.right = buildTree(rightPoints, depth + 1, rightRegion, steps);
+
+    steps.push({ type: 'return-node', node });
+    return node;
+  }
+
+  // Search nearest neighbor and record steps
+  function searchNN(query, node, best, steps) {
+    if (!node) {
+      steps.push({ type: 'visit-null', best: best ? {...best} : null });
+      return best;
+    }
+
+    steps.push({ type: 'visit', node, query, best: best ? {...best} : null });
+
+    const d2 = dist2(query, node.point);
+    let newBest = best;
+    if (!best || d2 < best.dist2) {
+      newBest = { point: node.point, dist2: d2 };
+      steps.push({ type: 'update-best', node, dist2: d2, previous: best ? {...best} : null });
+    } else {
+      steps.push({ type: 'no-update', node, dist2: d2, bestDist2: best.dist2 });
+    }
+
+    const axis = node.axis;
+    const axisKey = axis === 0 ? 'x' : 'y';
+    const diff = query[axisKey] - node.point[axisKey];
+
+    const goLeftFirst = diff < 0;
+    const near = goLeftFirst ? node.left : node.right;
+    const far  = goLeftFirst ? node.right : node.left;
+    const nearLabel = goLeftFirst ? 'left' : 'right';
+    const farLabel  = goLeftFirst ? 'right' : 'left';
+
+    steps.push({ type: 'choose-side', node, axis, diff, nearLabel, farLabel, bestDist2: newBest ? newBest.dist2 : Infinity });
+
+    steps.push({ type: 'recurse-near', node, side: nearLabel });
+    newBest = searchNN(query, near, newBest, steps);
+
+    const bestD2 = newBest ? newBest.dist2 : Infinity;
+    if (diff * diff < bestD2) {
+      steps.push({ type: 'check-far-needed', node, diff, bestDist2: bestD2 });
+      steps.push({ type: 'recurse-far', node, side: farLabel });
+      newBest = searchNN(query, far, newBest, steps);
+    } else {
+      steps.push({ type: 'prune', node, side: farLabel, diff, bestDist2: bestD2 });
+    }
+
+    steps.push({ type: 'return-up', node, best: newBest ? {...newBest} : null });
+    return newBest;
+  }
+
+  // ====================== CANVAS RENDERING ======================
+  const canvas = document.getElementById('viz');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function plotArea() {
+    const w = canvas.getBoundingClientRect().width;
+    const h = canvas.getBoundingClientRect().height;
+    return {
+      x0: CFG.padL,
+      y0: CFG.padT,
+      x1: w - CFG.padR,
+      y1: h - CFG.padB,
+      w: w - CFG.padL - CFG.padR,
+      h: h - CFG.padT - CFG.padB,
+    };
+  }
+
+  // World space is 0..100 in both axes. We map to plot area.
+  const WORLD = { xmin: 0, ymin: 0, xmax: 100, ymax: 100 };
+
+  function worldToScreen(p, area) {
+    const tx = (p.x - WORLD.xmin) / (WORLD.xmax - WORLD.xmin);
+    const ty = (p.y - WORLD.ymin) / (WORLD.ymax - WORLD.ymin);
+    return {
+      x: area.x0 + tx * area.w,
+      // Flip Y so y increases upward
+      y: area.y1 - ty * area.h,
+    };
+  }
+  function screenToWorld(sx, sy, area) {
+    const tx = (sx - area.x0) / area.w;
+    const ty = (area.y1 - sy) / area.h;
+    return {
+      x: WORLD.xmin + tx * (WORLD.xmax - WORLD.xmin),
+      y: WORLD.ymin + ty * (WORLD.ymax - WORLD.ymin),
+    };
+  }
+
+  function regionToRect(r, area) {
+    const tl = worldToScreen({ x: r.xmin, y: r.ymax }, area);
+    const br = worldToScreen({ x: r.xmax, y: r.ymin }, area);
+    return { x: tl.x, y: tl.y, w: br.x - tl.x, h: br.y - tl.y };
+  }
+
+  function render() {
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    const area = plotArea();
+
+    // Background grid
+    drawGrid(area);
+
+    // Border of plot area
+    ctx.strokeStyle = '#e4e4e7';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(area.x0, area.y0, area.w, area.h);
+
+    // Axes labels
+    drawAxesLabels(area);
+
+    // Splits (light dashed)
+    drawSplits(area);
+
+    // During build: highlight active region being processed
+    drawActiveRegion(area);
+
+    // During search: query circle + pruned regions
+    drawSearchVisuals(area);
+
+    // Points
+    drawPoints(area);
+
+    // During build: highlight active node being created
+    drawActiveBuild(area);
+  }
+
+  function drawGrid(area) {
+    ctx.strokeStyle = '#f1f1f4';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = 1; i < 10; i++) {
+      const x = area.x0 + (area.w * i) / 10;
+      ctx.moveTo(x, area.y0);
+      ctx.lineTo(x, area.y1);
+    }
+    for (let i = 1; i < 10; i++) {
+      const y = area.y0 + (area.h * i) / 10;
+      ctx.moveTo(area.x0, y);
+      ctx.lineTo(area.x1, y);
+    }
+    ctx.stroke();
+  }
+
+  function drawAxesLabels(area) {
+    ctx.fillStyle = '#a1a1aa';
+    ctx.font = '11px JetBrains Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('x →', area.x1 - 14, area.y1 + 14);
+    ctx.save();
+    ctx.translate(area.x0 - 18, area.y0 + 12);
+    ctx.fillText('y', 0, 0);
+    ctx.fillText('↑', 8, 0);
+    ctx.restore();
+  }
+
+  function drawSplits(area) {
+    if (!state.isBuilt && state.builtNodes && Object.keys(state.builtNodes).length === 0) return;
+    Object.values(state.builtNodes).forEach(info => {
+      const r = info.region;
+      const color = info.axis === 0 ? '#6366f1' : '#ec4899';
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = info.active ? 0.95 : 0.28;
+      ctx.lineWidth = info.active ? 2 : 1.2;
+      ctx.setLineDash(info.active ? [6, 3] : [4, 4]);
+      ctx.beginPath();
+      if (info.axis === 0) {
+        // vertical line at x = split value, spanning region's y
+        const top = worldToScreen({ x: info.value, y: r.ymax }, area);
+        const bot = worldToScreen({ x: info.value, y: r.ymin }, area);
+        ctx.moveTo(top.x, top.y);
+        ctx.lineTo(bot.x, bot.y);
+      } else {
+        const left = worldToScreen({ x: r.xmin, y: info.value }, area);
+        const right = worldToScreen({ x: r.xmax, y: info.value }, area);
+        ctx.moveTo(left.x, left.y);
+        ctx.lineTo(right.x, right.y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    });
+  }
+
+  function drawActiveRegion(area) {
+    // Highlight the region currently being split (during build)
+    if (state.currentPane !== 'build') return;
+    if (state.buildStepIndex < 0) return;
+    const step = state.buildSteps[state.buildStepIndex];
+    if (!step) return;
+    if (step.type !== 'split' && step.type !== 'recurse') return;
+
+    const r = step.region;
+    if (!r) return;
+    const rect = regionToRect(r, area);
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(99, 102, 241, 0.06)';
+    ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+    ctx.strokeStyle = 'rgba(99, 102, 241, 0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 3]);
+    ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+    ctx.restore();
+  }
+
+  function drawSearchVisuals(area) {
+    if (state.currentPane !== 'search') return;
+    if (state.searchStepIndex < 0) return;
+    const step = state.searchSteps[state.searchStepIndex];
+    if (!step) return;
+
+    // Query circle
+    if (state.queryPoint) {
+      const s = worldToScreen(state.queryPoint, area);
+      const r = Math.sqrt(state.searchBest ? state.searchBest.dist2 : 0);
+      const rPx = (r / (WORLD.xmax - WORLD.xmin)) * area.w;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.55)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, rPx, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.06)';
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Pruned regions: cross-hatch the far-side region if step.type === 'prune' or 'check-far-needed'
+    if (step.type === 'prune') {
+      const r = step.node.region;
+      const nearIsLeft = step.side === 'left' ? false : true; // if prune 'right', far is right
+      // The side being pruned is step.side. We need to draw that half of the region.
+      let subRegion;
+      if (step.node.axis === 0) {
+        // split along x
+        if (step.side === 'left') {
+          subRegion = { xmin: r.xmin, ymin: r.ymin, xmax: step.node.point.x, ymax: r.ymax };
+        } else {
+          subRegion = { xmin: step.node.point.x, ymin: r.ymin, xmax: r.xmax, ymax: r.ymax };
+        }
+      } else {
+        if (step.side === 'left') {
+          subRegion = { xmin: r.xmin, ymin: r.ymin, xmax: r.xmax, ymax: step.node.point.y };
+        } else {
+          subRegion = { xmin: r.xmin, ymin: step.node.point.y, xmax: r.xmax, ymax: r.ymax };
+        }
+      }
+      const rect = regionToRect(subRegion, area);
+      drawCrossHatch(rect, 'rgba(239, 68, 68, 0.12)');
+    }
+  }
+
+  function drawCrossHatch(rect, color) {
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.45)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    const step = 8;
+    ctx.beginPath();
+    for (let x = rect.x - rect.h; x < rect.x + rect.w; x += step) {
+      ctx.moveTo(x, rect.y);
+      ctx.lineTo(x + rect.h, rect.y + rect.h);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawPoints(area) {
+    // Sort so that highlighted/active draws on top
+    const pts = [...state.points];
+    pts.forEach(p => {
+      const s = worldToScreen(p, area);
+      const isBest = state.searchBest && state.searchBest.point.id === p.id;
+      const isVisited = state.searchVisited.has(p.id);
+      const isQuery = state.queryPoint && state.queryPoint.id === p.id;
+
+      let fill = '#6366f1';
+      let radius = CFG.pointRadius;
+      let stroke = 'white';
+      let strokeW = 2;
+
+      if (isVisited && !isBest) {
+        fill = '#6366f1';
+        radius = CFG.pointRadius + 0.5;
+        strokeW = 2.5;
+        stroke = '#312e81';
+      }
+      if (isBest) {
+        fill = '#10b981';
+        radius = CFG.pointRadius + 1.5;
+        stroke = '#064e3b';
+        strokeW = 2.5;
+      }
+      if (isQuery) {
+        fill = '#f59e0b';
+        radius = CFG.pointRadius + 2;
+        stroke = 'white';
+        strokeW = 3;
+      }
+
+      // Pruned: smaller, faded
+      if (state.searchPruned.has(p.id) && !isVisited && !isBest) {
+        fill = '#a1a1aa';
+        radius = CFG.pointRadius - 1;
+        stroke = 'white';
+        strokeW = 1;
+      }
+
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = fill;
+      ctx.fill();
+      ctx.lineWidth = strokeW;
+      ctx.strokeStyle = stroke;
+      ctx.stroke();
+    });
+
+    // Query point (search mode) — drawn as a star on top
+    if (state.queryPoint) {
+      const s = worldToScreen(state.queryPoint, area);
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.beginPath();
+      for (let i = 0; i < 8; i++) {
+        const ang = (Math.PI * 2 * i) / 8 - Math.PI / 2;
+        const r = i % 2 === 0 ? 9 : 4;
+        const px = Math.cos(ang) * r;
+        const py = Math.sin(ang) * r;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fillStyle = '#f59e0b';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = 'white';
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function drawActiveBuild(area) {
+    if (state.currentPane !== 'build') return;
+    if (state.buildStepIndex < 0) return;
+    const step = state.buildSteps[state.buildStepIndex];
+    if (!step) return;
+    if (step.type !== 'choose-median' && step.type !== 'create-node') return;
+
+    const s = worldToScreen(step.median || step.node.point, area);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, CFG.pointRadius + 5, 0, Math.PI * 2);
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([3, 2]);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ====================== TREE RENDERING (SVG) ======================
+  const treeSvg = document.getElementById('tree-svg');
+  const NS = 'http://www.w3.org/2000/svg';
+
+  function renderTree() {
+    treeSvg.innerHTML = '';
+    const tree = state.tree;
+    const meta = document.getElementById('tree-meta');
+
+    if (!tree) {
+      meta.textContent = '未建树';
+      // Show empty hint
+      const txt = document.createElementNS(NS, 'text');
+      txt.setAttribute('x', 210);
+      txt.setAttribute('y', 160);
+      txt.setAttribute('text-anchor', 'middle');
+      txt.setAttribute('fill', '#a1a1aa');
+      txt.setAttribute('font-family', 'Outfit, sans-serif');
+      txt.setAttribute('font-size', '13');
+      txt.textContent = '尚无树，先点几个点再「建树」';
+      treeSvg.appendChild(txt);
+      return;
+    }
+
+    const nodes = [];
+    const links = [];
+    const count = countNodes(tree);
+    const depth = treeDepth(tree);
+    meta.textContent = `${count} 个节点 · 深度 ${depth} · 根按 ${tree.axis === 0 ? 'x' : 'y'} 切分`;
+
+    layoutTree(tree, 210, 28, 180, 60, nodes, links);
+
+    // Edges first
+    links.forEach(L => {
+      const path = document.createElementNS(NS, 'path');
+      path.setAttribute('d', `M${L.x1},${L.y1} C${L.x1},${(L.y1+L.y2)/2} ${L.x2},${(L.y1+L.y2)/2} ${L.x2},${L.y2}`);
+      path.setAttribute('class', 'tree-link' + (L.cls ? ' ' + L.cls : ''));
+      treeSvg.appendChild(path);
+    });
+
+    // Nodes
+    nodes.forEach(N => {
+      const g = document.createElementNS(NS, 'g');
+      g.setAttribute('class', 'tree-node');
+      g.setAttribute('transform', `translate(${N.x}, ${N.y})`);
+
+      const cls = ['tree-node-bg', 'axis-' + (N.node.axis === 0 ? 'x' : 'y')];
+      if (N.cls) cls.push(N.cls);
+      const rect = document.createElementNS(NS, 'rect');
+      rect.setAttribute('x', -26);
+      rect.setAttribute('y', -14);
+      rect.setAttribute('width', 52);
+      rect.setAttribute('height', 28);
+      rect.setAttribute('rx', 6);
+      rect.setAttribute('class', cls.join(' '));
+      g.appendChild(rect);
+
+      const t1 = document.createElementNS(NS, 'text');
+      t1.setAttribute('class', 'tree-node-text');
+      t1.setAttribute('text-anchor', 'middle');
+      t1.setAttribute('y', -1);
+      t1.textContent = `(${N.node.point.x.toFixed(0)},${N.node.point.y.toFixed(0)})`;
+      g.appendChild(t1);
+
+      const t2 = document.createElementNS(NS, 'text');
+      t2.setAttribute('class', 'tree-node-text');
+      t2.setAttribute('text-anchor', 'middle');
+      t2.setAttribute('y', 11);
+      t2.setAttribute('font-size', '9');
+      t2.setAttribute('fill', 'rgba(255,255,255,0.7)');
+      t2.textContent = `按 ${N.node.axis === 0 ? 'x' : 'y'}=${(N.node.axis === 0 ? N.node.point.x : N.node.point.y).toFixed(0)}`;
+      g.appendChild(t2);
+
+      // Depth tag
+      const dep = document.createElementNS(NS, 'text');
+      dep.setAttribute('class', 'tree-depth-label');
+      dep.setAttribute('text-anchor', 'middle');
+      dep.setAttribute('y', 30);
+      dep.textContent = `d=${N.node.depth}`;
+      g.appendChild(dep);
+
+      treeSvg.appendChild(g);
+    });
+  }
+
+  function countNodes(n) {
+    if (!n) return 0;
+    return 1 + countNodes(n.left) + countNodes(n.right);
+  }
+  function treeDepth(n) {
+    if (!n) return 0;
+    return 1 + Math.max(treeDepth(n.left), treeDepth(n.right));
+  }
+
+  function layoutTree(node, x, y, dx, dy, nodes, links, parentX, parentY) {
+    if (!node) return;
+    nodes.push({ node, x, y });
+
+    if (parentX !== undefined) {
+      links.push({ x1: parentX, y1: parentY, x2: x, y2: y, cls: node._linkCls });
+    }
+
+    if (node.left) {
+      node.left._linkCls = node._linkClsLeft || '';
+      layoutTree(node.left, x - dx, y + dy, Math.max(dx * 0.55, 30), dy, nodes, links, x, y);
+    }
+    if (node.right) {
+      node.right._linkCls = node._linkClsRight || '';
+      layoutTree(node.right, x + dx, y + dy, Math.max(dx * 0.55, 30), dy, nodes, links, x, y);
+    }
+  }
+
+  // ====================== CODE PANEL ======================
+  const buildCode = [
+    'function build(points, depth, region):',
+    '  if points is empty:',
+    '      return null',
+    '  axis = depth mod 2                 // 0 = x, 1 = y',
+    '  sort points by axis',
+    '  median = points[middle]',
+    '  left  = build(leftHalf,  depth+1, leftRegion)',
+    '  right = build(rightHalf, depth+1, rightRegion)',
+    '  return {point: median, axis, left, right, region}',
+  ];
+
+  const searchCode = [
+    'function nearest(query, node, best):',
+    '  if node is null: return best',
+    '  d = distance(query, node.point)',
+    '  if best is null or d < best.dist:',
+    '      best = {point: node.point, dist: d}',
+    '  axis = node.axis',
+    '  diff = query[axis] - node.point[axis]',
+    '  if diff < 0: near, far = node.left,  node.right',
+    '  else:        near, far = node.right, node.left',
+    '  best = nearest(query, near, best)',
+    '  if diff² < best.dist:                // hyper-circle crosses split',
+    '      best = nearest(query, far, best)',
+    '  else:',
+    '      prune far subtree                 // safe to ignore',
+    '  return best',
+  ];
+
+  function renderCode() {
+    const buildEl = document.getElementById('code-build');
+    const searchEl = document.getElementById('code-search');
+
+    buildEl.innerHTML = buildCode.map((line, i) => {
+      return `<span class="line" data-line="${i+1}"><span class="ln">${i+1}</span>${escapeHtml(line)}</span>`;
+    }).join('');
+
+    searchEl.innerHTML = searchCode.map((line, i) => {
+      return `<span class="line" data-line="${i+1}"><span class="ln">${i+1}</span>${escapeHtml(line)}</span>`;
+    }).join('');
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function highlightLines(pane, lineNums) {
+    const codeEl = document.getElementById(pane === 'build' ? 'code-build' : 'code-search');
+    const lines = codeEl.querySelectorAll('.line');
+    lines.forEach(el => {
+      el.classList.remove('active', 'dimmed');
+    });
+    lineNums.forEach(n => {
+      const el = codeEl.querySelector(`.line[data-line="${n}"]`);
+      if (el) el.classList.add('active');
+    });
+    // Auto-scroll the active line into view
+    const firstActive = codeEl.querySelector('.line.active');
+    if (firstActive) {
+      firstActive.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }
+
+  function clearHighlight(pane) {
+    const codeEl = document.getElementById(pane === 'build' ? 'code-build' : 'code-search');
+    codeEl.querySelectorAll('.line').forEach(el => el.classList.remove('active', 'dimmed'));
+  }
+
+  // ====================== STEP APPLICATION ======================
+  function applyBuildStep(idx) {
+    state.builtNodes = {};
+    state.searchVisited.clear();
+    state.searchPruned.clear();
+    state.searchBest = null;
+    state.queryPoint = null;
+
+    for (let i = 0; i <= idx && i < state.buildSteps.length; i++) {
+      const step = state.buildSteps[i];
+      applyBuildStepEffect(step);
+    }
+  }
+
+  function applyBuildStepEffect(step) {
+    switch (step.type) {
+      case 'split': {
+        // Track this split so we can draw its line
+        if (!state.builtNodes[step.region.id || (step.region.xmin+'-'+step.region.ymin+'-'+step.region.xmax+'-'+step.region.ymax)]) {
+          // We will populate via create-node below; here we mark active region.
+        }
+        break;
+      }
+      case 'create-node': {
+        const r = step.node.region;
+        const key = regionKey(r);
+        state.builtNodes[key] = {
+          axis: step.node.axis,
+          value: step.node.axis === 0 ? step.node.point.x : step.node.point.y,
+          region: r,
+          active: false,
+        };
+        break;
+      }
+      case 'choose-median': {
+        // mark active split briefly
+        const r = findRegionForStep(step);
+        if (r) {
+          const key = regionKey(r);
+          if (state.builtNodes[key]) {
+            // mark active for one step
+            state.builtNodes[key].active = true;
+            setTimeout(() => { if (state.builtNodes[key]) state.builtNodes[key].active = false; }, 600);
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  function findRegionForStep(step) {
+    // Try to find the region currently being processed by looking back at recent enter/recursion steps
+    for (let i = state.buildStepIndex; i >= 0; i--) {
+      const s = state.buildSteps[i];
+      if (s.type === 'recurse' && s.region) return s.region;
+      if (s.type === 'enter' && s.region) return s.region;
+    }
+    return null;
+  }
+
+  function regionKey(r) {
+    return `${r.xmin.toFixed(3)}|${r.ymin.toFixed(3)}|${r.xmax.toFixed(3)}|${r.ymax.toFixed(3)}`;
+  }
+
+  function applySearchStep(idx) {
+    state.searchVisited.clear();
+    state.searchPruned.clear();
+    state.searchBest = null;
+    state.queryPoint = null;
+
+    // We need to replay all steps up to idx
+    // First, find query point
+    for (let i = 0; i <= idx && i < state.searchSteps.length; i++) {
+      const step = state.searchSteps[i];
+      if (step.type === 'visit' && step.query) {
+        state.queryPoint = step.query;
+        break;
+      }
+    }
+    // Then apply all step effects in order
+    for (let i = 0; i <= idx && i < state.searchSteps.length; i++) {
+      applySearchStepEffect(state.searchSteps[i]);
+    }
+  }
+
+  function applySearchStepEffect(step) {
+    switch (step.type) {
+      case 'visit':
+        state.searchVisited.add(step.node.id);
+        break;
+      case 'update-best':
+        state.searchBest = { point: step.node.point, dist2: step.dist2 };
+        break;
+      case 'prune':
+        // Mark all nodes under step.node's far side as pruned
+        const prunedRoot = step.side === 'left' ? step.node.left : step.node.right;
+        collectPruned(prunedRoot, state.searchPruned);
+        break;
+    }
+  }
+
+  function collectPruned(node, set) {
+    if (!node) return;
+    set.add(node.id);
+    collectPruned(node.left, set);
+    collectPruned(node.right, set);
+  }
+
+  // ====================== STEP INFO / EXPLANATION ======================
+  function getCurrentStepExplanation() {
+    if (state.currentPane === 'build') {
+      if (state.buildStepIndex < 0) return { lines: [], text: '点击 <b>建树</b> 或 <b>下一步 →</b> 开始观察递归建树过程。' };
+      const s = state.buildSteps[state.buildStepIndex];
+      return explainBuild(s);
+    } else {
+      if (state.searchStepIndex < 0) return { lines: [], text: '先建树，然后切到 <b>搜索</b> 模式，在画布上点击任意位置发起一次最近邻查询。' };
+      const s = state.searchSteps[state.searchStepIndex];
+      return explainSearch(s);
+    }
+  }
+
+  function explainBuild(s) {
+    switch (s.type) {
+      case 'enter':
+        return { lines: [1,2], text: `进入 <code>build</code>：当前区域有 <b>${s.count}</b> 个点${s.count === 0 ? ' → 返回 null' : '，继续切分'}。` };
+      case 'return-null':
+        return { lines: [2,3], text: `当前区域 <b>无点</b>，返回 <code>null</code>。` };
+      case 'choose-axis':
+        return { lines: [4], text: `当前深度 <b>${s.depth}</b>，<code>axis = ${s.depth} mod 2 = ${s.axis}</code>，这一层按 <b>${s.axis === 0 ? 'x' : 'y'}</b> 切。` };
+      case 'choose-median':
+        return { lines: [5,6], text: `<b>${s.count}</b> 个点按 ${s.axis === 0 ? 'x' : 'y'} 排序，取中位数 <b>(${s.median.x.toFixed(1)}, ${s.median.y.toFixed(1)})</b> 作为当前节点的分裂点。` };
+      case 'split':
+        return { lines: [], text: `在 <b>${s.axis === 0 ? 'x' : 'y'} = ${s.value.toFixed(1)}</b> 处画一条切分线，把区域分成两半。` };
+      case 'create-node':
+        return { lines: [9], text: `为分裂点 <b>(${s.node.point.x.toFixed(1)}, ${s.node.point.y.toFixed(1)})</b> 创建一个树节点。` };
+      case 'recurse':
+        return { lines: s.side === 'left' ? [7] : [8], text: `递归处理 <b>${s.side === 'left' ? '左' : '右'}</b> 子区域（还有 <b>${s.count}</b> 个点）。` };
+      case 'return-node':
+        return { lines: [9], text: `当前子树建完，把根节点返回给父调用。` };
+      default:
+        return { lines: [], text: '' };
+    }
+  }
+
+  function explainSearch(s) {
+    switch (s.type) {
+      case 'visit':
+        return { lines: [1,2,3], text: `访问节点 <b>(${s.node.point.x.toFixed(1)}, ${s.node.point.y.toFixed(1)})</b>，算它到查询点的距离。` };
+      case 'update-best':
+        return { lines: [4,5], text: `距离 <b>${Math.sqrt(s.dist2).toFixed(1)}</b> 比当前最近还近，更新 <code>best</code>。` };
+      case 'no-update':
+        return { lines: [4], text: `距离 <b>${Math.sqrt(s.dist2).toFixed(1)}</b> 不比当前最近 <b>${Math.sqrt(s.bestDist2).toFixed(1)}</b> 近，跳过。` };
+      case 'choose-side':
+        return { lines: [6,7,8,9], text: `分裂轴上的差值 <code>diff = ${s.diff.toFixed(1)}</code>，先往 <b>${s.nearLabel === 'left' ? '左' : '右'}</b>（靠近查询点的一侧）走。` };
+      case 'recurse-near':
+        return { lines: [10], text: `递归进入 <b>${s.side === 'left' ? '左' : '右'}</b> 子树。` };
+      case 'check-far-needed':
+        return { lines: [11,12], text: `分裂面离查询点只有 <b>${Math.abs(s.diff).toFixed(1)}</b>，而当前最近距离是 <b>${Math.sqrt(s.bestDist2).toFixed(1)}</b>，分裂面在查询球内 → <b>不能剪枝</b>，必须看另一侧。` };
+      case 'recurse-far':
+        return { lines: [12], text: `递归进入 <b>${s.side === 'left' ? '左' : '右'}</b> 子树。` };
+      case 'prune':
+        return { lines: [13,14], text: `分裂面在 <b>${Math.abs(s.diff).toFixed(1)}</b>，当前最近距离 <b>${Math.sqrt(s.bestDist2).toFixed(1)}</b>，分裂面在查询球外 → <b>整棵子树可以剪掉</b>。` };
+      case 'return-up':
+        return { lines: [15], text: `当前节点搜索完，把当前最近返回给上层。` };
+      case 'visit-null':
+        return { lines: [2], text: `走到空节点，直接返回。` };
+      default:
+        return { lines: [], text: '' };
+    }
+  }
+
+  function updateStepUI() {
+    const pane = state.currentPane;
+    const idx = pane === 'build' ? state.buildStepIndex : state.searchStepIndex;
+    const total = pane === 'build' ? state.buildSteps.length : state.searchSteps.length;
+    document.getElementById('step-num').textContent = Math.max(0, idx + 1);
+    document.getElementById('step-total').textContent = total;
+
+    const exp = getCurrentStepExplanation();
+    highlightLines(pane, exp.lines);
+    document.querySelector('.explain .text').innerHTML = exp.text;
+  }
+
+  function updateTreeDecorations() {
+    // Highlight current node in tree based on step
+    const pane = state.currentPane;
+    let activeId = null;
+    let prunedIds = new Set();
+    let visitedIds = new Set();
+
+    if (pane === 'build') {
+      const step = state.buildSteps[state.buildStepIndex];
+      if (step && step.node) activeId = step.node.id;
+    } else {
+      state.searchSteps.slice(0, state.searchStepIndex + 1).forEach(s => {
+        if (s.type === 'visit') visitedIds.add(s.node.id);
+        if (s.type === 'prune') {
+          const root = s.side === 'left' ? s.node.left : s.node.right;
+          collectPruned(root, prunedIds);
+        }
+      });
+      const last = state.searchSteps[state.searchStepIndex];
+      if (last && last.node) activeId = last.node.id;
+    }
+
+    // Re-render tree with class names per node
+    treeSvg.innerHTML = '';
+    if (!state.tree) {
+      renderTree();
+      return;
+    }
+    const nodes = [], links = [];
+    layoutTreeWithMeta(state.tree, 210, 28, 180, 60, nodes, links);
+    // edges
+    links.forEach(L => {
+      const path = document.createElementNS(NS, 'path');
+      path.setAttribute('d', `M${L.x1},${L.y1} C${L.x1},${(L.y1+L.y2)/2} ${L.x2},${(L.y1+L.y2)/2} ${L.x2},${L.y2}`);
+      let cls = 'tree-link';
+      if (L.pruned) cls += ' pruned';
+      else if (L.active) cls += ' active';
+      path.setAttribute('class', cls);
+      treeSvg.appendChild(path);
+    });
+    // nodes
+    nodes.forEach(N => {
+      const g = document.createElementNS(NS, 'g');
+      g.setAttribute('class', 'tree-node');
+      g.setAttribute('transform', `translate(${N.x}, ${N.y})`);
+      const clsList = ['tree-node-bg', 'axis-' + (N.node.axis === 0 ? 'x' : 'y')];
+      if (N.pruned) clsList.push('pruned');
+      else if (N.node.id === activeId) clsList.push('active');
+      else if (visitedIds.has(N.node.id)) clsList.push('visited');
+      const rect = document.createElementNS(NS, 'rect');
+      rect.setAttribute('x', -26);
+      rect.setAttribute('y', -14);
+      rect.setAttribute('width', 52);
+      rect.setAttribute('height', 28);
+      rect.setAttribute('rx', 6);
+      rect.setAttribute('class', clsList.join(' '));
+      g.appendChild(rect);
+
+      const t1 = document.createElementNS(NS, 'text');
+      t1.setAttribute('class', 'tree-node-text');
+      t1.setAttribute('text-anchor', 'middle');
+      t1.setAttribute('y', -1);
+      t1.textContent = `(${N.node.point.x.toFixed(0)},${N.node.point.y.toFixed(0)})`;
+      g.appendChild(t1);
+
+      const t2 = document.createElementNS(NS, 'text');
+      t2.setAttribute('class', 'tree-node-text');
+      t2.setAttribute('text-anchor', 'middle');
+      t2.setAttribute('y', 11);
+      t2.setAttribute('font-size', '9');
+      t2.setAttribute('fill', 'rgba(255,255,255,0.7)');
+      t2.textContent = `按 ${N.node.axis === 0 ? 'x' : 'y'}=${(N.node.axis === 0 ? N.node.point.x : N.node.point.y).toFixed(0)}`;
+      g.appendChild(t2);
+
+      const dep = document.createElementNS(NS, 'text');
+      dep.setAttribute('class', 'tree-depth-label');
+      dep.setAttribute('text-anchor', 'middle');
+      dep.setAttribute('y', 30);
+      dep.textContent = `d=${N.node.depth}`;
+      g.appendChild(dep);
+
+      treeSvg.appendChild(g);
+    });
+  }
+
+  function layoutTreeWithMeta(node, x, y, dx, dy, nodes, links, parentX, parentY, parentNode) {
+    if (!node) return;
+    const activePane = state.currentPane;
+    let nodePruned = false, linkActive = false, linkPruned = false;
+    if (activePane === 'search') {
+      if (state.searchPruned.has(node.id)) nodePruned = true;
+    }
+    nodes.push({ node, x, y, pruned: nodePruned });
+    if (parentX !== undefined) {
+      if (state.searchPruned.has(node.id)) linkPruned = true;
+      links.push({ x1: parentX, y1: parentY, x2: x, y2: y, pruned: linkPruned, active: linkActive });
+    }
+    if (node.left) layoutTreeWithMeta(node.left, x - dx, y + dy, Math.max(dx * 0.55, 30), dy, nodes, links, x, y, node);
+    if (node.right) layoutTreeWithMeta(node.right, x + dx, y + dy, Math.max(dx * 0.55, 30), dy, nodes, links, x, y, node);
+  }
+
+  // ====================== STEP CONTROLS ======================
+  function gotoStep(delta) {
+    const pane = state.currentPane;
+    if (pane === 'build') {
+      const next = Math.max(-1, Math.min(state.buildSteps.length - 1, state.buildStepIndex + delta));
+      state.buildStepIndex = next;
+      applyBuildStep(next);
+    } else {
+      const next = Math.max(-1, Math.min(state.searchSteps.length - 1, state.searchStepIndex + delta));
+      state.searchStepIndex = next;
+      applySearchStep(next);
+    }
+    render();
+    updateTreeDecorations();
+    updateStepUI();
+  }
+
+  function startPlay() {
+    if (state.isPlaying) return;
+    state.isPlaying = true;
+    document.getElementById('play-step').textContent = '⏸ 暂停';
+    const tick = () => {
+      if (!state.isPlaying) return;
+      const pane = state.currentPane;
+      const idx = pane === 'build' ? state.buildStepIndex : state.searchStepIndex;
+      const total = pane === 'build' ? state.buildSteps.length : state.searchSteps.length;
+      if (idx >= total - 1) {
+        stopPlay();
+        return;
+      }
+      gotoStep(1);
+      const delay = Math.max(120, 800 / state.speed);
+      state.playTimer = setTimeout(tick, delay);
+    };
+    tick();
+  }
+
+  function stopPlay() {
+    state.isPlaying = false;
+    if (state.playTimer) clearTimeout(state.playTimer);
+    state.playTimer = null;
+    document.getElementById('play-step').textContent = '▶ 播放';
+  }
+
+  // ====================== ACTIONS ======================
+  function doBuild() {
+    if (state.points.length === 0) {
+      setStatus('请先添加一些点', 'warn');
+      return;
+    }
+    state.tree = null;
+    state.nextNodeId = 1;
+    state.buildSteps = [];
+    state.buildStepIndex = -1;
+    state.searchSteps = [];
+    state.searchStepIndex = -1;
+    state.builtNodes = {};
+
+    const initialRegion = { xmin: WORLD.xmin, ymin: WORLD.ymin, xmax: WORLD.xmax, ymax: WORLD.ymax };
+    state.tree = buildTree(state.points, 0, initialRegion, state.buildSteps);
+
+    state.isBuilt = true;
+    state.currentPane = 'build';
+    setActivePane('build');
+
+    // Auto-play build
+    state.buildStepIndex = -1;
+    gotoStep(0);
+    startPlay();
+
+    setStatus(`树已建好 · ${countNodes(state.tree)} 个节点`, 'ok');
+  }
+
+  function doReset() {
+    stopPlay();
+    state.points = [];
+    state.tree = null;
+    state.nextPointId = 1;
+    state.nextNodeId = 1;
+    state.buildSteps = [];
+    state.buildStepIndex = -1;
+    state.searchSteps = [];
+    state.searchStepIndex = -1;
+    state.builtNodes = {};
+    state.searchVisited.clear();
+    state.searchPruned.clear();
+    state.searchBest = null;
+    state.queryPoint = null;
+    state.isBuilt = false;
+    updateHint();
+    render();
+    renderTree();
+    updateStepUI();
+    setStatus('已清空', 'ok');
+  }
+
+  function doSearch(queryWorld) {
+    if (!state.isBuilt) {
+      setStatus('请先建树', 'warn');
+      return;
+    }
+    state.searchSteps = [];
+    state.searchStepIndex = -1;
+    state.searchVisited.clear();
+    state.searchPruned.clear();
+    state.searchBest = null;
+    state.queryPoint = queryWorld;
+    state.currentPane = 'search';
+    setActivePane('search');
+
+    const result = searchNN(queryWorld, state.tree, null, state.searchSteps);
+    state.searchStepIndex = -1;
+    gotoStep(0);
+    startPlay();
+
+    if (result) {
+      setStatus(`最近邻 = (${result.point.x.toFixed(1)}, ${result.point.y.toFixed(1)}) · 距离 ${Math.sqrt(result.dist2).toFixed(1)}`, 'ok');
+    }
+  }
+
+  function setActivePane(pane) {
+    state.currentPane = pane;
+    document.querySelectorAll('.code-tabs button').forEach(b => {
+      b.classList.toggle('active', b.dataset.pane === pane);
+    });
+    document.getElementById('code-pane-build').style.display = pane === 'build' ? '' : 'none';
+    document.getElementById('code-pane-search').style.display = pane === 'search' ? '' : 'none';
+  }
+
+  function setStatus(msg, kind) {
+    const el = document.getElementById('status-text');
+    el.textContent = msg;
+    const dot = el.previousElementSibling;
+    if (!dot) return;
+    if (kind === 'ok') dot.style.background = '#10b981';
+    else if (kind === 'warn') dot.style.background = '#f59e0b';
+    else dot.style.background = '#71717a';
+  }
+
+  function updateHint() {
+    const hint = document.getElementById('canvas-hint');
+    if (state.mode === 'add') {
+      hint.innerHTML = '<strong>加点</strong> · 在画布上点击以添加数据点 · 再次点击已有点可删除';
+    } else {
+      hint.innerHTML = '<strong>搜索</strong> · 在画布上点击任意位置查找最近邻（需先建树）';
+    }
+    hint.classList.toggle('hidden', state.points.length > 0);
+  }
+
+  // ====================== PRESETS ======================
+  function loadPreset(name) {
+    doReset();
+    const W = WORLD.xmax, H = WORLD.ymax;
+    const rand = (lo, hi) => lo + Math.random() * (hi - lo);
+    let pts = [];
+    if (name === 'example') {
+      pts = [
+        {x: 30, y: 30}, {x: 70, y: 25}, {x: 50, y: 55},
+        {x: 25, y: 75}, {x: 75, y: 80}, {x: 55, y: 45},
+      ];
+    } else if (name === 'random') {
+      for (let i = 0; i < 10; i++) pts.push({ x: rand(10, 90), y: rand(10, 90) });
+    } else if (name === 'grid') {
+      for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) {
+        pts.push({ x: 18 + i * 22, y: 20 + j * 28 });
+      }
+    } else if (name === 'cluster') {
+      // Two clusters
+      for (let i = 0; i < 6; i++) pts.push({ x: rand(15, 40), y: rand(15, 40) });
+      for (let i = 0; i < 6; i++) pts.push({ x: rand(60, 85), y: rand(60, 85) });
+    }
+    pts.forEach(p => { p.id = state.nextPointId++; state.points.push(p); });
+    updateHint();
+    render();
+    setStatus(`已加载 ${pts.length} 个点 · 点「建树」开始`, 'ok');
+  }
+
+  // ====================== EVENTS ======================
+  function setupEvents() {
+    // Mode buttons
+    document.querySelectorAll('#mode-group button').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('#mode-group button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        state.mode = b.dataset.mode;
+        canvas.classList.toggle('search-mode', state.mode === 'search');
+        updateHint();
+      });
+    });
+
+    // Canvas click
+    canvas.addEventListener('click', e => {
+      const rect = canvas.getBoundingClientRect();
+      const sx = e.clientX - rect.left;
+      const sy = e.clientY - rect.top;
+      const area = plotArea();
+      if (sx < area.x0 || sx > area.x1 || sy < area.y0 || sy > area.y1) return;
+      const w = screenToWorld(sx, sy, area);
+
+      if (state.mode === 'add') {
+        // Check if clicked near an existing point → remove
+        const tol = 8;
+        const existing = state.points.find(p => {
+          const s = worldToScreen(p, area);
+          return Math.hypot(s.x - sx, s.y - sy) < tol;
+        });
+        if (existing) {
+          state.points = state.points.filter(p => p.id !== existing.id);
+          // Invalidate tree
+          invalidateTree();
+        } else {
+          state.points.push({ x: +w.x.toFixed(2), y: +w.y.toFixed(2), id: state.nextPointId++ });
+          invalidateTree();
+        }
+        updateHint();
+        render();
+      } else if (state.mode === 'search') {
+        doSearch({ x: w.x, y: w.y });
+      }
+    });
+
+    function invalidateTree() {
+      if (state.tree) {
+        state.tree = null;
+        state.buildSteps = [];
+        state.buildStepIndex = -1;
+        state.searchSteps = [];
+        state.searchStepIndex = -1;
+        state.builtNodes = {};
+        state.searchVisited.clear();
+        state.searchPruned.clear();
+        state.searchBest = null;
+        state.isBuilt = false;
+        renderTree();
+        updateStepUI();
+      }
+    }
+
+    // Build / reset
+    document.getElementById('build-btn').addEventListener('click', doBuild);
+    document.getElementById('reset-btn').addEventListener('click', doReset);
+
+    // Presets
+    document.querySelectorAll('.preset').forEach(b => {
+      b.addEventListener('click', () => loadPreset(b.dataset.preset));
+    });
+
+    // Code tabs
+    document.querySelectorAll('.code-tabs button').forEach(b => {
+      b.addEventListener('click', () => {
+        setActivePane(b.dataset.pane);
+        render();
+        updateTreeDecorations();
+        updateStepUI();
+      });
+    });
+
+    // Step controls
+    document.getElementById('prev-step').addEventListener('click', () => { stopPlay(); gotoStep(-1); });
+    document.getElementById('next-step').addEventListener('click', () => { stopPlay(); gotoStep(+1); });
+    document.getElementById('play-step').addEventListener('click', () => {
+      const pane = state.currentPane;
+      const idx = pane === 'build' ? state.buildStepIndex : state.searchStepIndex;
+      const total = pane === 'build' ? state.buildSteps.length : state.searchSteps.length;
+      // If at end, restart
+      if (idx >= total - 1) {
+        if (pane === 'build') { state.buildStepIndex = -1; applyBuildStep(-1); }
+        else { state.searchStepIndex = -1; applySearchStep(-1); }
+        render();
+        updateTreeDecorations();
+        updateStepUI();
+      }
+      if (state.isPlaying) stopPlay();
+      else startPlay();
+    });
+
+    document.getElementById('speed').addEventListener('input', e => {
+      state.speed = parseFloat(e.target.value);
+      document.getElementById('speed-val').textContent = state.speed.toFixed(2) + '×';
+    });
+
+    // Resize
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      render();
+    });
+  }
+
+  // ====================== INIT ======================
+  function init() {
+    resizeCanvas();
+    renderCode();
+    setupEvents();
+    loadPreset('example');
+    doBuild();
+    state.buildStepIndex = -1;
+    applyBuildStep(-1);
+    state.isPlaying = false;
+    document.getElementById('play-step').textContent = '▶ 播放';
+    render();
+    renderTree();
+    updateStepUI();
+    setStatus('示例就绪 · 点 ▶ 播放看建树过程', 'ok');
+  }
+
+  // Wait for fonts
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(init);
+  } else {
+    window.addEventListener('load', init);
+  }
+})();
+</script>
+</body>
+</html>

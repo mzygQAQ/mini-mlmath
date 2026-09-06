@@ -18,9 +18,10 @@ mini-mlmath/
 │   └── mini_mlmath/          # 库本体，全部 header-only
 │       ├── matrix.h          #   Matrix<T>：动态大小、行主序 + 三种乘法
 │       ├── vector.h          #   Vector<T>：点积 / 模长 / 余弦相似度
-│       ├── softmax.h         #   数值稳定的 softmax → [讲解](docs/softmax.md)
-│       ├── activation.h      #   激活函数：sigmoid + ReLU → [讲解](docs/activation.md)
-│       ├── statistics.h      #   基础描述性统计：mean / median / mode / variance / stddev
+│       ├── softmax.h           #   数值稳定的 softmax → [讲解](docs/softmax.md)
+│       ├── activation.h        #   激活函数：sigmoid + ReLU → [讲解](docs/activation.md)
+│       ├── autograd.h          #   迷你自动求导：Tensor + 记录式反向图（reverse-mode AD）
+│       ├── statistics.h        #   基础描述性统计：mean / median / mode / variance / stddev
 │       ├── random.h          #   类似 numpy.random：均匀/正态随机标量与矩阵
 │       ├── check.h           #   glog 风格 CHECK(pred) << "msg" 断言
 │       ├── feature_selection/    # 特征选择模块（有监督/无监督）
@@ -41,6 +42,7 @@ mini-mlmath/
 └── tests/                    # 测试程序，每个模块一个
     ├── CMakeLists.txt        #   每个 *_test.cpp 一个可执行 + 编译优化选项
     ├── matrix_test.cpp       #   矩阵乘法正确性验证 + 三版性能对比
+    ├── autograd_test.cpp     #   自动求导：手算链式法则 + MLP 数值梯度对拍
     ├── softmax_test.cpp      #   softmax 数值稳定性 / 归一化验证 → [讲解](docs/softmax.md)
     ├── vector_test.cpp       #   点积 / 模长 / 余弦相似度验证
     ├── knn_test.cpp          #   KNN：多数投票 + metric / strategy 扩展点
