@@ -239,6 +239,34 @@ void verify_mlp_numeric() {
 }
 
 // ----------------------------------------------------------------------------
+// 7) 无循环引用 / 无内存泄漏（GradNode::live_count_ 统计活节点数）
+//    out_ 如果也用 shared_ptr 持有输出，会和张量的 grad_fn 形成循环引用，
+//    图永远释放不掉。修复后每轮建图并丢弃，活节点数应回落为 0。
+// ----------------------------------------------------------------------------
+void verify_no_leak() {
+    std::cout << "===== 7) 图释放无泄漏（循环引用检查）=====\n";
+
+    const long long before = GradNode<double>::live_count_.load();
+
+    // 建 200 轮图（每轮含多个节点），每轮结束后所有句柄销毁
+    for (int i = 0; i < 200; ++i) {
+        Tensor<double> a(Matrix<double>({{1.0, 2.0}}), true);
+        Tensor<double> w(Matrix<double>({{3.0, 4.0}}), true);
+        Tensor<double> b(Matrix<double>({{0.5, 0.6}}), true);
+        Tensor<double> loss = sum(relu(a * w + b) * w);   // 一张小图
+        loss.backward();
+        // 作用域结束：loss/a/w/b 全部销毁，图应整体释放
+    }
+
+    const long long after = GradNode<double>::live_count_.load();
+    std::cout << "建图前活节点 = " << before
+              << "，200 轮后 = " << after << "\n";
+    const bool ok = (after == before);
+    std::cout << (ok ? "  ✓（无泄漏，图整体释放）\n" : "  ✗（有循环引用泄漏！）\n");
+    if (!ok) std::exit(1);
+}
+
+// ----------------------------------------------------------------------------
 // 入口
 // ----------------------------------------------------------------------------
 int main() {
@@ -253,6 +281,7 @@ int main() {
     verify_sub_neg();
     verify_accumulate_and_zero_grad();
     verify_mlp_numeric();
+    verify_no_leak();
 
     std::cout << "\n全部通过 ✓\n";
     std::cout << "API：Tensor<T>(matrix, track) 造张量，a+b/a*b/matmul/relu/sum 建图，\n";

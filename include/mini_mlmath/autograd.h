@@ -30,7 +30,9 @@
 // ============================================================================
 #pragma once
 
+#include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <unordered_set>
 #include <utility>
@@ -153,21 +155,33 @@ private:
 //    2) apply()：把「自己输出张量累积到的上游梯度」按链式法则改写成
 //       每个输入的局部梯度，累加到输入张量的 grad 里。
 //
-//  图的引用方向：节点 -> 输入张量（shared_ptr 句柄）。每个张量最多被一个
-//  节点「生产」，节点又只引用更早的张量 —— 整体是严格单向的 DAG，不会
-//  出现 shared_ptr 循环引用，图随最后一个用户句柄析构而整体释放。
+//  图的引用方向（这里要仔细，关系到会不会内存泄漏）：
+//    - 张量 Impl  ——shared_ptr——►  产生它的 GradNode（grad_fn）
+//    - GradNode  ——shared_ptr——►  它的输入张量（inputs_，比它更早）
+//    - GradNode  ——裸指针(不拥有)——►  它的输出张量（out_）
+//  为什么 out_ 用裸指针？如果节点也 shared 持有输出，就会和「输出张量的
+//  grad_fn 持有节点」构成循环引用：Impl ⇄ GradNode 互相牵制，引用计数永不
+//  归零，图永远释放不掉（这是本文件踩过的坑，已修复，见下方 live_count_）。
+//  out_ 用非拥有指针是安全的：节点被它的输出张量通过 grad_fn 持有，所以
+//  「节点活着 ⇒ 输出活着」，节点访问 out_ 时输出必然还活着。
+//  整体：张量→节点→更早的张量，严格单向，无环，图随最后一个用户句柄析构
+//  而整体释放。live_count_ 是验证这一点用的（见 tests/autograd_test.cpp）。
 // ============================================================================
 template <typename T>
 class GradNode {
 public:
-    virtual ~GradNode() = default;
+    // 当前存活的节点数（用于测试验证「图释放无泄漏」）。
+    static inline std::atomic<std::int64_t> live_count_{0};
+
+    GradNode() { live_count_.fetch_add(1); }
+    virtual ~GradNode() { live_count_.fetch_sub(1); }
 
     // 把「输出张量累积到的梯度」分发到各输入的 grad_（按局部梯度公式）。
     virtual void apply() = 0;
 
     // 输出张量的梯度清零（backward 每次开始前清理中间节点）。
     void clear_out_grad() {
-        out_.p_->grad = Matrix<T>(out_.p_->value.rows(), out_.p_->value.cols());
+        out_->grad = Matrix<T>(out_->value.rows(), out_->value.cols());
     }
 
     // 后序遍历收集整张图（依赖在前、自身在后），供 backward 逆序调度。
@@ -180,17 +194,21 @@ public:
     }
 
 protected:
-    Tensor<T> out_;                     // 我产生的输出张量（反向时读它的 grad）
-    std::vector<Tensor<T>> inputs_;     // 我的直接输入（含常数，图遍历用）
+    typename Tensor<T>::Impl* out_ = nullptr;  // 输出（非拥有，见文件头注释）
+    std::vector<Tensor<T>> inputs_;     // 我的直接输入（拥有，图遍历用）
 
-    GradNode(const Tensor<T>& out, std::vector<Tensor<T>> inputs)
-        : out_(out), inputs_(std::move(inputs)) {}
+    GradNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
+             std::vector<Tensor<T>> inputs)
+        : out_(out.get()), inputs_(std::move(inputs)) {
+        // 参数化构造也要计入 live_count_（析构统一 -1，构造必须对称 +1）
+        live_count_.fetch_add(1);
+    }
 
     // 读取输入张量的前向值（apply 的局部梯度公式要用）。
     const Matrix<T>& val(const Tensor<T>& t) const { return t.p_->value; }
 
     // 读取「我输出张量」已累积到的上游梯度。
-    const Matrix<T>& out_grad() const { return out_.p_->grad; }
+    const Matrix<T>& out_grad() const { return out_->grad; }
 
     // 把局部梯度 g 累加进输入张量的 grad_；常数张量（不追踪）直接跳过。
     void accumulate(const Tensor<T>& in, const Matrix<T>& g) {
@@ -297,7 +315,7 @@ class AddNode : public GradNode<T> {
 public:
     AddNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
             const Tensor<T>& a, const Tensor<T>& b)
-        : GradNode<T>(Tensor<T>(out), {a, b}), a_(a), b_(b) {}
+        : GradNode<T>(out, {a, b}), a_(a), b_(b) {}
     void apply() override {
         this->accumulate(a_, this->out_grad());
         this->accumulate(b_, this->out_grad());
@@ -312,7 +330,7 @@ class SubNode : public GradNode<T> {
 public:
     SubNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
             const Tensor<T>& a, const Tensor<T>& b)
-        : GradNode<T>(Tensor<T>(out), {a, b}), a_(a), b_(b) {}
+        : GradNode<T>(out, {a, b}), a_(a), b_(b) {}
     void apply() override {
         this->accumulate(a_, this->out_grad());
         this->accumulate(b_, ew_scale(this->out_grad(), T(-1)));
@@ -327,7 +345,7 @@ class MulNode : public GradNode<T> {
 public:
     MulNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
             const Tensor<T>& a, const Tensor<T>& b)
-        : GradNode<T>(Tensor<T>(out), {a, b}), a_(a), b_(b) {}
+        : GradNode<T>(out, {a, b}), a_(a), b_(b) {}
     void apply() override {
         const auto& g = this->out_grad();
         this->accumulate(a_, ew_mul(g, this->val(b_)));
@@ -343,7 +361,7 @@ class DivNode : public GradNode<T> {
 public:
     DivNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
             const Tensor<T>& a, const Tensor<T>& b)
-        : GradNode<T>(Tensor<T>(out), {a, b}), a_(a), b_(b) {}
+        : GradNode<T>(out, {a, b}), a_(a), b_(b) {}
     void apply() override {
         const auto& g = this->out_grad();
         const auto& av = this->val(a_);
@@ -361,7 +379,7 @@ class ScalarMulNode : public GradNode<T> {
 public:
     ScalarMulNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
                   const Tensor<T>& a, const T& s)
-        : GradNode<T>(Tensor<T>(out), {a}), a_(a), s_(s) {}
+        : GradNode<T>(out, {a}), a_(a), s_(s) {}
     void apply() override {
         this->accumulate(a_, ew_scale(this->out_grad(), s_));
     }
@@ -379,7 +397,7 @@ class MatMulNode : public GradNode<T> {
 public:
     MatMulNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
                const Tensor<T>& a, const Tensor<T>& b)
-        : GradNode<T>(Tensor<T>(out), {a, b}), a_(a), b_(b) {}
+        : GradNode<T>(out, {a, b}), a_(a), b_(b) {}
     void apply() override {
         const auto& g = this->out_grad();
         this->accumulate(a_, g * this->val(b_).transposed());
@@ -396,7 +414,7 @@ class SumNode : public GradNode<T> {
 public:
     SumNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
             const Tensor<T>& a)
-        : GradNode<T>(Tensor<T>(out), {a}), a_(a) {}
+        : GradNode<T>(out, {a}), a_(a) {}
     void apply() override {
         this->accumulate(a_, filled(this->val(a_), this->out_grad()(0, 0)));
     }
@@ -411,7 +429,7 @@ class ReluNode : public GradNode<T> {
 public:
     ReluNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
              const Tensor<T>& a)
-        : GradNode<T>(Tensor<T>(out), {a}), a_(a) {}
+        : GradNode<T>(out, {a}), a_(a) {}
     void apply() override {
         const auto& g = this->out_grad();
         const auto& av = this->val(a_);
