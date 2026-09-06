@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 400" font-family="sans-serif">
+  <!-- ============ fan-out：w 被两个消费者引用，梯度 += 累加 ============ -->
+  <defs>
+    <marker id="arrowF" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e88e5"/>
+    </marker>
+    <marker id="arrowR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e53935"/>
+    </marker>
+  </defs>
+
+  <text x="430" y="28" text-anchor="middle" font-size="20" font-weight="bold">fan-out：一个叶子被多个消费者引用</text>
+  <text x="430" y="50" text-anchor="middle" font-size="14" fill="#666">y₁ = w*3，y₂ = w*4，loss = sum(y₁ + y₂)；梯度要按 += 累加：3 + 4 = 7</text>
+
+  <!-- w 叶子（橙） -->
+  <rect x="30" y="170" width="120" height="80" rx="8" fill="#fff3e0" stroke="#fb8c00" stroke-width="2.5"/>
+  <text x="90" y="202" text-anchor="middle" font-size="18" font-weight="bold">w = [2]</text>
+  <text x="90" y="228" text-anchor="middle" font-size="12" fill="#888">叶子（track）</text>
+
+  <!-- y1 / y2（蓝） -->
+  <rect x="330" y="60" width="120" height="70" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="390" y="92" text-anchor="middle" font-size="16" font-weight="bold">y₁ = w*3</text>
+  <text x="390" y="116" text-anchor="middle" font-size="11" fill="#555">= [6]</text>
+
+  <rect x="330" y="290" width="120" height="70" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="390" y="322" text-anchor="middle" font-size="16" font-weight="bold">y₂ = w*4</text>
+  <text x="390" y="346" text-anchor="middle" font-size="11" fill="#555">= [8]</text>
+
+  <!-- Add（绿） -->
+  <rect x="600" y="160" width="110" height="100" rx="10" fill="#e8f5e9" stroke="#43a047" stroke-width="2.5"/>
+  <text x="655" y="198" text-anchor="middle" font-size="17" font-weight="bold">Add</text>
+  <text x="655" y="226" text-anchor="middle" font-size="13" fill="#2e7d32">da = g</text>
+  <text x="655" y="246" text-anchor="middle" font-size="13" fill="#2e7d32">db = g</text>
+
+  <!-- loss -->
+  <rect x="770" y="170" width="80" height="80" rx="8" fill="#fce4ec" stroke="#e53935" stroke-width="2"/>
+  <text x="810" y="204" text-anchor="middle" font-size="16" font-weight="bold">loss</text>
+  <text x="810" y="232" text-anchor="middle" font-size="12" fill="#c62828">= 14</text>
+
+  <!-- 前向（蓝） -->
+  <line x1="150" y1="185" x2="328" y2="95" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="150" y1="235" x2="328" y2="315" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="450" y1="95" x2="598" y2="190" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="450" y1="325" x2="598" y2="230" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="710" y1="210" x2="768" y2="210" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+
+  <!-- 反向（红虚线） -->
+  <!-- loss -> Add -->
+  <line x1="770" y1="250" x2="712" y2="250" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="735" y="272" font-size="13" fill="#c62828">g = 1</text>
+
+  <!-- Add -> y1（梯度 1 原样分两份），y1 -> w（×3） -->
+  <line x1="600" y1="235" x2="452" y2="135" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="470" y="120" font-size="13" fill="#c62828">1</text>
+
+  <!-- Add -> y2（×4） -->
+  <line x1="600" y1="250" x2="452" y2="320" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="475" y="352" font-size="13" fill="#c62828">1</text>
+
+  <!-- y1 -> w（梯度 1*3=3） -->
+  <line x1="330" y1="130" x2="152" y2="195" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="205" y="140" font-size="13" fill="#c62828">3</text>
+
+  <!-- y2 -> w（梯度 1*4=4） -->
+  <line x1="330" y1="315" x2="152" y2="250" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="205" y="318" font-size="13" fill="#c62828">4</text>
+
+  <!-- w 梯度累积标注 -->
+  <text x="90" y="300" text-anchor="middle" font-size="14" font-weight="bold" fill="#c62828">w.grad = 3 + 4 = 7</text>
+  <text x="90" y="322" text-anchor="middle" font-size="12" fill="#888">两个消费者各贡献一份，+= 累加</text>
+
+  <!-- 底部说明：拓扑序保证消费者先跑 -->
+  <text x="430" y="380" text-anchor="middle" font-size="12" fill="#777">拓扑逆序调度：Add 先 apply（把 1 分给 y₁、y₂），两个 ScalarMul 再各自累加到 w —— 所以 w 能收到 3 和 4 两份</text>
+</svg>

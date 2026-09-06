@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 470" font-family="sans-serif">
+  <!-- ============ 三层 MLP 的完整反向：梯度一层层流回参数 ============ -->
+  <defs>
+    <marker id="arrowF" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e88e5"/>
+    </marker>
+    <marker id="arrowR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e53935"/>
+    </marker>
+  </defs>
+
+  <text x="510" y="28" text-anchor="middle" font-size="20" font-weight="bold">三层 MLP 的完整反向：梯度一层层流回参数</text>
+  <text x="510" y="50" text-anchor="middle" font-size="14" fill="#666">h = relu(X@W1)，out = h@W2，loss = sum(out) = 0.43</text>
+
+  <!-- 参数 W1 / W2（橙） -->
+  <rect x="180" y="52" width="130" height="66" rx="8" fill="#fff3e0" stroke="#fb8c00" stroke-width="2.5"/>
+  <text x="245" y="80" text-anchor="middle" font-size="17" font-weight="bold">W1（2×3）</text>
+  <text x="245" y="102" text-anchor="middle" font-size="12" fill="#888">参数（叶子）</text>
+
+  <rect x="820" y="52" width="130" height="66" rx="8" fill="#fff3e0" stroke="#fb8c00" stroke-width="2.5"/>
+  <text x="885" y="80" text-anchor="middle" font-size="17" font-weight="bold">W2（3×1）</text>
+  <text x="885" y="102" text-anchor="middle" font-size="12" fill="#888">参数（叶子）</text>
+
+  <!-- 算子（绿） -->
+  <rect x="150" y="215" width="100" height="90" rx="10" fill="#e8f5e9" stroke="#43a047" stroke-width="2.5"/>
+  <text x="200" y="250" text-anchor="middle" font-size="16" font-weight="bold">MatMul₁</text>
+  <text x="200" y="276" text-anchor="middle" font-size="12" fill="#2e7d32">da = g@bᵀ</text>
+  <text x="200" y="295" text-anchor="middle" font-size="12" fill="#2e7d32">db = aᵀ@g</text>
+
+  <rect x="450" y="215" width="100" height="90" rx="10" fill="#e8f5e9" stroke="#43a047" stroke-width="2.5"/>
+  <text x="500" y="252" text-anchor="middle" font-size="16" font-weight="bold">Relu</text>
+  <text x="500" y="276" text-anchor="middle" font-size="12" fill="#2e7d32">掩码 a>0</text>
+  <text x="500" y="295" text-anchor="middle" font-size="11" fill="#888">h 全正 → 原样通过</text>
+
+  <rect x="750" y="215" width="100" height="90" rx="10" fill="#e8f5e9" stroke="#43a047" stroke-width="2.5"/>
+  <text x="800" y="250" text-anchor="middle" font-size="16" font-weight="bold">MatMul₂</text>
+  <text x="800" y="276" text-anchor="middle" font-size="12" fill="#2e7d32">da = g@bᵀ</text>
+  <text x="800" y="295" text-anchor="middle" font-size="12" fill="#2e7d32">db = aᵀ@g</text>
+
+  <!-- 张量（蓝） -->
+  <rect x="20" y="230" width="80" height="60" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="60" y="256" text-anchor="middle" font-size="17" font-weight="bold">X</text>
+  <text x="60" y="278" text-anchor="middle" font-size="11" fill="#555">[1, -0.5]</text>
+
+  <rect x="320" y="230" width="80" height="60" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="360" y="256" text-anchor="middle" font-size="15" font-weight="bold">X@W1</text>
+  <text x="360" y="278" text-anchor="middle" font-size="11" fill="#555">[0.5, 0.4, 0.3]</text>
+
+  <rect x="620" y="230" width="80" height="60" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="660" y="256" text-anchor="middle" font-size="17" font-weight="bold">h</text>
+  <text x="660" y="278" text-anchor="middle" font-size="11" fill="#555">[0.5, 0.4, 0.3]</text>
+
+  <rect x="920" y="230" width="80" height="60" rx="8" fill="#fce4ec" stroke="#e53935" stroke-width="2"/>
+  <text x="960" y="256" text-anchor="middle" font-size="15" font-weight="bold">out</text>
+  <text x="960" y="278" text-anchor="middle" font-size="11" fill="#555">= loss 0.43</text>
+
+  <!-- 参数 -> 算子 连线 -->
+  <line x1="245" y1="118" x2="205" y2="213" stroke="#fb8c00" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="885" y1="118" x2="805" y2="213" stroke="#fb8c00" stroke-width="2.5" marker-end="url(#arrowF)"/>
+
+  <!-- 前向（蓝） -->
+  <line x1="100" y1="260" x2="148" y2="260" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="250" y1="260" x2="318" y2="260" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="400" y1="260" x2="448" y2="260" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="550" y1="260" x2="618" y2="260" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="700" y1="260" x2="748" y2="260" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="850" y1="260" x2="918" y2="260" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+
+  <!-- 反向（红虚线），y = 330 -->
+  <line x1="920" y1="330" x2="852" y2="330" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="875" y="322" font-size="13" fill="#c62828">g = 1</text>
+
+  <line x1="750" y1="330" x2="702" y2="330" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="715" y="322" font-size="13" fill="#c62828">[0.5, 0.3, 0.2]</text>
+
+  <line x1="620" y1="330" x2="552" y2="330" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="555" y="322" font-size="13" fill="#c62828">[0.5, 0.3, 0.2]</text>
+
+  <line x1="450" y1="330" x2="402" y2="330" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="410" y="322" font-size="13" fill="#c62828">[0.5, 0.3, 0.2]</text>
+
+  <line x1="320" y1="330" x2="252" y2="330" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="260" y="322" font-size="13" fill="#c62828">[0.5, 0.3, 0.2]</text>
+
+  <line x1="150" y1="330" x2="102" y2="330" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <text x="60" y="322" font-size="12" fill="#999">常数，丢弃</text>
+
+  <!-- 参数的梯度结果（红） -->
+  <text x="110" y="140" font-size="13" font-weight="bold" fill="#c62828">∂loss/∂W1 = [[0.5, 0.3, 0.2],</text>
+  <text x="110" y="160" font-size="13" font-weight="bold" fill="#c62828">             [-0.25, -0.15, -0.1]]</text>
+  <text x="110" y="182" font-size="11" fill="#888">（X 的各列系数 × 上游梯度）</text>
+
+  <text x="830" y="140" font-size="13" font-weight="bold" fill="#c62828">∂loss/∂W2 = [0.5, 0.4, 0.3]ᵀ</text>
+  <text x="830" y="160" font-size="11" fill="#888">（就是 h！）</text>
+
+  <!-- 图例 -->
+  <line x1="470" y1="420" x2="520" y2="420" stroke="#1e88e5" stroke-width="2.5"/>
+  <text x="530" y="425" font-size="13" fill="#555">前向（算值 + 建图）</text>
+  <line x1="660" y1="420" x2="710" y2="420" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5"/>
+  <text x="720" y="425" font-size="13" fill="#555">反向（梯度信号）</text>
+
+  <!-- 底部总结 -->
+  <text x="510" y="455" text-anchor="middle" font-size="12" fill="#777">每个算子独立用「对输入的偏导 × 上游梯度」拆梯度；W2 的梯度就是 h，W1 的梯度由 X 的系数放大/缩小</text>
+</svg>

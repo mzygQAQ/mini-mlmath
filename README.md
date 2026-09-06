@@ -20,7 +20,7 @@ mini-mlmath/
 │       ├── vector.h          #   Vector<T>：点积 / 模长 / 余弦相似度
 │       ├── softmax.h           #   数值稳定的 softmax → [讲解](docs/softmax.md)
 │       ├── activation.h        #   激活函数：sigmoid + ReLU → [讲解](docs/activation.md)
-│       ├── autograd.h          #   迷你自动求导：Tensor + 记录式反向图（reverse-mode AD）
+│       ├── autograd.h          #   迷你自动求导：Tensor + 记录式反向图 → [讲解](docs/autograd.md)
 │       ├── statistics.h        #   基础描述性统计：mean / median / mode / variance / stddev
 │       ├── random.h          #   类似 numpy.random：均匀/正态随机标量与矩阵
 │       ├── check.h           #   glog 风格 CHECK(pred) << "msg" 断言

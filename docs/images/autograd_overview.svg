@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 340" font-family="sans-serif">
+  <!-- ============ 自动求导总览：前向建图 + 反向传梯度 ============ -->
+  <defs>
+    <marker id="arrowF" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e88e5"/>
+    </marker>
+    <marker id="arrowR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e53935"/>
+    </marker>
+  </defs>
+
+  <text x="470" y="28" text-anchor="middle" font-size="20" font-weight="bold">自动求导 = 前向建图 + 反向传梯度</text>
+
+  <!-- 张量（值） -->
+  <rect x="30"  y="80" width="70" height="60" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="65" y="106" text-anchor="middle" font-size="18" font-weight="bold">x</text>
+  <text x="65" y="128" text-anchor="middle" font-size="11" fill="#555">输入</text>
+
+  <rect x="290" y="80" width="70" height="60" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="325" y="106" text-anchor="middle" font-size="18" font-weight="bold">y₁</text>
+  <text x="325" y="128" text-anchor="middle" font-size="11" fill="#555">中间量</text>
+
+  <rect x="550" y="80" width="70" height="60" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="585" y="106" text-anchor="middle" font-size="18" font-weight="bold">y₂</text>
+  <text x="585" y="128" text-anchor="middle" font-size="11" fill="#555">中间量</text>
+
+  <rect x="810" y="80" width="80" height="60" rx="8" fill="#fce4ec" stroke="#e53935" stroke-width="2"/>
+  <text x="850" y="106" text-anchor="middle" font-size="18" font-weight="bold">loss</text>
+  <text x="850" y="128" text-anchor="middle" font-size="11" fill="#555">终点</text>
+
+  <!-- 算子（反向节点） -->
+  <rect x="150" y="72" width="90" height="56" rx="10" fill="#e8f5e9" stroke="#43a047" stroke-width="2"/>
+  <text x="195" y="99" text-anchor="middle" font-size="16" font-weight="bold">算子</text>
+  <text x="195" y="118" text-anchor="middle" font-size="11" fill="#555">grad_fn</text>
+
+  <rect x="410" y="72" width="90" height="56" rx="10" fill="#e8f5e9" stroke="#43a047" stroke-width="2"/>
+  <text x="455" y="99" text-anchor="middle" font-size="16" font-weight="bold">算子</text>
+  <text x="455" y="118" text-anchor="middle" font-size="11" fill="#555">grad_fn</text>
+
+  <rect x="670" y="72" width="90" height="56" rx="10" fill="#e8f5e9" stroke="#43a047" stroke-width="2"/>
+  <text x="715" y="99" text-anchor="middle" font-size="16" font-weight="bold">算子</text>
+  <text x="715" y="118" text-anchor="middle" font-size="11" fill="#555">grad_fn</text>
+
+  <!-- 前向（蓝色实线） -->
+  <line x1="100" y1="110" x2="148" y2="110" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="240" y1="110" x2="288" y2="110" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="360" y1="110" x2="408" y2="110" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="500" y1="110" x2="548" y2="110" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="620" y1="110" x2="668" y2="110" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+  <line x1="760" y1="110" x2="808" y2="110" stroke="#1e88e5" stroke-width="2.5" marker-end="url(#arrowF)"/>
+
+  <!-- 反向（红色虚线，从右到左） -->
+  <line x1="810" y1="170" x2="762" y2="170" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <line x1="700" y1="170" x2="662" y2="170" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <line x1="550" y1="170" x2="502" y2="170" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <line x1="440" y1="170" x2="402" y2="170" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <line x1="290" y1="170" x2="242" y2="170" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+  <line x1="180" y1="170" x2="132" y2="170" stroke="#e53935" stroke-width="2.5" stroke-dasharray="7,5" marker-end="url(#arrowR)"/>
+
+  <!-- 说明区 -->
+  <text x="30" y="230" font-size="15" fill="#1e88e5">前向（蓝，→）：从左到右——算值，并给每个结果挂 grad_fn（建图）</text>
+  <text x="30" y="258" font-size="15" fill="#e53935">反向（红，←）：从右到左——初始梯度 1，按拓扑逆序跑每个节点的 apply()</text>
+  <text x="30" y="286" font-size="13" fill="#777">每个算子节点里存着前向时的输入张量：图遍历（拓扑排序）和局部梯度公式都要用它们。</text>
+</svg>
