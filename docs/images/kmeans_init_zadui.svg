@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 560" font-family="sans-serif">
+  <!-- ============ k-means 重点问题①：随机初始化质心会扎堆 ============ -->
+  <!-- 左栏（坏）：随机初始化，两个质心都落在左簇；右栏（好）：k-means++ 让质心分居两簇 -->
+  <!-- 左簇中心约 (200,345)，右簇中心约 (340,195)；质心用 ✕ 十字标记 -->
+
+  <text x="470" y="34" text-anchor="middle" font-size="20" font-weight="bold">
+    随机初始化的质心会「扎堆」：Lloyd 救不回来（左）vs k-means++ 让质心分散（右）
+  </text>
+  <text x="470" y="56" text-anchor="middle" font-size="14" fill="#555">✕ = 质心（红、蓝各一个）；同色样本归同一簇</text>
+
+  <!-- 左栏标题 / 右栏标题 / 中分隔线 -->
+  <text x="260" y="82" text-anchor="middle" font-size="16" font-weight="bold" fill="#c62828">随机初始化：两个质心全扎在左簇</text>
+  <text x="700" y="82" text-anchor="middle" font-size="16" font-weight="bold" fill="#1b5e20">k-means++：两个质心分居两簇</text>
+  <line x1="480" y1="95" x2="480" y2="470" stroke="#bbb" stroke-width="1.5" stroke-dasharray="6,5"/>
+
+  <!-- ============ 左栏（坏）：随机初始化 → 扎堆 → 坏局部最优 ============ -->
+  <!-- 右簇点：全被质心 C1(200,345) 吞并 → 红 -->
+  <g fill="#e53935">
+    <circle cx="315" cy="165" r="5.5"/>
+    <circle cx="330" cy="175" r="5.5"/>
+    <circle cx="345" cy="170" r="5.5"/>
+    <circle cx="320" cy="195" r="5.5"/>
+    <circle cx="340" cy="190" r="5.5"/>
+    <circle cx="355" cy="205" r="5.5"/>
+    <circle cx="330" cy="215" r="5.5"/>
+    <circle cx="350" cy="210" r="5.5"/>
+    <circle cx="340" cy="225" r="5.5"/>
+    <circle cx="325" cy="200" r="5.5"/>
+  </g>
+  <!-- 左簇点：归 C1 的一半 → 红 -->
+  <g fill="#e53935">
+    <circle cx="175" cy="320" r="5.5"/>
+    <circle cx="190" cy="330" r="5.5"/>
+    <circle cx="205" cy="325" r="5.5"/>
+    <circle cx="180" cy="350" r="5.5"/>
+    <circle cx="200" cy="345" r="5.5"/>
+    <circle cx="185" cy="360" r="5.5"/>
+  </g>
+  <!-- 左簇点：归 C2 的一半 → 蓝（左簇被切成两半） -->
+  <g fill="#1e88e5">
+    <circle cx="215" cy="360" r="5.5"/>
+    <circle cx="190" cy="370" r="5.5"/>
+    <circle cx="210" cy="365" r="5.5"/>
+    <circle cx="200" cy="380" r="5.5"/>
+  </g>
+  <!-- 质心 C1 / C2（都在左簇，扎堆） -->
+  <path d="M 191,336 L 209,354 M 191,354 L 209,336" stroke="#c62828" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 201,359 L 219,377 M 201,377 L 219,359" stroke="#1565c0" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- ============ 右栏（好）：k-means++ → 质心分居两簇 ============ -->
+  <!-- 左簇点：全红 -->
+  <g fill="#e53935">
+    <circle cx="615" cy="320" r="5.5"/>
+    <circle cx="630" cy="330" r="5.5"/>
+    <circle cx="645" cy="325" r="5.5"/>
+    <circle cx="620" cy="350" r="5.5"/>
+    <circle cx="640" cy="345" r="5.5"/>
+    <circle cx="625" cy="360" r="5.5"/>
+    <circle cx="655" cy="360" r="5.5"/>
+    <circle cx="630" cy="370" r="5.5"/>
+    <circle cx="650" cy="365" r="5.5"/>
+    <circle cx="640" cy="380" r="5.5"/>
+  </g>
+  <!-- 右簇点：全蓝 -->
+  <g fill="#1e88e5">
+    <circle cx="755" cy="165" r="5.5"/>
+    <circle cx="770" cy="175" r="5.5"/>
+    <circle cx="785" cy="170" r="5.5"/>
+    <circle cx="760" cy="195" r="5.5"/>
+    <circle cx="780" cy="190" r="5.5"/>
+    <circle cx="795" cy="205" r="5.5"/>
+    <circle cx="770" cy="215" r="5.5"/>
+    <circle cx="790" cy="210" r="5.5"/>
+    <circle cx="780" cy="225" r="5.5"/>
+    <circle cx="765" cy="200" r="5.5"/>
+  </g>
+  <!-- 质心 C1 / C2（一个在左簇、一个在右簇） -->
+  <path d="M 631,336 L 649,354 M 631,354 L 649,336" stroke="#c62828" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 771,186 L 789,204 M 771,204 L 789,186" stroke="#1565c0" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- 底部说明 -->
+  <text x="260" y="505" text-anchor="middle" font-size="14" fill="#c62828">左簇被切成两半 ✗　右簇整团被吞并 ✗</text>
+  <text x="260" y="528" text-anchor="middle" font-size="13" fill="#666">收敛进「坏局部最优」，且 Lloyd 救不回来</text>
+  <text x="700" y="516" text-anchor="middle" font-size="14" fill="#1b5e20">每簇各得一个质心 ✓　收敛进好结果</text>
+</svg>

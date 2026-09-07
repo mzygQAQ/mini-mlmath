@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 560" font-family="sans-serif">
+  <!-- ============ k-means 重点问题②：k 的取值直接决定结果 ============ -->
+  <!-- 同一份三簇数据，画三次：k=2（欠拟合）/ k=3（刚好）/ k=5（过拟合） -->
+  <!-- 数据：簇 A 左下、簇 B 右下、簇 C 上方；质心用 ✕ 十字标记 -->
+  <!-- 基准坐标（栏1）；栏2 全部 x+270；栏3 全部 x+540 -->
+
+  <text x="470" y="34" text-anchor="middle" font-size="20" font-weight="bold">
+    同一个数据，k 取不同值 → 聚类结果天差地别
+  </text>
+  <text x="470" y="56" text-anchor="middle" font-size="14" fill="#555">✕ = 质心；同色样本归同一簇</text>
+
+  <!-- 三栏标题 + 分隔线 -->
+  <text x="175" y="82" text-anchor="middle" font-size="16" font-weight="bold" fill="#c62828">k = 2（欠拟合）</text>
+  <text x="445" y="82" text-anchor="middle" font-size="16" font-weight="bold" fill="#1b5e20">k = 3（刚好）</text>
+  <text x="715" y="82" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">k = 5（过拟合）</text>
+  <line x1="310" y1="95" x2="310" y2="455" stroke="#bbb" stroke-width="1.5" stroke-dasharray="6,5"/>
+  <line x1="580" y1="95" x2="580" y2="455" stroke="#bbb" stroke-width="1.5" stroke-dasharray="6,5"/>
+
+  <!-- ============ 栏1：k=2 —— A、B 被并成一簇（紫），C 一簇（绿） ============ -->
+  <!-- 簇 A（紫） -->
+  <g fill="#7e57c2">
+    <circle cx="80" cy="260" r="5.5"/><circle cx="90" cy="275" r="5.5"/>
+    <circle cx="100" cy="255" r="5.5"/><circle cx="85" cy="300" r="5.5"/>
+    <circle cx="100" cy="295" r="5.5"/><circle cx="110" cy="280" r="5.5"/>
+    <circle cx="95" cy="315" r="5.5"/><circle cx="110" cy="310" r="5.5"/>
+  </g>
+  <!-- 簇 B（紫，和 A 并成一簇） -->
+  <g fill="#7e57c2">
+    <circle cx="225" cy="265" r="5.5"/><circle cx="235" cy="280" r="5.5"/>
+    <circle cx="245" cy="260" r="5.5"/><circle cx="230" cy="305" r="5.5"/>
+    <circle cx="245" cy="300" r="5.5"/><circle cx="255" cy="285" r="5.5"/>
+    <circle cx="240" cy="320" r="5.5"/><circle cx="255" cy="315" r="5.5"/>
+  </g>
+  <!-- 簇 C（绿） -->
+  <g fill="#43a047">
+    <circle cx="150" cy="120" r="5.5"/><circle cx="160" cy="135" r="5.5"/>
+    <circle cx="170" cy="115" r="5.5"/><circle cx="155" cy="155" r="5.5"/>
+    <circle cx="170" cy="150" r="5.5"/><circle cx="180" cy="135" r="5.5"/>
+    <circle cx="165" cy="170" r="5.5"/><circle cx="180" cy="165" r="5.5"/>
+  </g>
+  <!-- 质心：并簇质心落在 A/B 之间的真空区（紫十字），C 质心（绿十字） -->
+  <path d="M 160,282 L 178,300 M 160,300 L 178,282" stroke="#4527a0" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 157,132 L 175,150 M 157,150 L 175,132" stroke="#2e7d32" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- ============ 栏2：k=3 —— A 红、B 蓝、C 绿，正好 ============ -->
+  <!-- 簇 A（红） -->
+  <g fill="#e53935">
+    <circle cx="350" cy="260" r="5.5"/><circle cx="360" cy="275" r="5.5"/>
+    <circle cx="370" cy="255" r="5.5"/><circle cx="355" cy="300" r="5.5"/>
+    <circle cx="370" cy="295" r="5.5"/><circle cx="380" cy="280" r="5.5"/>
+    <circle cx="365" cy="315" r="5.5"/><circle cx="380" cy="310" r="5.5"/>
+  </g>
+  <!-- 簇 B（蓝） -->
+  <g fill="#1e88e5">
+    <circle cx="495" cy="265" r="5.5"/><circle cx="505" cy="280" r="5.5"/>
+    <circle cx="515" cy="260" r="5.5"/><circle cx="500" cy="305" r="5.5"/>
+    <circle cx="515" cy="300" r="5.5"/><circle cx="525" cy="285" r="5.5"/>
+    <circle cx="510" cy="320" r="5.5"/><circle cx="525" cy="315" r="5.5"/>
+  </g>
+  <!-- 簇 C（绿） -->
+  <g fill="#43a047">
+    <circle cx="420" cy="120" r="5.5"/><circle cx="430" cy="135" r="5.5"/>
+    <circle cx="440" cy="115" r="5.5"/><circle cx="425" cy="155" r="5.5"/>
+    <circle cx="440" cy="150" r="5.5"/><circle cx="450" cy="135" r="5.5"/>
+    <circle cx="435" cy="170" r="5.5"/><circle cx="450" cy="165" r="5.5"/>
+  </g>
+  <!-- 质心：每簇一个，落在簇内 -->
+  <path d="M 362,283 L 380,301 M 362,301 L 380,283" stroke="#c62828" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 505,282 L 523,300 M 505,300 L 523,282" stroke="#1565c0" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 427,132 L 445,150 M 427,150 L 445,132" stroke="#2e7d32" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- ============ 栏3：k=5 —— 真实簇被切碎 ============ -->
+  <!-- 簇 A 上半（红）+ 下半（橙） -->
+  <g fill="#e53935">
+    <circle cx="620" cy="260" r="5.5"/><circle cx="630" cy="275" r="5.5"/>
+    <circle cx="640" cy="255" r="5.5"/><circle cx="640" cy="295" r="5.5"/>
+    <circle cx="650" cy="280" r="5.5"/>
+  </g>
+  <g fill="#fb8c00">
+    <circle cx="625" cy="300" r="5.5"/><circle cx="635" cy="315" r="5.5"/>
+    <circle cx="650" cy="310" r="5.5"/>
+  </g>
+  <!-- 簇 B 上半（蓝）+ 下半（紫） -->
+  <g fill="#1e88e5">
+    <circle cx="765" cy="265" r="5.5"/><circle cx="775" cy="280" r="5.5"/>
+    <circle cx="785" cy="260" r="5.5"/><circle cx="795" cy="285" r="5.5"/>
+  </g>
+  <g fill="#8e24aa">
+    <circle cx="770" cy="305" r="5.5"/><circle cx="785" cy="300" r="5.5"/>
+    <circle cx="780" cy="320" r="5.5"/><circle cx="795" cy="315" r="5.5"/>
+  </g>
+  <!-- 簇 C（绿，保持一簇） -->
+  <g fill="#43a047">
+    <circle cx="690" cy="120" r="5.5"/><circle cx="700" cy="135" r="5.5"/>
+    <circle cx="710" cy="115" r="5.5"/><circle cx="695" cy="155" r="5.5"/>
+    <circle cx="710" cy="150" r="5.5"/><circle cx="720" cy="135" r="5.5"/>
+    <circle cx="705" cy="170" r="5.5"/><circle cx="720" cy="165" r="5.5"/>
+  </g>
+  <!-- 质心：5 个（A 被切成两片、B 被切成两片、C 一片） -->
+  <path d="M 632,264 L 650,282 M 632,282 L 650,264" stroke="#c62828" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 632,299 L 650,317 M 632,317 L 650,299" stroke="#ef6c00" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 775,263 L 793,281 M 775,281 L 793,263" stroke="#1565c0" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 776,301 L 794,319 M 776,319 L 794,301" stroke="#6a1b9a" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 697,132 L 715,150 M 697,150 L 715,132" stroke="#2e7d32" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- 底部说明 -->
+  <text x="175" y="485" text-anchor="middle" font-size="14" fill="#c62828">A、B 被并成一簇，质心落在中间「真空区」</text>
+  <text x="175" y="507" text-anchor="middle" font-size="13" fill="#666">惯性 J 很大，划分无意义 ✗</text>
+  <text x="445" y="485" text-anchor="middle" font-size="14" fill="#1b5e20">每簇一个质心、正好落回簇内</text>
+  <text x="445" y="507" text-anchor="middle" font-size="13" fill="#666">J 小且符合直觉 ✓</text>
+  <text x="715" y="485" text-anchor="middle" font-size="14" fill="#e65100">真实簇被切碎，J 更小</text>
+  <text x="715" y="507" text-anchor="middle" font-size="13" fill="#666">但每一块都没有意义 ✗（k=n 时 J=0）</text>
+</svg>
