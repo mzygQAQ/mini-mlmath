@@ -31,13 +31,15 @@ mini-mlmath/
 │       └── ml/                   # 机器学习模型模块
 │           ├── perceptron.h         #   感知机 → [原理](docs/perceptron.md) / [逻辑门](docs/logic_gates.md)
 │           ├── linear_regression.h  #   线性回归 → [原理](docs/linear_regression.md)
-│           └── knn.h               #   K 近邻 → [原理](docs/knn.md)
+│           ├── knn.h               #   K 近邻 → [原理](docs/knn.md)
+│           └── kmeans.h            #   K 均值聚类（骨架，待实现）→ [原理](docs/kmeans.md)
 ├── docs/                      # 文档：原理讲解 + 配图
 │   ├── perceptron.md          #   感知机原理（结构 / 学习规则 / 收敛定理）
 │   ├── logic_gates.md         #   逻辑门：AND / OR / NAND 权重推导 + XOR 不可分
 │   ├── activation.md          #   激活函数：sigmoid / ReLU vs 阶跃、ReLU 为什么成为现代默认
 │   ├── linear_regression.md   #   线性回归：模型、闭式解 / 梯度下降、R²、bias folding
-│   ├── knn.md                 #   KNN：常见 metric、搜索策略（暴力/KDTree/BallTree）
+│   ├── knn.md             #   KNN：常见 metric、搜索策略（暴力/KDTree/BallTree）
+│   ├── kmeans.md          #   KMeans：Lloyd 迭代、初始化策略、k 怎么选
 │   ├── softmax.md             #   softmax：减 max 数值稳定性、attention 用法、温度
 │   ├── autograd.md            #   自动求导：反向图 + 梯度怎么算出来
 │   ├── chain_rule.md          #   链式法则：零基础入门（反向传播的地基）
@@ -52,7 +54,8 @@ mini-mlmath/
     ├── logic_gate.cpp        #   感知机学逻辑门 → [讲解](docs/logic_gates.md) / [原理](docs/perceptron.md)
     ├── perceptron_test.cpp   #   端到端测 Perceptron 类
     ├── knn_test.cpp          #   KNN：多数投票 + metric / strategy 扩展点
-    └── autograd_test.cpp     #   自动求导：手算链式法则 + MLP 数值梯度对拍
+    ├── autograd_test.cpp     #   自动求导：手算链式法则 + MLP 数值梯度对拍
+    └── kmeans_test.cpp       #   KMeans：聚类 + 初始化策略扩展点（骨架期）
 ```
 
 头文件引用统一写 `<mini_mlmath/xxx.h>`，`include/` 是头文件搜索根。
@@ -64,6 +67,7 @@ mini-mlmath/
 - [激活函数](docs/activation.md) —— sigmoid vs 阶跃、ReLU 为什么成为现代默认、为什么多层必须可导、数值稳定性
 - [线性回归](docs/linear_regression.md) —— 模型、正规方程 / 梯度下降、R²、bias folding、和感知机的对照
 - [KNN](docs/knn.md) —— 常见 metric（L1/L2/L∞/余弦/汉明…）、搜索策略（暴力/KDTree/BallTree）、k 与投票
+- [KMeans](docs/kmeans.md) —— Lloyd 迭代、初始化策略（随机 / k-means++）、n_init 多起点、k 怎么选（骨架期，核心算法待实现）
 - [Softmax](docs/softmax.md) —— 减 max 救命符、按行归一化（attention 用法）、温度 T、KV cache 简化
 - [链式法则](docs/chain_rule.md) —— 零基础入门：导数直觉、链式法则、路径相加、反向传播（autograd 的地基）
 - [自动求导](docs/autograd.md) —— Tensor + 反向图，梯度怎么在图上算出来（reverse-mode AD）
@@ -94,6 +98,7 @@ cmake --build build -j
 ./build/tests/perceptron_test   # 感知机：端到端测试
 ./build/tests/knn_test          # KNN：多数投票 + metric / strategy 扩展点
 ./build/tests/autograd_test     # 自动求导：手算链式法则 + MLP 数值梯度对拍
+./build/tests/kmeans_test       # KMeans：聚类 + 初始化策略（骨架期，SKIPPED 为预期）
 ```
 
 Windows 直接用 VS2022「打开本地文件夹」指向本目录（切 Release、选 x64）。
