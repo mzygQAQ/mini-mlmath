@@ -21,6 +21,7 @@ mini-mlmath/
 │       ├── vector.h          #   Vector<T>：点积 / 模长 / 余弦相似度
 │       ├── softmax.h           #   数值稳定的 softmax → [讲解](docs/softmax.md)
 │       ├── activation.h        #   激活函数：sigmoid + ReLU → [讲解](docs/activation.md)
+│       ├── positional_encoding.h  #   正弦位置编码（骨架，待实现）：给注意力注入位置信息
 │       ├── autograd.h          #   迷你自动求导：Tensor + 记录式反向图 → [讲解](docs/autograd.md)
 │       ├── statistics.h        #   基础描述性统计：mean / median / mode / variance / stddev
 │       ├── random.h          #   类似 numpy.random：均匀/正态随机标量与矩阵
@@ -101,6 +102,7 @@ cmake --build build -j
 ./build/tests/knn_test          # KNN：多数投票 + metric / strategy 扩展点
 ./build/tests/autograd_test     # 自动求导：手算链式法则 + MLP 数值梯度对拍
 ./build/tests/kmeans_test       # KMeans：聚类 + 初始化策略（骨架期，SKIPPED 为预期）
+./build/tests/positional_encoding_test   # 正弦位置编码（骨架期，SKIPPED 为预期）
 ```
 
 Windows 直接用 VS2022「打开本地文件夹」指向本目录（切 Release、选 x64）。
