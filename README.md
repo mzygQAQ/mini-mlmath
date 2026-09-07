@@ -34,16 +34,16 @@ mini-mlmath/
 │           ├── knn.h               #   K 近邻 → [原理](docs/knn.md)
 │           └── kmeans.h            #   K 均值聚类（骨架，待实现）→ [原理](docs/kmeans.md)
 ├── docs/                      # 文档：原理讲解 + 配图
+│   ├── math_functions.md      #   数学地基：幂/指数/对数/三角 + 导数速查
+│   ├── chain_rule.md          #   链式法则：零基础入门（反向传播的地基）
 │   ├── perceptron.md          #   感知机原理（结构 / 学习规则 / 收敛定理）
 │   ├── logic_gates.md         #   逻辑门：AND / OR / NAND 权重推导 + XOR 不可分
 │   ├── activation.md          #   激活函数：sigmoid / ReLU vs 阶跃、ReLU 为什么成为现代默认
 │   ├── linear_regression.md   #   线性回归：模型、闭式解 / 梯度下降、R²、bias folding
-│   ├── knn.md             #   KNN：常见 metric、搜索策略（暴力/KDTree/BallTree）
-│   ├── kmeans.md          #   KMeans：Lloyd 迭代、初始化策略、k 怎么选
+│   ├── knn.md                 #   KNN：常见 metric、搜索策略（暴力/KDTree/BallTree）
+│   ├── kmeans.md              #   KMeans：Lloyd 迭代、初始化策略、k 怎么选
 │   ├── softmax.md             #   softmax：减 max 数值稳定性、attention 用法、温度
 │   ├── autograd.md            #   自动求导：反向图 + 梯度怎么算出来
-│   ├── chain_rule.md          #   链式法则：零基础入门（反向传播的地基）
-│   ├── math_functions.md      #   常见数学函数与图像（幂/指数/对数/三角 + 导数速查）
 │   └── images/                #   配图（手写 SVG，零依赖）
 ├── tests/                    # 测试程序，每个模块一个
     ├── CMakeLists.txt        #   每个 *_test.cpp 一个可执行 + 编译优化选项
@@ -62,16 +62,18 @@ mini-mlmath/
 
 ## 文档
 
-- [感知机原理](docs/perceptron.md) —— 结构、学习规则、收敛定理、bias folding
-- [逻辑门与决策边界](docs/logic_gates.md) —— AND / OR / NAND 的权重推导（不等式组法）、XOR 为什么线性不可分
+以下按**推荐的学习顺序**排列：先数学地基与微积分工具，再走「感知机 → 神经网络组件」与「线性模型 → 距离模型」两条线，最后落到自动求导。
+
+- [常见数学函数与图像](docs/math_functions.md) —— 数学地基：幂/指数/对数/三角函数图像 + 定义域/值域/导数速查表
+- [链式法则](docs/chain_rule.md) —— 微积分工具：零基础入门，导数直觉、路径相加、反向传播（autograd 的地基）
+- [感知机原理](docs/perceptron.md) —— 入门第一课：结构、学习规则、收敛定理、bias folding
+- [逻辑门与决策边界](docs/logic_gates.md) —— 感知机的应用：AND / OR / NAND 的权重推导（不等式组法）、XOR 为什么线性不可分
 - [激活函数](docs/activation.md) —— sigmoid vs 阶跃、ReLU 为什么成为现代默认、为什么多层必须可导、数值稳定性
-- [线性回归](docs/linear_regression.md) —— 模型、正规方程 / 梯度下降、R²、bias folding、和感知机的对照
-- [KNN](docs/knn.md) —— 常见 metric（L1/L2/L∞/余弦/汉明…）、搜索策略（暴力/KDTree/BallTree）、k 与投票
-- [KMeans](docs/kmeans.md) —— Lloyd 迭代、初始化策略（随机 / k-means++）、n_init 多起点、k 怎么选（骨架期，核心算法待实现）
+- [线性回归](docs/linear_regression.md) —— 线性模型：正规方程 / 梯度下降、R²、bias folding、和感知机的对照
+- [KNN](docs/knn.md) —— 距离模型：常见 metric（L1/L2/L∞/余弦/汉明…）、搜索策略（暴力/KDTree/BallTree）、k 与投票
+- [KMeans](docs/kmeans.md) —— 无监督：Lloyd 迭代、初始化策略（随机 / k-means++）、n_init 多起点、k 怎么选（骨架期，核心算法待实现）
 - [Softmax](docs/softmax.md) —— 减 max 救命符、按行归一化（attention 用法）、温度 T、KV cache 简化
-- [链式法则](docs/chain_rule.md) —— 零基础入门：导数直觉、链式法则、路径相加、反向传播（autograd 的地基）
-- [自动求导](docs/autograd.md) —— Tensor + 反向图，梯度怎么在图上算出来（reverse-mode AD）
-- [常见数学函数与图像](docs/math_functions.md) —— 幂/指数/对数/三角函数图像 + 定义域/值域/导数速查表
+- [自动求导](docs/autograd.md) —— 压轴：Tensor + 反向图，梯度怎么在图上算出来（reverse-mode AD）
 
 ## 三种乘法（越往后越接近真实 BLAS）
 
