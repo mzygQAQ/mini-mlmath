@@ -67,7 +67,7 @@ constexpr std::size_t kBlock = 64;
 //  -  data() 直接暴露连续内存，后面乘法里可以直接拿裸指针索引，
 //     跟 C 数组一样快（vector::data() 在 -O2 下就是零开销）。
 // ============================================================================
-template<typename T>
+template <typename T>
 class Matrix {
 public:
     using value_type = T;
@@ -80,22 +80,24 @@ public:
 
     // 直接指定行列：全 0。注意 data_ 是 rows*cols 个 T{}（对 double 即 0.0）
     Matrix(size_type rows, size_type cols)
-            : rows_(rows), cols_(cols), data_(rows * cols, T{}) {}
+        : rows_(rows), cols_(cols), data_(rows * cols, T{}) {}
 
     // 从嵌套花括号初始化。这是给用户「看得懂」的初始化方式，
     // 等价于 Eigen 的 MatrixXd 初始化写法（Eigen 靠 << 操作符 + comma
     // initializer 语法糖实现，这里用 C++11 自带的 initializer_list）。
     Matrix(std::initializer_list<std::initializer_list<T>> init) {
         rows_ = init.size();
-        if (rows_ == 0) return;  // 空列表 -> 0×0，合法
+        if (rows_ == 0)
+            return; // 空列表 -> 0×0，合法
         cols_ = init.begin()->size();
         data_.reserve(rows_ * cols_);
-        for (const auto &row: init) {
+        for (const auto &row : init) {
             if (row.size() != cols_) {
                 throw std::invalid_argument(
-                        "Matrix: each row must have the same number of elements (no jagged matrices)");
+                    "Matrix: each row must have the same number of elements (no jagged matrices)");
             }
-            for (const T &v: row) data_.push_back(v);
+            for (const T &v : row)
+                data_.push_back(v);
         }
     }
 
@@ -116,7 +118,7 @@ public:
     // 从 std::vector 构造一列（n×1）。典型用途：感知机 fit 里把
     //   [w_1, ..., w_d, b]  这一维数组直接变成 (d+1)×1 的列向量，
     // 配合 X.with_ones_column() 就能用一次矩阵乘算出 w·x + b
-    //（详见 ml/perceptron.h 头注释里的「bias folding」）。
+    // （详见 ml/perceptron.h 头注释里的「bias folding」）。
     // 空 vector → 0×1 矩阵。
     static Matrix from_column(const std::vector<T> &v) {
         Matrix r(v.size(), 1);
@@ -183,19 +185,22 @@ public:
         if (rows_ != rhs.rows_ || cols_ != rhs.cols_)
             throw std::invalid_argument("operator+=: shape mismatch");
         // 直接按连续内存逐元素加，跟行列无关，最快。
-        for (size_type i = 0; i < data_.size(); ++i) data_[i] += rhs.data_[i];
+        for (size_type i = 0; i < data_.size(); ++i)
+            data_[i] += rhs.data_[i];
         return *this;
     }
 
     Matrix &operator-=(const Matrix &rhs) {
         if (rows_ != rhs.rows_ || cols_ != rhs.cols_)
             throw std::invalid_argument("operator-=: shape mismatch");
-        for (size_type i = 0; i < data_.size(); ++i) data_[i] -= rhs.data_[i];
+        for (size_type i = 0; i < data_.size(); ++i)
+            data_[i] -= rhs.data_[i];
         return *this;
     }
 
     Matrix &operator*=(const T &scalar) {
-        for (T &v: data_) v *= scalar;
+        for (T &v : data_)
+            v *= scalar;
         return *this;
     }
 
@@ -224,8 +229,9 @@ public:
         CHECK(rows() > 0) << "cannot append a ones column to an empty matrix";
         Matrix r(rows_, cols_ + 1);
         for (size_type i = 0; i < rows_; ++i) {
-            for (size_type j = 0; j < cols_; ++j) r(i, j) = (*this)(i, j);
-            r(i, cols_) = T(1);   // 最后一列恒 1，喂给 bias
+            for (size_type j = 0; j < cols_; ++j)
+                r(i, j) = (*this)(i, j);
+            r(i, cols_) = T(1); // 最后一列恒 1，喂给 bias
         }
         return r;
     }
@@ -242,7 +248,8 @@ public:
                                     << rows() << " vs " << rhs.rows();
         Matrix r(rows_, cols_ + rhs.cols_);
         for (size_type i = 0; i < rows_; ++i) {
-            for (size_type j = 0; j < cols_; ++j) r(i, j) = (*this)(i, j);
+            for (size_type j = 0; j < cols_; ++j)
+                r(i, j) = (*this)(i, j);
             for (size_type j = 0; j < rhs.cols_; ++j)
                 r(i, cols_ + j) = rhs(i, j);
         }
@@ -252,7 +259,7 @@ public:
 private:
     size_type rows_ = 0;
     size_type cols_ = 0;
-    std::vector<T> data_;   // 连续内存，长度 rows_*cols_，行主序
+    std::vector<T> data_; // 连续内存，长度 rows_*cols_，行主序
 };
 
 // ============================================================================
@@ -261,14 +268,14 @@ private:
 //  注意返回值语义：按值返回一个全新矩阵（eager）。写成
 //  auto C = A + B;  实际发生了：构造临时、operator+=、移动返回，两步。
 // ============================================================================
-template<typename T>
+template <typename T>
 Matrix<T> operator+(const Matrix<T> &a, const Matrix<T> &b) {
-    Matrix<T> r(a);      // 拷贝 a
-    r += b;              // 就地加 b
-    return r;            // 移动返回（C++17 起有 guaranteed copy elision）
+    Matrix<T> r(a); // 拷贝 a
+    r += b;         // 就地加 b
+    return r;       // 移动返回（C++17 起有 guaranteed copy elision）
 }
 
-template<typename T>
+template <typename T>
 Matrix<T> operator-(const Matrix<T> &a, const Matrix<T> &b) {
     Matrix<T> r(a);
     r -= b;
@@ -276,26 +283,29 @@ Matrix<T> operator-(const Matrix<T> &a, const Matrix<T> &b) {
 }
 
 // 标量乘法：scalar * m 和 m * scalar 都给一个，方便两边写
-template<typename T>
+template <typename T>
 Matrix<T> operator*(const Matrix<T> &m, const T &scalar) {
     Matrix<T> r(m);
     r *= scalar;
     return r;
 }
 
-template<typename T>
-Matrix<T> operator*(const T &scalar, const Matrix<T> &m) { return m * scalar; }
+template <typename T>
+Matrix<T> operator*(const T &scalar, const Matrix<T> &m) {
+    return m * scalar;
+}
 
 // ============================================================================
 //  operator<<：打印。行主序，每行一个方括号。
 // ============================================================================
-template<typename T>
+template <typename T>
 std::ostream &operator<<(std::ostream &os, const Matrix<T> &m) {
     for (std::size_t i = 0; i < m.rows(); ++i) {
         os << '[';
         for (std::size_t j = 0; j < m.cols(); ++j) {
             os << m(i, j);
-            if (j + 1 < m.cols()) os << ", ";
+            if (j + 1 < m.cols())
+                os << ", ";
         }
         os << "]\n";
     }
@@ -338,11 +348,11 @@ std::ostream &operator<<(std::ostream &os, const Matrix<T> &m) {
 //   实测基准（本机 g++ 13.3 -O3 -march=native，double）：N=2048 时 2845 ms；
 //   N=512 时 21.9 ms。它是下面两版的对比基准线。
 // ============================================================================
-template<typename T>
+template <typename T>
 Matrix<T> multiply_naive(const Matrix<T> &A, const Matrix<T> &B) {
-    const std::size_t M = A.rows();   // A: M×K
+    const std::size_t M = A.rows(); // A: M×K
     const std::size_t K = A.cols();
-    const std::size_t N = B.cols();   // B: K×N -> C: M×N
+    const std::size_t N = B.cols(); // B: K×N -> C: M×N
     if (B.rows() != K)
         throw std::invalid_argument("multiply_naive: A.cols() != B.rows()");
 
@@ -353,7 +363,7 @@ Matrix<T> multiply_naive(const Matrix<T> &A, const Matrix<T> &B) {
 
     for (std::size_t i = 0; i < M; ++i) {
         for (std::size_t k = 0; k < K; ++k) {
-            const T aik = a[i * K + k];   // 标量，内层复用（编译器放寄存器）
+            const T aik = a[i * K + k]; // 标量，内层复用（编译器放寄存器）
             // 内层 j：C 行和 B 行都顺序访问 —— 这是缓存友好的关键，见上面注释
             for (std::size_t j = 0; j < N; ++j) {
                 c[i * N + j] += aik * b[k * N + j];
@@ -393,7 +403,7 @@ Matrix<T> multiply_naive(const Matrix<T> &A, const Matrix<T> &B) {
 //     N=2048：1887 ms，比 naive(2845 ms) 快约 1.5 倍 —— 缓存复用开始生效，
 //             但没打包，依然比 packed(941 ms) 慢约 2 倍（教训 2）。
 // ============================================================================
-template<typename T>
+template <typename T>
 Matrix<T> multiply_blocked(const Matrix<T> &A, const Matrix<T> &B,
                            std::size_t bs = kBlock) {
     const std::size_t M = A.rows();
@@ -425,7 +435,7 @@ Matrix<T> multiply_blocked(const Matrix<T> &A, const Matrix<T> &B,
                         const T aik = a[(i0 + i) * K + (k0 + k)];
                         for (std::size_t j = 0; j < jSize; ++j) {
                             c[(i0 + i) * N + (j0 + j)] +=
-                                    aik * b[(k0 + k) * N + (j0 + j)];
+                                aik * b[(k0 + k) * N + (j0 + j)];
                         }
                     }
                 }
@@ -477,7 +487,7 @@ Matrix<T> multiply_blocked(const Matrix<T> &A, const Matrix<T> &B,
 //              约 2.0 倍。大矩阵下「连续访问」与「面板复用」的优势全兑现。
 //   再对照 -O2 的同一份代码：N=2048 要 4128 ms（教训 1，见 CMakeLists.txt）。
 // ============================================================================
-template<typename T>
+template <typename T>
 Matrix<T> multiply_packed(const Matrix<T> &A, const Matrix<T> &B,
                           std::size_t bs = kBlock) {
     const std::size_t M = A.rows();
@@ -493,8 +503,8 @@ Matrix<T> multiply_packed(const Matrix<T> &A, const Matrix<T> &B,
 
     // 打包用的连续 workspace（真实 BLAS 在进程启动时申请固定大小的
     // workspace 复用；这里直接重用两个 vector，避免在热循环里反复 malloc）。
-    std::vector<T> aPack(bs * bs);   // 一块 A 的小块，行主序：aPack[i*bs+k]
-    std::vector<T> bPack(bs * N);    // 一条 B 的横向 panel，行主序：bPack[k*N+j]
+    std::vector<T> aPack(bs * bs); // 一块 A 的小块，行主序：aPack[i*bs+k]
+    std::vector<T> bPack(bs * N);  // 一条 B 的横向 panel，行主序：bPack[k*N+j]
 
     for (std::size_t k0 = 0; k0 < K; k0 += bs) {
         const std::size_t kSize = std::min(bs, K - k0);
@@ -525,11 +535,11 @@ Matrix<T> multiply_packed(const Matrix<T> &A, const Matrix<T> &B,
                 // 有 stride 的原始矩阵。
                 for (std::size_t i = 0; i < iSize; ++i) {
                     for (std::size_t k = 0; k < kSize; ++k) {
-                        const T aik = aPack[i * kSize + k];   // 连续 ✓
-                        T *cRow = c + (i0 + i) * N + j0;     // 连续 ✓
+                        const T aik = aPack[i * kSize + k];        // 连续 ✓
+                        T *cRow = c + (i0 + i) * N + j0;           // 连续 ✓
                         const T *bRow = bPack.data() + k * N + j0; // 连续 ✓
                         for (std::size_t j = 0; j < jSize; ++j) {
-                            cRow[j] += aik * bRow[j];         // 全部顺序访问
+                            cRow[j] += aik * bRow[j]; // 全部顺序访问
                         }
                     }
                 }
@@ -562,11 +572,11 @@ Matrix<T> multiply_packed(const Matrix<T> &A, const Matrix<T> &B,
 //    性能差异，仍然请显式调用 multiply_naive / multiply_blocked /
 //    multiply_packed。
 // ============================================================================
-template<typename T>
+template <typename T>
 Matrix<T> operator*(const Matrix<T> &a, const Matrix<T> &b) {
     CHECK(a.cols() == b.rows()) << "A.cols() must equal B.rows(), got "
                                 << a.cols() << " vs " << b.rows();
-    return multiply_packed(a, b);   // 默认走最快的版本
+    return multiply_packed(a, b); // 默认走最快的版本
 }
 
 // ============================================================================
@@ -575,16 +585,18 @@ Matrix<T> operator*(const Matrix<T> &a, const Matrix<T> &b) {
 //  的加法不满足结合律，结果在最后几位会有差异 —— 这是**正常的浮点行为**，
 //  不是 bug。所以「正确性」用相对容差判断，而不是 bit 级 ==。
 // ============================================================================
-template<typename T>
+template <typename T>
 bool approxEqual(const Matrix<T> &a, const Matrix<T> &b, T relTol = T(1e-9)) {
-    if (a.rows() != b.rows() || a.cols() != b.cols()) return false;
+    if (a.rows() != b.rows() || a.cols() != b.cols())
+        return false;
     for (std::size_t i = 0; i < a.rows(); ++i) {
         for (std::size_t j = 0; j < a.cols(); ++j) {
             const T diff = std::abs(a(i, j) - b(i, j));
             // 相对误差 = diff / max(1, |a|, |b|)，避免除以 0、避免 0.0 附近误判
             const T scale =
-                    std::max(T(1), std::max(std::abs(a(i, j)), std::abs(b(i, j))));
-            if (diff > relTol * scale) return false;
+                std::max(T(1), std::max(std::abs(a(i, j)), std::abs(b(i, j))));
+            if (diff > relTol * scale)
+                return false;
         }
     }
     return true;

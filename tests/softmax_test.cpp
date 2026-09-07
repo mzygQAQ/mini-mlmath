@@ -42,7 +42,8 @@ void verify_softmax() {
 
     // 和必须为 1
     double sum = 0;
-    for (double v : p) sum += v;
+    for (double v : p)
+        sum += v;
     std::cout << "各项之和 = " << sum
               << (std::abs(sum - 1.0) < 1e-12 ? "  ✓\n" : "  ✗\n");
 
@@ -50,7 +51,8 @@ void verify_softmax() {
     const auto big = softmax(std::vector<double>{1000.0, 999.0, 998.0});
     bool finite = true;
     for (double v : big)
-        if (!std::isfinite(v)) finite = false;
+        if (!std::isfinite(v))
+            finite = false;
     std::cout << "softmax({1000,999,998}) = {";
     for (std::size_t i = 0; i < big.size(); ++i)
         std::cout << big[i] << (i + 1 < big.size() ? ", " : "}\n");
@@ -59,15 +61,18 @@ void verify_softmax() {
     // 矩阵按行 softmax（模拟 2 行注意力分数）
     const Matrix<double> scores = Matrix<double>::fromList({
         {1.0, 2.0, 3.0},
-        {0.0, 0.0, 0.0}   // 全 0 行 -> 均匀分布 {1/3,1/3,1/3}
+        {0.0, 0.0, 0.0} // 全 0 行 -> 均匀分布 {1/3,1/3,1/3}
     });
     const auto rows = softmax_rows(scores);
-    std::cout << "softmax_rows(scores) = \n" << rows;
+    std::cout << "softmax_rows(scores) = \n"
+              << rows;
     bool rowsOk = true;
     for (std::size_t i = 0; i < rows.rows(); ++i) {
         double rs = 0;
-        for (std::size_t j = 0; j < rows.cols(); ++j) rs += rows(i, j);
-        if (std::abs(rs - 1.0) > 1e-12) rowsOk = false;
+        for (std::size_t j = 0; j < rows.cols(); ++j)
+            rs += rows(i, j);
+        if (std::abs(rs - 1.0) > 1e-12)
+            rowsOk = false;
     }
     std::cout << (rowsOk ? "✓ 每行和均为 1\n" : "✗ 行和不为 1\n");
 }

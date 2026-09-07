@@ -62,12 +62,12 @@ public:
     // 字段公开是为了让 autograd.h 内部（GradNode）直接读写；用户代码请只
     // 通过下面公开方法访问，别直接动 grad_ / grad_fn。
     struct Impl {
-        Matrix<T> value;                     // 前向计算出来的值
-        Matrix<T> grad;                      // 反向累积的梯度（形状同 value）
+        Matrix<T> value;                      // 前向计算出来的值
+        Matrix<T> grad;                       // 反向累积的梯度（形状同 value）
         std::shared_ptr<GradNode<T>> grad_fn; // 谁产生了这个张量；null=叶子
-        bool track = false;                  // 是否参与自动求导
+        bool track = false;                   // 是否参与自动求导
 
-        explicit Impl(const Matrix<T>& v, bool t)
+        explicit Impl(const Matrix<T> &v, bool t)
             : value(v), grad(v.rows(), v.cols()), track(t) {}
     };
 
@@ -76,22 +76,23 @@ public:
 
     // 从 Matrix 构造。track=true 表示「我是需要梯度的叶子（参数）」。
     // track=false 表示「我是常数（数据/标签），梯度直接丢弃」。
-    explicit Tensor(const Matrix<T>& value, bool track = true)
+    explicit Tensor(const Matrix<T> &value, bool track = true)
         : p_(std::make_shared<Impl>(value, track)) {}
 
     // 从标量构造 1×1 张量（常数）。
-    explicit Tensor(const T& scalar, bool track = false)
+    explicit Tensor(const T &scalar, bool track = false)
         : p_(std::make_shared<Impl>(Matrix<T>({{scalar}}), track)) {}
 
     // 内部：由算子构造结果张量（传进已算好的内核 + 已挂上的反向函数）。
     // 名字带下划线，表示「autograd 机制内部使用，普通用户请勿调用」。
-    explicit Tensor(const std::shared_ptr<Impl>& impl) : p_(impl) {}
+    explicit Tensor(const std::shared_ptr<Impl> &impl)
+        : p_(impl) {}
 
     // 拷贝/移动默认：拷贝 = 共享同一个 Impl（句柄语义，见文件头注释）。
-    Tensor(const Tensor&) = default;
-    Tensor(Tensor&&) noexcept = default;
-    Tensor& operator=(const Tensor&) = default;
-    Tensor& operator=(Tensor&&) noexcept = default;
+    Tensor(const Tensor &) = default;
+    Tensor(Tensor &&) noexcept = default;
+    Tensor &operator=(const Tensor &) = default;
+    Tensor &operator=(Tensor &&) noexcept = default;
 
     // ---- 形状与取值 ----
     std::size_t rows() const { return p_->value.rows(); }
@@ -99,10 +100,10 @@ public:
     std::size_t numel() const { return p_->value.rows() * p_->value.cols(); }
 
     // 前向值（只读）。想改一个叶子参数的值，用 set_value()（见下）。
-    const Matrix<T>& value() const { return p_->value; }
+    const Matrix<T> &value() const { return p_->value; }
 
     // 反向后叶子累积的梯度（只读）。
-    const Matrix<T>& grad() const { return p_->grad; }
+    const Matrix<T> &grad() const { return p_->grad; }
 
     // 1×1 张量取标量。CHECK 保证只有 1×1 才能取。
     T item() const {
@@ -126,7 +127,7 @@ public:
     // 只允许叶子：改中间张量会破坏已建好的图，梯度就错了。
     // 注意：只能在前向之后、同一步的 backward() 之前改，别动「正在反向的图」
     // 需要的叶子值 —— 这是本版没有版本计数器的替代约定（见文件头注释）。
-    void set_value(const Matrix<T>& v) {
+    void set_value(const Matrix<T> &v) {
         CHECK(p_->grad_fn == nullptr)
             << "set_value() only allowed on leaf tensors (grad_fn == nullptr); "
                "changing a non-leaf would corrupt the backward graph";
@@ -185,19 +186,19 @@ public:
     }
 
     // 后序遍历收集整张图（依赖在前、自身在后），供 backward 逆序调度。
-    static std::vector<GradNode<T>*> collect_topo(
-            std::shared_ptr<GradNode<T>> root) {
-        std::unordered_set<GradNode<T>*> seen;
-        std::vector<GradNode<T>*> topo;
+    static std::vector<GradNode<T> *> collect_topo(
+        std::shared_ptr<GradNode<T>> root) {
+        std::unordered_set<GradNode<T> *> seen;
+        std::vector<GradNode<T> *> topo;
         collect(root, seen, topo);
         return topo;
     }
 
 protected:
-    typename Tensor<T>::Impl* out_ = nullptr;  // 输出（非拥有，见文件头注释）
-    std::vector<Tensor<T>> inputs_;     // 我的直接输入（拥有，图遍历用）
+    typename Tensor<T>::Impl *out_ = nullptr; // 输出（非拥有，见文件头注释）
+    std::vector<Tensor<T>> inputs_;           // 我的直接输入（拥有，图遍历用）
 
-    GradNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
+    GradNode(const std::shared_ptr<typename Tensor<T>::Impl> &out,
              std::vector<Tensor<T>> inputs)
         : out_(out.get()), inputs_(std::move(inputs)) {
         // 参数化构造也要计入 live_count_（析构统一 -1，构造必须对称 +1）
@@ -205,25 +206,28 @@ protected:
     }
 
     // 读取输入张量的前向值（apply 的局部梯度公式要用）。
-    const Matrix<T>& val(const Tensor<T>& t) const { return t.p_->value; }
+    const Matrix<T> &val(const Tensor<T> &t) const { return t.p_->value; }
 
     // 读取「我输出张量」已累积到的上游梯度。
-    const Matrix<T>& out_grad() const { return out_->grad; }
+    const Matrix<T> &out_grad() const { return out_->grad; }
 
     // 把局部梯度 g 累加进输入张量的 grad_；常数张量（不追踪）直接跳过。
-    void accumulate(const Tensor<T>& in, const Matrix<T>& g) {
-        if (!in.requires_grad()) return;
+    void accumulate(const Tensor<T> &in, const Matrix<T> &g) {
+        if (!in.requires_grad())
+            return;
         in.p_->grad += g;
     }
 
 private:
-    static void collect(const std::shared_ptr<GradNode<T>>& n,
-                        std::unordered_set<GradNode<T>*>& seen,
-                        std::vector<GradNode<T>*>& topo) {
-        if (!n || seen.count(n.get())) return;
+    static void collect(const std::shared_ptr<GradNode<T>> &n,
+                        std::unordered_set<GradNode<T> *> &seen,
+                        std::vector<GradNode<T> *> &topo) {
+        if (!n || seen.count(n.get()))
+            return;
         seen.insert(n.get());
-        for (const auto& in : n->inputs_) {
-            if (in.p_->grad_fn) collect(in.p_->grad_fn, seen, topo);
+        for (const auto &in : n->inputs_) {
+            if (in.p_->grad_fn)
+                collect(in.p_->grad_fn, seen, topo);
         }
         topo.push_back(n.get());
     }
@@ -248,14 +252,16 @@ void Tensor<T>::backward() {
     auto topo = GradNode<T>::collect_topo(p_->grad_fn);
 
     // 1) 清零所有中间节点的梯度（叶子不清 —— 多轮累积是期望语义）。
-    for (auto* node : topo) node->clear_out_grad();
+    for (auto *node : topo)
+        node->clear_out_grad();
 
     // 2) 初始上游梯度：全 1。
     for (std::size_t i = 0; i < p_->grad.rows() * p_->grad.cols(); ++i)
         p_->grad.data()[i] = T(1);
 
     // 3) 拓扑逆序跑 apply()。
-    for (auto it = topo.rbegin(); it != topo.rend(); ++it) (*it)->apply();
+    for (auto it = topo.rbegin(); it != topo.rend(); ++it)
+        (*it)->apply();
 }
 
 // ============================================================================
@@ -264,7 +270,7 @@ void Tensor<T>::backward() {
 
 // 逐元素乘（对应 numpy 的 A * B，注意：不是矩阵乘！矩阵乘用 matmul()）
 template <typename T>
-Matrix<T> ew_mul(const Matrix<T>& a, const Matrix<T>& b) {
+Matrix<T> ew_mul(const Matrix<T> &a, const Matrix<T> &b) {
     CHECK(a.rows() == b.rows() && a.cols() == b.cols())
         << "ew_mul: shape mismatch, got " << a.rows() << "x" << a.cols()
         << " vs " << b.rows() << "x" << b.cols();
@@ -276,7 +282,7 @@ Matrix<T> ew_mul(const Matrix<T>& a, const Matrix<T>& b) {
 
 // 逐元素除
 template <typename T>
-Matrix<T> ew_div(const Matrix<T>& a, const Matrix<T>& b) {
+Matrix<T> ew_div(const Matrix<T> &a, const Matrix<T> &b) {
     CHECK(a.rows() == b.rows() && a.cols() == b.cols())
         << "ew_div: shape mismatch";
     Matrix<T> r(a.rows(), a.cols());
@@ -287,7 +293,7 @@ Matrix<T> ew_div(const Matrix<T>& a, const Matrix<T>& b) {
 
 // 逐元素乘标量
 template <typename T>
-Matrix<T> ew_scale(const Matrix<T>& a, const T& s) {
+Matrix<T> ew_scale(const Matrix<T> &a, const T &s) {
     Matrix<T> r(a.rows(), a.cols());
     for (std::size_t i = 0; i < a.rows() * a.cols(); ++i)
         r.data()[i] = a.data()[i] * s;
@@ -296,7 +302,7 @@ Matrix<T> ew_scale(const Matrix<T>& a, const T& s) {
 
 // 用 v 填满一张和 like 形状相同的矩阵
 template <typename T>
-Matrix<T> filled(const Matrix<T>& like, const T& v) {
+Matrix<T> filled(const Matrix<T> &like, const T &v) {
     Matrix<T> r(like.rows(), like.cols());
     for (std::size_t i = 0; i < like.rows() * like.cols(); ++i)
         r.data()[i] = v;
@@ -313,13 +319,14 @@ Matrix<T> filled(const Matrix<T>& like, const T& v) {
 template <typename T>
 class AddNode : public GradNode<T> {
 public:
-    AddNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
-            const Tensor<T>& a, const Tensor<T>& b)
+    AddNode(const std::shared_ptr<typename Tensor<T>::Impl> &out,
+            const Tensor<T> &a, const Tensor<T> &b)
         : GradNode<T>(out, {a, b}), a_(a), b_(b) {}
     void apply() override {
         this->accumulate(a_, this->out_grad());
         this->accumulate(b_, this->out_grad());
     }
+
 private:
     Tensor<T> a_, b_;
 };
@@ -328,13 +335,14 @@ private:
 template <typename T>
 class SubNode : public GradNode<T> {
 public:
-    SubNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
-            const Tensor<T>& a, const Tensor<T>& b)
+    SubNode(const std::shared_ptr<typename Tensor<T>::Impl> &out,
+            const Tensor<T> &a, const Tensor<T> &b)
         : GradNode<T>(out, {a, b}), a_(a), b_(b) {}
     void apply() override {
         this->accumulate(a_, this->out_grad());
         this->accumulate(b_, ew_scale(this->out_grad(), T(-1)));
     }
+
 private:
     Tensor<T> a_, b_;
 };
@@ -343,14 +351,15 @@ private:
 template <typename T>
 class MulNode : public GradNode<T> {
 public:
-    MulNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
-            const Tensor<T>& a, const Tensor<T>& b)
+    MulNode(const std::shared_ptr<typename Tensor<T>::Impl> &out,
+            const Tensor<T> &a, const Tensor<T> &b)
         : GradNode<T>(out, {a, b}), a_(a), b_(b) {}
     void apply() override {
-        const auto& g = this->out_grad();
+        const auto &g = this->out_grad();
         this->accumulate(a_, ew_mul(g, this->val(b_)));
         this->accumulate(b_, ew_mul(g, this->val(a_)));
     }
+
 private:
     Tensor<T> a_, b_;
 };
@@ -359,16 +368,17 @@ private:
 template <typename T>
 class DivNode : public GradNode<T> {
 public:
-    DivNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
-            const Tensor<T>& a, const Tensor<T>& b)
+    DivNode(const std::shared_ptr<typename Tensor<T>::Impl> &out,
+            const Tensor<T> &a, const Tensor<T> &b)
         : GradNode<T>(out, {a, b}), a_(a), b_(b) {}
     void apply() override {
-        const auto& g = this->out_grad();
-        const auto& av = this->val(a_);
-        const auto& bv = this->val(b_);
+        const auto &g = this->out_grad();
+        const auto &av = this->val(a_);
+        const auto &bv = this->val(b_);
         this->accumulate(a_, ew_div(g, bv));
         this->accumulate(b_, ew_scale(ew_div(ew_mul(g, av), ew_mul(bv, bv)), T(-1)));
     }
+
 private:
     Tensor<T> a_, b_;
 };
@@ -377,12 +387,13 @@ private:
 template <typename T>
 class ScalarMulNode : public GradNode<T> {
 public:
-    ScalarMulNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
-                  const Tensor<T>& a, const T& s)
+    ScalarMulNode(const std::shared_ptr<typename Tensor<T>::Impl> &out,
+                  const Tensor<T> &a, const T &s)
         : GradNode<T>(out, {a}), a_(a), s_(s) {}
     void apply() override {
         this->accumulate(a_, ew_scale(this->out_grad(), s_));
     }
+
 private:
     Tensor<T> a_;
     T s_;
@@ -395,14 +406,15 @@ private:
 template <typename T>
 class MatMulNode : public GradNode<T> {
 public:
-    MatMulNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
-               const Tensor<T>& a, const Tensor<T>& b)
+    MatMulNode(const std::shared_ptr<typename Tensor<T>::Impl> &out,
+               const Tensor<T> &a, const Tensor<T> &b)
         : GradNode<T>(out, {a, b}), a_(a), b_(b) {}
     void apply() override {
-        const auto& g = this->out_grad();
+        const auto &g = this->out_grad();
         this->accumulate(a_, g * this->val(b_).transposed());
         this->accumulate(b_, this->val(a_).transposed() * g);
     }
+
 private:
     Tensor<T> a_, b_;
 };
@@ -412,12 +424,13 @@ private:
 template <typename T>
 class SumNode : public GradNode<T> {
 public:
-    SumNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
-            const Tensor<T>& a)
+    SumNode(const std::shared_ptr<typename Tensor<T>::Impl> &out,
+            const Tensor<T> &a)
         : GradNode<T>(out, {a}), a_(a) {}
     void apply() override {
         this->accumulate(a_, filled(this->val(a_), this->out_grad()(0, 0)));
     }
+
 private:
     Tensor<T> a_;
 };
@@ -427,17 +440,18 @@ private:
 template <typename T>
 class ReluNode : public GradNode<T> {
 public:
-    ReluNode(const std::shared_ptr<typename Tensor<T>::Impl>& out,
-             const Tensor<T>& a)
+    ReluNode(const std::shared_ptr<typename Tensor<T>::Impl> &out,
+             const Tensor<T> &a)
         : GradNode<T>(out, {a}), a_(a) {}
     void apply() override {
-        const auto& g = this->out_grad();
-        const auto& av = this->val(a_);
+        const auto &g = this->out_grad();
+        const auto &av = this->val(a_);
         Matrix<T> local(av.rows(), av.cols());
         for (std::size_t i = 0; i < av.rows() * av.cols(); ++i)
             local.data()[i] = av.data()[i] > T(0) ? g.data()[i] : T(0);
         this->accumulate(a_, local);
     }
+
 private:
     Tensor<T> a_;
 };
@@ -456,98 +470,111 @@ private:
 
 // 逐元素加
 template <typename T>
-Tensor<T> operator+(const Tensor<T>& a, const Tensor<T>& b) {
+Tensor<T> operator+(const Tensor<T> &a, const Tensor<T> &b) {
     CHECK(a.rows() == b.rows() && a.cols() == b.cols())
         << "Tensor::operator+ shape mismatch, got "
         << a.rows() << "x" << a.cols() << " vs " << b.rows() << "x" << b.cols();
     const bool track = a.requires_grad() || b.requires_grad();
     auto impl = std::make_shared<typename Tensor<T>::Impl>(a.value() + b.value(), track);
-    if (track) impl->grad_fn = std::make_shared<AddNode<T>>(impl, a, b);
+    if (track)
+        impl->grad_fn = std::make_shared<AddNode<T>>(impl, a, b);
     return Tensor<T>(impl);
 }
 
 // 逐元素减
 template <typename T>
-Tensor<T> operator-(const Tensor<T>& a, const Tensor<T>& b) {
+Tensor<T> operator-(const Tensor<T> &a, const Tensor<T> &b) {
     CHECK(a.rows() == b.rows() && a.cols() == b.cols())
         << "Tensor::operator- shape mismatch";
     const bool track = a.requires_grad() || b.requires_grad();
     auto impl = std::make_shared<typename Tensor<T>::Impl>(a.value() - b.value(), track);
-    if (track) impl->grad_fn = std::make_shared<SubNode<T>>(impl, a, b);
+    if (track)
+        impl->grad_fn = std::make_shared<SubNode<T>>(impl, a, b);
     return Tensor<T>(impl);
 }
 
 // 逐元素乘（numpy A*B 语义；不是矩阵乘！矩阵乘用 matmul()）
 template <typename T>
-Tensor<T> operator*(const Tensor<T>& a, const Tensor<T>& b) {
+Tensor<T> operator*(const Tensor<T> &a, const Tensor<T> &b) {
     const bool track = a.requires_grad() || b.requires_grad();
     auto impl = std::make_shared<typename Tensor<T>::Impl>(ew_mul(a.value(), b.value()), track);
-    if (track) impl->grad_fn = std::make_shared<MulNode<T>>(impl, a, b);
+    if (track)
+        impl->grad_fn = std::make_shared<MulNode<T>>(impl, a, b);
     return Tensor<T>(impl);
 }
 
 // 逐元素除
 template <typename T>
-Tensor<T> operator/(const Tensor<T>& a, const Tensor<T>& b) {
+Tensor<T> operator/(const Tensor<T> &a, const Tensor<T> &b) {
     const bool track = a.requires_grad() || b.requires_grad();
     auto impl = std::make_shared<typename Tensor<T>::Impl>(ew_div(a.value(), b.value()), track);
-    if (track) impl->grad_fn = std::make_shared<DivNode<T>>(impl, a, b);
+    if (track)
+        impl->grad_fn = std::make_shared<DivNode<T>>(impl, a, b);
     return Tensor<T>(impl);
 }
 
 // 标量乘：s * a 和 a * s
 template <typename T>
-Tensor<T> operator*(const Tensor<T>& a, const T& s) {
+Tensor<T> operator*(const Tensor<T> &a, const T &s) {
     const bool track = a.requires_grad();
     auto impl = std::make_shared<typename Tensor<T>::Impl>(a.value() * s, track);
-    if (track) impl->grad_fn = std::make_shared<ScalarMulNode<T>>(impl, a, s);
+    if (track)
+        impl->grad_fn = std::make_shared<ScalarMulNode<T>>(impl, a, s);
     return Tensor<T>(impl);
 }
 
 template <typename T>
-Tensor<T> operator*(const T& s, const Tensor<T>& a) { return a * s; }
+Tensor<T> operator*(const T &s, const Tensor<T> &a) {
+    return a * s;
+}
 
 // 一元负号：-a == a * (-1)
 template <typename T>
-Tensor<T> operator-(const Tensor<T>& a) { return a * T(-1); }
+Tensor<T> operator-(const Tensor<T> &a) {
+    return a * T(-1);
+}
 
 // 矩阵乘（PyTorch 的 @）：A: M×K, B: K×N -> M×N
 template <typename T>
-Tensor<T> matmul(const Tensor<T>& a, const Tensor<T>& b) {
+Tensor<T> matmul(const Tensor<T> &a, const Tensor<T> &b) {
     CHECK(a.cols() == b.rows())
         << "Tensor::matmul: inner dims must match, got "
         << a.cols() << " vs " << b.rows();
     const bool track = a.requires_grad() || b.requires_grad();
     auto impl = std::make_shared<typename Tensor<T>::Impl>(a.value() * b.value(), track);
-    if (track) impl->grad_fn = std::make_shared<MatMulNode<T>>(impl, a, b);
+    if (track)
+        impl->grad_fn = std::make_shared<MatMulNode<T>>(impl, a, b);
     return Tensor<T>(impl);
 }
 
 // 逐元素 ReLU（PyTorch 的 relu）—— 现代深度学习隐藏层默认激活
 template <typename T>
-Tensor<T> relu(const Tensor<T>& a) {
+Tensor<T> relu(const Tensor<T> &a) {
     const bool track = a.requires_grad();
     auto impl = std::make_shared<typename Tensor<T>::Impl>(relu(a.value()), track);
-    if (track) impl->grad_fn = std::make_shared<ReluNode<T>>(impl, a);
+    if (track)
+        impl->grad_fn = std::make_shared<ReluNode<T>>(impl, a);
     return Tensor<T>(impl);
 }
 
 // 全部元素求和 -> 1×1（PyTorch 的 loss 标量化常用写法）
 template <typename T>
-Tensor<T> sum(const Tensor<T>& a) {
-    const T* d = a.value().data();
+Tensor<T> sum(const Tensor<T> &a) {
+    const T *d = a.value().data();
     T s = T(0);
-    for (std::size_t i = 0; i < a.numel(); ++i) s += d[i];
+    for (std::size_t i = 0; i < a.numel(); ++i)
+        s += d[i];
     const bool track = a.requires_grad();
     Matrix<T> v(1, 1);
     v(0, 0) = s;
     auto impl = std::make_shared<typename Tensor<T>::Impl>(std::move(v), track);
-    if (track) impl->grad_fn = std::make_shared<SumNode<T>>(impl, a);
+    if (track)
+        impl->grad_fn = std::make_shared<SumNode<T>>(impl, a);
     return Tensor<T>(impl);
 }
 
 // 打印前向值（调试用）
 template <typename T>
-std::ostream& operator<<(std::ostream& os, const Tensor<T>& t) {
+std::ostream &operator<<(std::ostream &os, const Tensor<T> &t) {
     return os << t.value();
 }

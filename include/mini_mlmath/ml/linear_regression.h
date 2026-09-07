@@ -82,7 +82,7 @@
 // 整数 T 会在编译期就报错 —— 原因和 Perceptron 一样：int 权重会让 MSE
 // 退化（梯度是 Σ2x_i(y_i - ŷ_i)，int 累加极易溢出；解正规方程时 int
 // 矩阵也没法做浮点除法），用类内 static_assert 把错误钉在实例化点。
-template<typename T = float>
+template <typename T = float>
 class LinearRegression {
     static_assert(std::is_floating_point_v<T>,
                   "LinearRegression<T> requires floating-point T "
@@ -117,15 +117,15 @@ public:
 
     // ---- 查询（命名和 Perceptron 统一：weights / bias）----
     // fit 之前调用行为未定义（看 fitted() 自己判）。
-    std::vector<T> weights() const { return weights_; }     // 长度 d
-    T bias() const { return bias_; }         // 标量
+    std::vector<T> weights() const { return weights_; } // 长度 d
+    T bias() const { return bias_; }                    // 标量
 
-    bool fitted() const { return fitted_; }                  // 是否已 fit
+    bool fitted() const { return fitted_; } // 是否已 fit
 
 private:
-    std::vector<T> weights_;          // 权重 w，fit 后长度 = d
-    T bias_ = T(0);      // 偏置 b
-    bool fitted_ = false;   // 是否已 fit 过
+    std::vector<T> weights_; // 权重 w，fit 后长度 = d
+    T bias_ = T(0);          // 偏置 b
+    bool fitted_ = false;    // 是否已 fit 过
 };
 
 // ============================================================================
@@ -137,7 +137,7 @@ private:
 //  替换成你的实现就行。
 // ============================================================================
 
-template<typename T>
+template <typename T>
 LinearRegression<T> &LinearRegression<T>::fit(const Matrix<T> &X,
                                               const std::vector<T> &y) {
     // ---- 1) 参数校验（用 check.h 的 CHECK，习惯和 Perceptron 一致） ----
@@ -156,7 +156,7 @@ LinearRegression<T> &LinearRegression<T>::fit(const Matrix<T> &X,
     //   - 不需要单独管 bias，代码更干净（perceptron.h 也用同一招）
     // X_design 的形状：n × (d+1)
     Matrix<T> X_design = X.with_ones_column();
-    const size_type D = X_design.cols();   // = d + 1
+    const size_type D = X_design.cols(); // = d + 1
 
     // ---- 3) 把 y 变成 n×1 的列向量（矩阵运算需要） ----
     Matrix<T> Y = Matrix<T>::from_column(y);
@@ -179,11 +179,12 @@ LinearRegression<T> &LinearRegression<T>::fit(const Matrix<T> &X,
     //       想练手或想顺便为 Ridge 打基础就选这条。
     //
     //   解出 w_aug 后，用下面这段把它拆回 weights / bias（已写好）：
-    Matrix<T> w_aug;  // TODO: 把这一行替换成你的求解结果（(d+1) × 1）
+    Matrix<T> w_aug; // TODO: 把这一行替换成你的求解结果（(d+1) × 1）
 
     // w_aug 的最后一维是 bias，前面 d 维是 weight
     std::vector<T> w_vec(D);
-    for (size_type i = 0; i < D; ++i) w_vec[i] = w_aug(i, 0);
+    for (size_type i = 0; i < D; ++i)
+        w_vec[i] = w_aug(i, 0);
     bias_ = w_vec.back();
     w_vec.pop_back();
     weights_ = std::move(w_vec);
@@ -193,7 +194,7 @@ LinearRegression<T> &LinearRegression<T>::fit(const Matrix<T> &X,
     return *this;
 }
 
-template<typename T>
+template <typename T>
 std::vector<T> LinearRegression<T>::predict(const Matrix<T> &X) const {
     // ---- 校验：必须先 fit；列数必须等于训练时的特征数 d ----
     CHECK(fitted_) << "LinearRegression::predict: must call fit() before predict()";
@@ -218,7 +219,7 @@ std::vector<T> LinearRegression<T>::predict(const Matrix<T> &X) const {
     return result;
 }
 
-template<typename T>
+template <typename T>
 T LinearRegression<T>::score(const Matrix<T> &X, const std::vector<T> &y) const {
     // R² = 1 - SSE / SST
     //   SSE = Σ_i (y_i - ŷ_i)²   （模型残差平方和，越小越好）
@@ -230,7 +231,7 @@ T LinearRegression<T>::score(const Matrix<T> &X, const std::vector<T> &y) const 
     //   表示「完美拟合常数」也行 —— 这是个值得思考的设计点）。
     //
     //   实现完把下面这行替换掉：
-    (void) X;
-    (void) y;  // TODO: 删掉这一行
-    return T(0);       // TODO: 替换为真正的 R²
+    (void)X;
+    (void)y;     // TODO: 删掉这一行
+    return T(0); // TODO: 替换为真正的 R²
 }

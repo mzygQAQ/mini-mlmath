@@ -59,8 +59,8 @@
 #include <vector>
 
 #include "mini_mlmath/check.h"
-#include "mini_mlmath/random.h"
 #include "mini_mlmath/matrix.h"
+#include "mini_mlmath/random.h"
 
 // 约束：Perceptron 的 T 必须是浮点类型（float / double / long double），
 // 整数类型会在编译期就报错。原因和 random.h 一样：int 权重会让
@@ -70,7 +70,7 @@
 //
 // T 默认 float：感知机算的是 w·x + b 这种简单线性运算，不需要 double 精度；
 // float 内存和带宽都更省，GPU 友好。需要 double 时显式写 Perceptron<double>。
-template<typename T = float>
+template <typename T = float>
 class Perceptron {
     static_assert(std::is_floating_point_v<T>,
                   "Perceptron<T> requires floating-point T "
@@ -130,11 +130,11 @@ private:
 //  算法步骤写在注释里，实现留给你自己写（写完记得删掉 throw）。
 // ============================================================================
 
-template<typename T>
+template <typename T>
 Perceptron<T>::Perceptron(T learning_rate, size_type max_iter)
-        : learning_rate_(learning_rate), max_iter_(max_iter) {}
+    : learning_rate_(learning_rate), max_iter_(max_iter) {}
 
-template<typename T>
+template <typename T>
 Perceptron<T> &Perceptron<T>::fit(const Matrix<T> &X, const std::vector<T> &y) {
     //  1) 校验：X 至少 1 行 1 列；y.size() == X.rows()（用 CHECK，见 check.h）；
     CHECK(y.size() == X.rows());
@@ -154,8 +154,8 @@ Perceptron<T> &Perceptron<T>::fit(const Matrix<T> &X, const std::vector<T> &y) {
     //       - bias 更新自动并入 w_aug[d]（因为 features(i, d) = 1）
     //       - 不再需要单独管 bias，代码更干净
     std::vector<T> w_aug = weights_;
-    w_aug.push_back(bias_);                                // 长度 d+1，最后一个是 bias
-    Matrix<T> features = X.with_ones_column();             // n × (d+1)
+    w_aug.push_back(bias_);                    // 长度 d+1，最后一个是 bias
+    Matrix<T> features = X.with_ones_column(); // n × (d+1)
 
     //  4) 外层循环 max_iter_ 轮。每轮：
     //       - 用当前 w_aug 算所有样本的分数（一次矩阵乘）
@@ -165,7 +165,7 @@ Perceptron<T> &Perceptron<T>::fit(const Matrix<T> &X, const std::vector<T> &y) {
     //       - 更新规则对所有 j 统一：w_aug[j] += lr * y_i * features(i, j)
     //         j=d 时 features(i, d) = 1，所以 bias 更新自动包含在内
     for (size_type epoch = 0; epoch < max_iter_; ++epoch) {
-        Matrix<T> scores = features * Matrix<T>::from_column(w_aug);  // n×1
+        Matrix<T> scores = features * Matrix<T>::from_column(w_aug); // n×1
         for (size_type i = 0; i < X.rows(); ++i) {
             // y_i × score_i > 0 → 正确；<= 0 → 错
             if (y[i] * scores(i, 0) <= T(0)) {
@@ -186,26 +186,27 @@ Perceptron<T> &Perceptron<T>::fit(const Matrix<T> &X, const std::vector<T> &y) {
     return *this;
 }
 
-template<typename T>
+template <typename T>
 std::vector<T> Perceptron<T>::decision_function(const Matrix<T> &X) const {
     CHECK(fitted_) << "must call fit() before decision_function()";
     CHECK(X.cols() == weights_.size())
-            << "Perceptron::decision_function: feature count mismatch, got "
-            << X.cols() << " cols but trained on " << weights_.size();
+        << "Perceptron::decision_function: feature count mismatch, got "
+        << X.cols() << " cols but trained on " << weights_.size();
 
     // 用 bias folding 一次矩阵乘算所有分数（复用 fit 里的模式）
     std::vector<T> w_aug = weights_;
     w_aug.push_back(bias_);
     Matrix<T> features = X.with_ones_column();
-    Matrix<T> scores = features * Matrix<T>::from_column(w_aug);  // n×1
+    Matrix<T> scores = features * Matrix<T>::from_column(w_aug); // n×1
 
     // 拉平 n×1 → std::vector
     std::vector<T> result(X.rows());
-    for (size_type i = 0; i < X.rows(); ++i) result[i] = scores(i, 0);
+    for (size_type i = 0; i < X.rows(); ++i)
+        result[i] = scores(i, 0);
     return result;
 }
 
-template<typename T>
+template <typename T>
 std::vector<T> Perceptron<T>::predict(const Matrix<T> &X) const {
     // 取 decision_function 的符号。score == 0 落在平面上，归 -1
     // （和 sklearn 的 Perceptron 行为一致：默认 0 归负类）

@@ -35,8 +35,9 @@
 // 保证：输出各项 ∈ (0,1)，且和为 1；输入全等时退化为均匀分布。
 // ----------------------------------------------------------------------------
 template <typename T>
-std::vector<T> softmax(const std::vector<T>& x) {
-    if (x.empty()) return {};
+std::vector<T> softmax(const std::vector<T> &x) {
+    if (x.empty())
+        return {};
 
     // 数值稳定性：先减去最大值，见文件头注释
     const T maxVal = *std::max_element(x.begin(), x.end());
@@ -47,7 +48,8 @@ std::vector<T> softmax(const std::vector<T>& x) {
         e[i] = std::exp(x[i] - maxVal);
         sum += e[i];
     }
-    for (T& v : e) v /= sum;   // 归一化：除以所有 exp 之和
+    for (T &v : e)
+        v /= sum; // 归一化：除以所有 exp 之和
     return e;
 }
 
@@ -58,19 +60,20 @@ std::vector<T> softmax(const std::vector<T>& x) {
 // 返回一个新矩阵，不修改入参（eager 语义，与 Matrix.h 一致）。
 // ----------------------------------------------------------------------------
 template <typename T>
-Matrix<T> softmax_rows(const Matrix<T>& x) {
+Matrix<T> softmax_rows(const Matrix<T> &x) {
     Matrix<T> r(x.rows(), x.cols());
-    const T* xd = x.data();
-    T* rd = r.data();
+    const T *xd = x.data();
+    T *rd = r.data();
     const std::size_t cols = x.cols();
 
     for (std::size_t i = 0; i < x.rows(); ++i) {
-        const T* row = xd + i * cols;
-        T* out = rd + i * cols;
+        const T *row = xd + i * cols;
+        T *out = rd + i * cols;
 
         // 1) 求行最大值（用于数值稳定）
         T maxVal = row[0];
-        for (std::size_t j = 1; j < cols; ++j) maxVal = std::max(maxVal, row[j]);
+        for (std::size_t j = 1; j < cols; ++j)
+            maxVal = std::max(maxVal, row[j]);
 
         // 2) exp(x - max) 并累加分母
         T sum = T(0);
@@ -80,7 +83,8 @@ Matrix<T> softmax_rows(const Matrix<T>& x) {
         }
 
         // 3) 归一化
-        for (std::size_t j = 0; j < cols; ++j) out[j] /= sum;
+        for (std::size_t j = 0; j < cols; ++j)
+            out[j] /= sum;
     }
     return r;
 }

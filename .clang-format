@@ -1,0 +1,52 @@
+# ============================================================================
+#  clang-format 配置 —— 统一全库格式，消除不同 IDE 的格式化差异
+#
+#  目标：让 CLion / VS / VSCode 的 clang-format 插件输出**一模一样**的格式，
+#  同一个文件换 IDE 打开不再变样。风格基准：LLVM，再按本库既有代码微调
+# （4 空格缩进、{ 同行、public 顶格、指针/引用右对齐、template < 带空格）。
+#
+#  用法（统一入口，各 IDE 里选「基于项目 .clang-format」即可）：
+#    clang-format -i include/mini_mlmath/**/*.h tests/*.cpp
+#  或开 IDE 的 Format on Save / Reformat Code，让它读本文件。
+#
+#  为什么不能靠各 IDE 默认？
+#    - CLion 默认 K&R、VS 默认 Allman、VSCode 默认 LLVM —— 三家大括号、
+#      缩进、指针对齐规则各不相同，同一个文件换 IDE 打开就变样。
+#      本文件把关键选项钉死，谁格式化结果都一样。
+#    - 全库约定见 AGENTS.md：header-only、无宏（除 check.h）、
+#      教学注释尽量详尽（所以 ColumnLimit 关掉，长行注释不打断）。
+# ============================================================================
+
+BasedOnStyle: LLVM
+
+# ---- 缩进 ----
+IndentWidth: 4                    # 4 空格缩进（全库既有风格）
+TabWidth: 4
+UseTab: Never                     # 禁止 Tab，统一空格
+ContinuationIndentWidth: 4        # 续行缩进
+AccessModifierOffset: -4          # public:/private: 顶格（= 缩进 + (-4)，与 class 同列）
+NamespaceIndentation: None        # namespace 内不额外缩进
+
+# ---- 大括号 / 换行 ----
+BreakBeforeBraces: Attach          # { 跟在声明/函数签名同一行（全库既有风格）
+AlwaysBreakTemplateDeclarations: Yes          # template <...> 单独占一行
+AllowShortFunctionsOnASingleLine: Inline      # 允许短的 inline 函数单行（getter 等）
+AllowShortLambdasOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+
+# ---- 行宽：教学注释长行多，不强制换行 ----
+ColumnLimit: 0                    # 0 = 不换行，保留原行长（注释/CHECK 消息）
+MaxEmptyLinesToKeep: 2
+
+# ---- 指针 / 引用：统一右对齐（const T *p / const Matrix<T> &X）----
+PointerAlignment: Right
+DerivePointerAlignment: false     # 别让 clang-format 从代码里猜，钉死右对齐
+
+# ---- include ----
+SortIncludes: CaseSensitive       # include 按字母序（已有文件都已排好）
+
+# ---- 其他 ----
+FixNamespaceComments: true        # } // namespace xxx 收尾注释
+IndentCaseLabels: false

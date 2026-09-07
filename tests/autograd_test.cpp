@@ -34,8 +34,8 @@ void verify_mul_sum() {
     Tensor<double> a(Matrix<double>({{1.0, 2.0}}), true);
     Tensor<double> w(Matrix<double>({{3.0, 4.0}}), true);
 
-    Tensor<double> y = a * w;        // 逐元素乘
-    Tensor<double> loss = sum(y);    // 11
+    Tensor<double> y = a * w;     // 逐元素乘
+    Tensor<double> loss = sum(y); // 11
     loss.backward();
 
     std::cout << "loss = " << loss.item() << "（期望 11）\n";
@@ -43,13 +43,10 @@ void verify_mul_sum() {
     std::cout << "a.grad = " << a.grad() << "（期望 [3, 4]）\n";
     std::cout << "w.grad = " << w.grad() << "（期望 [1, 2]）\n";
 
-    const bool ok = (std::abs(loss.item() - 11.0) < 1e-12)
-                 && (std::abs(a.grad()(0, 0) - 3.0) < 1e-12)
-                 && (std::abs(a.grad()(0, 1) - 4.0) < 1e-12)
-                 && (std::abs(w.grad()(0, 0) - 1.0) < 1e-12)
-                 && (std::abs(w.grad()(0, 1) - 2.0) < 1e-12);
+    const bool ok = (std::abs(loss.item() - 11.0) < 1e-12) && (std::abs(a.grad()(0, 0) - 3.0) < 1e-12) && (std::abs(a.grad()(0, 1) - 4.0) < 1e-12) && (std::abs(w.grad()(0, 0) - 1.0) < 1e-12) && (std::abs(w.grad()(0, 1) - 2.0) < 1e-12);
     std::cout << (ok ? "  ✓\n" : "  ✗\n");
-    if (!ok) std::exit(1);
+    if (!ok)
+        std::exit(1);
 }
 
 // ----------------------------------------------------------------------------
@@ -59,18 +56,18 @@ void verify_mul_sum() {
 void verify_constant() {
     std::cout << "===== 2) 常数张量不累积梯度 =====\n";
 
-    Tensor<double> x(Matrix<double>({{1.0, 2.0}}), false);  // 常数（数据）
-    Tensor<double> w(Matrix<double>({{3.0, 4.0}}), true);   // 参数（要梯度）
+    Tensor<double> x(Matrix<double>({{1.0, 2.0}}), false); // 常数（数据）
+    Tensor<double> w(Matrix<double>({{3.0, 4.0}}), true);  // 参数（要梯度）
 
     Tensor<double> loss = sum(x * w);
     loss.backward();
 
     std::cout << "w.grad = " << w.grad() << "（期望 [1, 2] = x）\n";
 
-    const bool ok = (std::abs(w.grad()(0, 0) - 1.0) < 1e-12)
-                 && (std::abs(w.grad()(0, 1) - 2.0) < 1e-12);
+    const bool ok = (std::abs(w.grad()(0, 0) - 1.0) < 1e-12) && (std::abs(w.grad()(0, 1) - 2.0) < 1e-12);
     std::cout << (ok ? "  ✓\n" : "  ✗\n");
-    if (!ok) std::exit(1);
+    if (!ok)
+        std::exit(1);
 }
 
 // ----------------------------------------------------------------------------
@@ -84,16 +81,16 @@ void verify_fanout() {
     Tensor<double> w(Matrix<double>({{2.0}}), true);
     Tensor<double> y1 = w * 3.0;
     Tensor<double> y2 = w * 4.0;
-    Tensor<double> loss = sum(y1 + y2);   // (6+8)=14
+    Tensor<double> loss = sum(y1 + y2); // (6+8)=14
     loss.backward();
 
     std::cout << "loss   = " << loss.item() << "（期望 14）\n";
     std::cout << "w.grad = " << w.grad()(0, 0) << "（期望 7）\n";
 
-    const bool ok = (std::abs(loss.item() - 14.0) < 1e-12)
-                 && (std::abs(w.grad()(0, 0) - 7.0) < 1e-12);
+    const bool ok = (std::abs(loss.item() - 14.0) < 1e-12) && (std::abs(w.grad()(0, 0) - 7.0) < 1e-12);
     std::cout << (ok ? "  ✓\n" : "  ✗\n");
-    if (!ok) std::exit(1);
+    if (!ok)
+        std::exit(1);
 }
 
 // ----------------------------------------------------------------------------
@@ -110,15 +107,12 @@ void verify_sub_neg() {
     Tensor<double> loss = sum(c);
     loss.backward();
 
-    const bool ok = (std::abs(loss.item() - 5.0) < 1e-12)
-                 && (std::abs(a.grad()(0, 0) - 1.0) < 1e-12)
-                 && (std::abs(a.grad()(0, 1) - 1.0) < 1e-12)
-                 && (std::abs(b.grad()(0, 0) + 1.0) < 1e-12)
-                 && (std::abs(b.grad()(0, 1) + 1.0) < 1e-12);
+    const bool ok = (std::abs(loss.item() - 5.0) < 1e-12) && (std::abs(a.grad()(0, 0) - 1.0) < 1e-12) && (std::abs(a.grad()(0, 1) - 1.0) < 1e-12) && (std::abs(b.grad()(0, 0) + 1.0) < 1e-12) && (std::abs(b.grad()(0, 1) + 1.0) < 1e-12);
     std::cout << "a.grad = " << a.grad() << "（期望 [1, 1]）\n";
     std::cout << "b.grad = " << b.grad() << "（期望 [-1, -1]）\n";
     std::cout << (ok ? "  ✓\n" : "  ✗\n");
-    if (!ok) std::exit(1);
+    if (!ok)
+        std::exit(1);
 }
 
 // ----------------------------------------------------------------------------
@@ -147,7 +141,8 @@ void verify_accumulate_and_zero_grad() {
     const bool ok2 = (std::abs(w.grad()(0, 0)) < 1e-12);
 
     std::cout << ((ok1 && ok2) ? "  ✓\n" : "  ✗\n");
-    if (!(ok1 && ok2)) std::exit(1);
+    if (!(ok1 && ok2))
+        std::exit(1);
 }
 
 // ----------------------------------------------------------------------------
@@ -159,10 +154,10 @@ void verify_accumulate_and_zero_grad() {
 // ----------------------------------------------------------------------------
 
 // 纯矩阵版前向（不经过 autograd，用 Matrix<T> 直接算），返回标量 loss
-double plain_forward(const Matrix<double>& W1, const Matrix<double>& W2) {
+double plain_forward(const Matrix<double> &W1, const Matrix<double> &W2) {
     const Matrix<double> X({{1.0, -0.5}});
-    Matrix<double> h = relu(X * W1);     // 1×3
-    Matrix<double> o = h * W2;           // 1×1
+    Matrix<double> h = relu(X * W1); // 1×3
+    Matrix<double> o = h * W2;       // 1×1
     return o(0, 0);
 }
 
@@ -170,19 +165,17 @@ void verify_mlp_numeric() {
     std::cout << "===== 6) 小型 MLP 梯度 vs 数值有限差分 =====\n";
 
     const Matrix<double> W1({{0.8, 0.6, 0.4},
-                             {0.6, 0.4, 0.2}});   // 2×3
+                             {0.6, 0.4, 0.2}}); // 2×3
     const Matrix<double> W2({{0.5},
                              {0.3},
-                             {0.2}});             // 3×1
+                             {0.2}}); // 3×1
 
     // 先手动算 h = X@W1 = [0.5, 0.4, 0.3]（全 > 0，relu 不动），
     // 因此数值差分不必担心跨过不可导点。
     {
         Matrix<double> h = relu(Matrix<double>({{1.0, -0.5}}) * W1);
         std::cout << "h = " << h << "（期望 [0.5, 0.4, 0.3]，全正）\n";
-        const bool h_ok = (std::abs(h(0, 0) - 0.5) < 1e-12)
-                       && (std::abs(h(0, 1) - 0.4) < 1e-12)
-                       && (std::abs(h(0, 2) - 0.3) < 1e-12);
+        const bool h_ok = (std::abs(h(0, 0) - 0.5) < 1e-12) && (std::abs(h(0, 1) - 0.4) < 1e-12) && (std::abs(h(0, 2) - 0.3) < 1e-12);
         if (!h_ok) {
             std::cout << "  ✗ h 的手算核对失败，测试假设不成立\n";
             std::exit(1);
@@ -190,7 +183,7 @@ void verify_mlp_numeric() {
     }
 
     // autograd 前向 + 反向
-    Tensor<double> x(Matrix<double>({{1.0, -0.5}}), false);  // 常数输入
+    Tensor<double> x(Matrix<double>({{1.0, -0.5}}), false); // 常数输入
     Tensor<double> w1(W1, true);
     Tensor<double> w2(W2, true);
     Tensor<double> h = relu(matmul(x, w1));
@@ -216,7 +209,8 @@ void verify_mlp_numeric() {
             const double num = (plain_forward(Wp, W2) - plain_forward(Wm, W2)) / (2 * hh);
             const double ana = w1.grad()(i, j);
             const double err = std::abs(num - ana);
-            if (err > max_err_w1) max_err_w1 = err;
+            if (err > max_err_w1)
+                max_err_w1 = err;
         }
     }
     for (std::size_t i = 0; i < W2.rows(); ++i) {
@@ -227,7 +221,8 @@ void verify_mlp_numeric() {
             const double num = (plain_forward(W1, Wp) - plain_forward(W1, Wm)) / (2 * hh);
             const double ana = w2.grad()(i, j);
             const double err = std::abs(num - ana);
-            if (err > max_err_w2) max_err_w2 = err;
+            if (err > max_err_w2)
+                max_err_w2 = err;
         }
     }
 
@@ -235,7 +230,8 @@ void verify_mlp_numeric() {
               << ", W2 = " << max_err_w2 << "\n";
     const bool ok = (max_err_w1 < 1e-6) && (max_err_w2 < 1e-6);
     std::cout << (ok ? "  ✓\n" : "  ✗\n");
-    if (!ok) std::exit(1);
+    if (!ok)
+        std::exit(1);
 }
 
 // ----------------------------------------------------------------------------
@@ -253,7 +249,7 @@ void verify_no_leak() {
         Tensor<double> a(Matrix<double>({{1.0, 2.0}}), true);
         Tensor<double> w(Matrix<double>({{3.0, 4.0}}), true);
         Tensor<double> b(Matrix<double>({{0.5, 0.6}}), true);
-        Tensor<double> loss = sum(relu(a * w + b) * w);   // 一张小图
+        Tensor<double> loss = sum(relu(a * w + b) * w); // 一张小图
         loss.backward();
         // 作用域结束：loss/a/w/b 全部销毁，图应整体释放
     }
@@ -263,7 +259,8 @@ void verify_no_leak() {
               << "，200 轮后 = " << after << "\n";
     const bool ok = (after == before);
     std::cout << (ok ? "  ✓（无泄漏，图整体释放）\n" : "  ✗（有循环引用泄漏！）\n");
-    if (!ok) std::exit(1);
+    if (!ok)
+        std::exit(1);
 }
 
 // ----------------------------------------------------------------------------

@@ -40,18 +40,18 @@ struct Fixture {
  */
 Fixture make_data() {
     Matrix<double> X = {
-        {0.8, 1.1},   // 簇 0
-        {1.2, 0.9},   // 簇 0
-        {1.1, 1.3},   // 簇 0
-        {0.9, 0.8},   // 簇 0
-        {4.8, 5.2},   // 簇 1
-        {5.2, 4.8},   // 簇 1
-        {5.1, 5.3},   // 簇 1
-        {4.9, 4.7},   // 簇 1
-        {9.1, 0.9},   // 簇 2
-        {8.9, 1.1},   // 簇 2
-        {9.2, 0.7},   // 簇 2
-        {8.8, 1.2},   // 簇 2
+        {0.8, 1.1}, // 簇 0
+        {1.2, 0.9}, // 簇 0
+        {1.1, 1.3}, // 簇 0
+        {0.9, 0.8}, // 簇 0
+        {4.8, 5.2}, // 簇 1
+        {5.2, 4.8}, // 簇 1
+        {5.1, 5.3}, // 簇 1
+        {4.9, 4.7}, // 簇 1
+        {9.1, 0.9}, // 簇 2
+        {8.9, 1.1}, // 簇 2
+        {9.2, 0.7}, // 簇 2
+        {8.8, 1.2}, // 簇 2
     };
     return {X};
 }
@@ -86,11 +86,13 @@ void verify_predict() {
         bool ok = (lab.size() == fx.X.rows());
         for (std::size_t g = 0; g < 3 && ok; ++g) {
             for (std::size_t i = g * 4 + 1; i < g * 4 + 4; ++i) {
-                if (lab[i] != lab[g * 4]) ok = false;
+                if (lab[i] != lab[g * 4])
+                    ok = false;
             }
         }
         std::printf("  三组各 4 点同簇: %s\n", ok ? "OK" : "FAIL");
-        if (!ok) std::printf("  FAIL: expected each group of 4 rows to share a cluster\n");
+        if (!ok)
+            std::printf("  FAIL: expected each group of 4 rows to share a cluster\n");
     } catch (const std::logic_error &) {
         std::printf("  SKIPPED (not implemented)\n");
     }
@@ -117,17 +119,24 @@ void verify_centers() {
             double best = 1e30;
             std::size_t best_j = 0;
             for (std::size_t j = 0; j < C.rows(); ++j) {
-                if (used[j]) continue;
+                if (used[j])
+                    continue;
                 const double dx = C(j, 0) - e.first;
                 const double dy = C(j, 1) - e.second;
                 const double d = std::sqrt(dx * dx + dy * dy);
-                if (d < best) { best = d; best_j = j; }
+                if (d < best) {
+                    best = d;
+                    best_j = j;
+                }
             }
-            if (best < 0.05) { used[best_j] = true; }
-            else ok = false;
+            if (best < 0.05) {
+                used[best_j] = true;
+            } else
+                ok = false;
         }
         std::printf("  簇心贴近各簇均值: %s\n", ok ? "OK" : "FAIL");
-        if (!ok) std::printf("  FAIL: expected centers near (1,1.025)/(5,5)/(9,0.975)\n");
+        if (!ok)
+            std::printf("  FAIL: expected centers near (1,1.025)/(5,5)/(9,0.975)\n");
     } catch (const std::logic_error &) {
         std::printf("  SKIPPED (not implemented)\n");
     }
@@ -145,7 +154,8 @@ void verify_fit_predict() {
         const auto pr = km.predict(fx.X);
         const bool ok = (fp == pr);
         std::printf("  fit_predict == predict: %s\n", ok ? "OK" : "FAIL");
-        if (!ok) std::printf("  FAIL\n");
+        if (!ok)
+            std::printf("  FAIL\n");
     } catch (const std::logic_error &) {
         std::printf("  SKIPPED (not implemented)\n");
     }
@@ -169,11 +179,11 @@ void verify_inertia_score() {
         km.fit(fx.X);
         const double iner = km.inertia();
         const double scr = km.score(fx.X);
-        bool ok = (std::fabs(iner - expected_inertia) < 1e-3)
-                  && (std::fabs(scr + expected_inertia) < 1e-3);
+        bool ok = (std::fabs(iner - expected_inertia) < 1e-3) && (std::fabs(scr + expected_inertia) < 1e-3);
         std::printf("  inertia=%.4f (期望 %.4f), score=%.4f: %s\n",
                     iner, expected_inertia, scr, ok ? "OK" : "FAIL");
-        if (!ok) std::printf("  FAIL\n");
+        if (!ok)
+            std::printf("  FAIL\n");
     } catch (const std::logic_error &) {
         std::printf("  SKIPPED (not implemented)\n");
     }
@@ -189,7 +199,7 @@ void verify_guards() {
     {
         KMeans<double> km(3);
         try {
-            (void) km.predict(fx.X);
+            (void)km.predict(fx.X);
             std::printf("  FAIL: predict without fit should have thrown\n");
             return;
         } catch (const std::invalid_argument &) {
@@ -197,9 +207,9 @@ void verify_guards() {
         }
     }
     {
-        KMeans<double> km(99);   // n_clusters=99 > n_samples=12
+        KMeans<double> km(99); // n_clusters=99 > n_samples=12
         try {
-            (void) km.fit(fx.X);
+            (void)km.fit(fx.X);
             std::printf("  FAIL: n_clusters > n_samples should have thrown\n");
             return;
         } catch (const std::invalid_argument &) {

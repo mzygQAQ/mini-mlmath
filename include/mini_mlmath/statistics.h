@@ -16,7 +16,8 @@ template <typename T>
 T mean(const std::vector<T> &x) {
     CHECK(!x.empty()) << "statistics::mean: empty input";
     T sum = T(0);
-    for (const T &v : x) sum += v;
+    for (const T &v : x)
+        sum += v;
     return sum / static_cast<T>(x.size());
 }
 
@@ -27,7 +28,8 @@ T median(const std::vector<T> &x) {
     std::vector<T> sorted = x;
     std::sort(sorted.begin(), sorted.end());
     const std::size_t n = sorted.size();
-    if (n % 2 == 1) return sorted[n / 2];
+    if (n % 2 == 1)
+        return sorted[n / 2];
     return (sorted[n / 2 - 1] + sorted[n / 2]) / T(2);
 }
 
@@ -53,7 +55,8 @@ T mode(const std::vector<T> &x) {
             current_count = 1;
         }
     }
-    if (current_count > best_count) best = current;
+    if (current_count > best_count)
+        best = current;
     return best;
 }
 
@@ -61,7 +64,7 @@ T mode(const std::vector<T> &x) {
 template <typename T>
 T variance(const std::vector<T> &x) {
     CHECK(x.size() >= 2)
-            << "statistics::variance: need >= 2 elements (sample variance uses n-1)";
+        << "statistics::variance: need >= 2 elements (sample variance uses n-1)";
     const T m = mean(x);
     T sum_sq = T(0);
     for (const T &v : x) {

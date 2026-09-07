@@ -5,8 +5,8 @@
 #include <cstdio>
 #include <vector>
 
-#include "mini_mlmath/ml/perceptron.h"
 #include "mini_mlmath/matrix.h"
+#include "mini_mlmath/ml/perceptron.h"
 
 int main() {
     // 4 个样本的布尔真值表（行 = 样本，列 = 特征）
@@ -14,8 +14,7 @@ int main() {
         {0, 0},
         {0, 1},
         {1, 0},
-        {1, 1}
-    };
+        {1, 1}};
     // 标签约定：+1 / -1（Perceptron 的 sign 函数定义域，见 perceptron.h 头注释）
 
     // ---- AND：只有 (1,1) 是 +1 ----
@@ -27,7 +26,8 @@ int main() {
         std::printf("AND learned weights: [%.3f, %.3f], bias: %.3f\n",
                     p.weights()[0], p.weights()[1], p.bias());
         std::printf("AND predict: ");
-        for (auto v : pred) std::printf("%+.0f ", v);
+        for (auto v : pred)
+            std::printf("%+.0f ", v);
         std::printf("\n");
         for (std::size_t i = 0; i < 4; ++i) {
             if (pred[i] != y_and[i]) {

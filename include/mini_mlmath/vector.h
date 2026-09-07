@@ -33,9 +33,11 @@ public:
     using size_type = std::size_t;
 
     // ---- 构造 ----
-    Vector() = default;                          // 空向量
-    explicit Vector(size_type n) : data_(n, T{}) {}   // n 维零向量
-    Vector(std::initializer_list<T> init) : data_(init) {}  // {1,2,3} 直接初始化
+    Vector() = default; // 空向量
+    explicit Vector(size_type n)
+        : data_(n, T{}) {} // n 维零向量
+    Vector(std::initializer_list<T> init)
+        : data_(init) {} // {1,2,3} 直接初始化
 
     // 静态工厂，语义更明确：Vector<double>::fromList({1,2,3})
     static Vector fromList(std::initializer_list<T> init) { return Vector(init); }
@@ -44,19 +46,19 @@ public:
     size_type size() const noexcept { return data_.size(); }
 
     // 带越界检查的方括号下标（教学友好）。数学上 v(i) 等价 v[i]。
-    T& operator[](size_type i) {
+    T &operator[](size_type i) {
         if (i >= data_.size())
             throw std::out_of_range("Vector::operator[]: index out of range");
         return data_[i];
     }
-    const T& operator[](size_type i) const {
+    const T &operator[](size_type i) const {
         if (i >= data_.size())
             throw std::out_of_range("Vector::operator[]: index out of range");
         return data_[i];
     }
 
-    T*       data() noexcept       { return data_.data(); }
-    const T* data() const noexcept { return data_.data(); }
+    T *data() noexcept { return data_.data(); }
+    const T *data() const noexcept { return data_.data(); }
 
     // ------------------------------------------------------------------------
     // 点积 dot：a·b = Σ_i a_i·b_i
@@ -67,13 +69,14 @@ public:
     //   - a、b 反向   → 负数
     // 两个向量长度必须相同，否则抛异常。
     // ------------------------------------------------------------------------
-    T dot(const Vector& rhs) const {
+    T dot(const Vector &rhs) const {
         if (size() != rhs.size())
             throw std::invalid_argument("Vector::dot: dimension mismatch");
         T s = T(0);
         // 内层一个乘加循环，和 matrix.h 的乘法内层一样，
         // -O3 下会被向量化成一次处理多个分量。
-        for (size_type i = 0; i < size(); ++i) s += data_[i] * rhs.data_[i];
+        for (size_type i = 0; i < size(); ++i)
+            s += data_[i] * rhs.data_[i];
         return s;
     }
 
@@ -84,7 +87,8 @@ public:
     // ------------------------------------------------------------------------
     T squared_norm() const {
         T s = T(0);
-        for (const T& v : data_) s += v * v;
+        for (const T &v : data_)
+            s += v * v;
         return s;
     }
 
@@ -105,7 +109,7 @@ public:
     // 边界：任一向量模长为 0（零向量没有方向可言），抛异常比悄悄返回 0
     // 更能暴露 bug。
     // ------------------------------------------------------------------------
-    T cosine_similarity(const Vector& rhs) const {
+    T cosine_similarity(const Vector &rhs) const {
         const T na = norm();
         const T nb = rhs.norm();
         if (na == T(0) || nb == T(0))
@@ -115,46 +119,52 @@ public:
     }
 
     // ---- 基础二元运算（eager，返回新向量）----
-    Vector operator+(const Vector& rhs) const {
+    Vector operator+(const Vector &rhs) const {
         if (size() != rhs.size())
             throw std::invalid_argument("Vector::operator+: dimension mismatch");
         Vector r(size());
-        for (size_type i = 0; i < size(); ++i) r[i] = data_[i] + rhs.data_[i];
+        for (size_type i = 0; i < size(); ++i)
+            r[i] = data_[i] + rhs.data_[i];
         return r;
     }
 
-    Vector operator-(const Vector& rhs) const {
+    Vector operator-(const Vector &rhs) const {
         if (size() != rhs.size())
             throw std::invalid_argument("Vector::operator-: dimension mismatch");
         Vector r(size());
-        for (size_type i = 0; i < size(); ++i) r[i] = data_[i] - rhs.data_[i];
+        for (size_type i = 0; i < size(); ++i)
+            r[i] = data_[i] - rhs.data_[i];
         return r;
     }
 
     // 标量乘法：v * s，把向量每个分量放大 s 倍
-    Vector operator*(const T& s) const {
+    Vector operator*(const T &s) const {
         Vector r(size());
-        for (size_type i = 0; i < size(); ++i) r[i] = data_[i] * s;
+        for (size_type i = 0; i < size(); ++i)
+            r[i] = data_[i] * s;
         return r;
     }
 
 private:
-    std::vector<T> data_;   // 连续存储
+    std::vector<T> data_; // 连续存储
 };
 
 // 标量在左边的写法：s * v
 template <typename T>
-Vector<T> operator*(const T& s, const Vector<T>& v) { return v * s; }
+Vector<T> operator*(const T &s, const Vector<T> &v) {
+    return v * s;
+}
 
 // ----------------------------------------------------------------------------
 // 打印：[1, 2, 3]
 // ----------------------------------------------------------------------------
 template <typename T>
-std::ostream& operator<<(std::ostream& os, const Vector<T>& v) {
+std::ostream &operator<<(std::ostream &os, const Vector<T> &v) {
     os << '[';
     for (std::size_t i = 0; i < v.size(); ++i) {
         os << v[i];
-        if (i + 1 < v.size()) os << ", ";
+        if (i + 1 < v.size())
+            os << ", ";
     }
     os << ']';
     return os;

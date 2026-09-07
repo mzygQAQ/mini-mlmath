@@ -32,7 +32,7 @@
 // 小工具：测一次 f() 的执行毫秒数
 // ----------------------------------------------------------------------------
 template <typename F>
-double bench_ms(F&& f) {
+double bench_ms(F &&f) {
     const auto t0 = std::chrono::high_resolution_clock::now();
     f();
     const auto t1 = std::chrono::high_resolution_clock::now();
@@ -43,10 +43,11 @@ double bench_ms(F&& f) {
 // 小工具：随机填充一个矩阵（均匀分布在 [-1, 1)）
 // ----------------------------------------------------------------------------
 template <typename T, typename RNG>
-void fill_random(Matrix<T>& m, RNG& rng) {
+void fill_random(Matrix<T> &m, RNG &rng) {
     std::uniform_real_distribution<T> dist(T(-1), T(1));
     for (std::size_t i = 0; i < m.rows(); ++i)
-        for (std::size_t j = 0; j < m.cols(); ++j) m(i, j) = dist(rng);
+        for (std::size_t j = 0; j < m.cols(); ++j)
+            m(i, j) = dist(rng);
 }
 
 // ----------------------------------------------------------------------------
@@ -54,10 +55,11 @@ void fill_random(Matrix<T>& m, RNG& rng) {
 // 整个优化掉 —— 这正是真实 benchmark 里校验和（checksum）的作用）
 // ----------------------------------------------------------------------------
 template <typename T>
-T checksum(const Matrix<T>& m) {
+T checksum(const Matrix<T> &m) {
     T s = T(0);
     for (std::size_t i = 0; i < m.rows(); ++i)
-        for (std::size_t j = 0; j < m.cols(); ++j) s += m(i, j);
+        for (std::size_t j = 0; j < m.cols(); ++j)
+            s += m(i, j);
     return s;
 }
 
@@ -80,16 +82,21 @@ void verify_hand_example() {
     const Matrix<double> expected =
         Matrix<double>::fromList({{58, 64}, {139, 154}});
 
-    std::cout << "A = \n" << A;
-    std::cout << "B = \n" << B;
+    std::cout << "A = \n"
+              << A;
+    std::cout << "B = \n"
+              << B;
 
     const auto C0 = multiply_naive(A, B);
     const auto C1 = multiply_blocked(A, B);
     const auto C2 = multiply_packed(A, B);
 
-    std::cout << "multiply_naive  结果:\n" << C0;
-    std::cout << "multiply_blocked 结果:\n" << C1;
-    std::cout << "multiply_packed  结果:\n" << C2;
+    std::cout << "multiply_naive  结果:\n"
+              << C0;
+    std::cout << "multiply_blocked 结果:\n"
+              << C1;
+    std::cout << "multiply_packed  结果:\n"
+              << C2;
 
     // 三版都要等于手算值，且三版彼此一致
     const bool ok = approxEqual(C0, expected) && approxEqual(C1, expected) &&
@@ -106,7 +113,7 @@ void verify_hand_example() {
 // ----------------------------------------------------------------------------
 void verify_random_consistency() {
     std::cout << "===== 正确性验证 2：随机矩阵三版一致性 (N=256) =====\n";
-    std::mt19937 rng(42);  // 固定种子，结果可复现
+    std::mt19937 rng(42); // 固定种子，结果可复现
 
     const std::size_t N = 256;
     Matrix<double> A(N, N), B(N, N);
@@ -177,17 +184,17 @@ void run_benchmark() {
 
         for (int rep = 0; rep < 3; ++rep) {
             t_naive = std::min(t_naive, bench_ms([&] {
-                volatile double s = checksum(multiply_naive(A, B));
-                (void)s;
-            }));
+                                   volatile double s = checksum(multiply_naive(A, B));
+                                   (void)s;
+                               }));
             t_blocked = std::min(t_blocked, bench_ms([&] {
-                volatile double s = checksum(multiply_blocked(A, B));
-                (void)s;
-            }));
+                                     volatile double s = checksum(multiply_blocked(A, B));
+                                     (void)s;
+                                 }));
             t_packed = std::min(t_packed, bench_ms([&] {
-                volatile double s = checksum(multiply_packed(A, B));
-                (void)s;
-            }));
+                                    volatile double s = checksum(multiply_packed(A, B));
+                                    (void)s;
+                                }));
         }
 
         std::cout << std::left << std::setw(8) << N

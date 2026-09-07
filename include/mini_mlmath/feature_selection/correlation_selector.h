@@ -54,20 +54,20 @@
 
 // 皮尔逊相关系数：直接用原始值算（见文件头公式）
 struct Pearson {
-    template<typename T>
+    template <typename T>
     static T measure(const Vector<T> &x, const Vector<T> &y);
 };
 
 // 斯皮尔曼秩相关系数：x、y 先各自取秩，再对秩算皮尔逊。
 // 对单调非线性关系也敏感（皮尔逊只对线性关系敏感）。
 struct Spearman {
-    template<typename T>
+    template <typename T>
     static T measure(const Vector<T> &x, const Vector<T> &y);
 };
 
 // 秩变换辅助：把向量 v 的每个元素替换成它在全向量中的名次（秩）。
 // 升序排名：最小值秩 1，最大值秩 n；并列（tie）取平均秩。自己实现。
-template<typename T>
+template <typename T>
 Vector<T> rank_vector(const Vector<T> &v) {
     return v;
 }
@@ -75,7 +75,7 @@ Vector<T> rank_vector(const Vector<T> &v) {
 // ----------------------------------------------------------------------------
 // 相关系数选择器：骨架逻辑固定，算法由模板参数 Measure 注入
 // ----------------------------------------------------------------------------
-template<typename T, typename Measure = Pearson>
+template <typename T, typename Measure = Pearson>
 class CorrelationSelector {
 public:
     using value_type = T;
@@ -85,7 +85,8 @@ public:
 
     // threshold：|r| 低于该值的特征列被剔除。默认 0.5（|r|>=0.5 通常算
     // 「中等偏强相关」，可改）。
-    explicit CorrelationSelector(T threshold = T(0.5)) : threshold_(threshold) {}
+    explicit CorrelationSelector(T threshold = T(0.5))
+        : threshold_(threshold) {}
 
     // ---- 训练阶段 ----
 
@@ -111,8 +112,8 @@ public:
     std::vector<std::uint8_t> get_support() const { return support_; }
 
 private:
-    T threshold_ = T(0.5);      // |r| 阈值
-    bool fitted_ = false;       // 是否已 fit 过（transform 前必须为 true）
+    T threshold_ = T(0.5);              // |r| 阈值
+    bool fitted_ = false;               // 是否已 fit 过（transform 前必须为 true）
     std::vector<T> correlations_;       // 每列相关系数，fit 后填充
     std::vector<std::uint8_t> support_; // 每列是否保留（1/0），fit 后填充
 };
@@ -121,7 +122,7 @@ private:
 //  类外实现（模板必须留在头文件里）。以下是空骨架，待你自己填实现。
 // ============================================================================
 
-template<typename T>
+template <typename T>
 T Pearson::measure(const Vector<T> &x, const Vector<T> &y) {
     // 1) CHECK(x.size() == y.size())
     // 2) 公式见文件头：r = Σ(x-x̄)(y-ȳ) / sqrt(Σ(x-x̄)² · Σ(y-ȳ)²)
@@ -130,14 +131,14 @@ T Pearson::measure(const Vector<T> &x, const Vector<T> &y) {
     return T(0);
 }
 
-template<typename T>
+template <typename T>
 T Spearman::measure(const Vector<T> &x, const Vector<T> &y) {
     // 斯皮尔曼 = 在秩上算皮尔逊：
     //     return Pearson::measure(rank_vector(x), rank_vector(y));
     return T(0);
 }
 
-template<typename T, typename Measure>
+template <typename T, typename Measure>
 CorrelationSelector<T, Measure> &
 CorrelationSelector<T, Measure>::fit(const Matrix<T> &X, const Vector<T> &y) {
     // 1) 校验：X 至少一行一列；y 长度必须等于 X.rows()
@@ -149,14 +150,14 @@ CorrelationSelector<T, Measure>::fit(const Matrix<T> &X, const Vector<T> &y) {
     return *this;
 }
 
-template<typename T, typename Measure>
+template <typename T, typename Measure>
 Matrix<T> CorrelationSelector<T, Measure>::fit_transform(const Matrix<T> &X,
                                                          const Vector<T> &y) {
     // 一步到位：fit(X, y) 后再 transform(X)
     return transform(X);
 }
 
-template<typename T, typename Measure>
+template <typename T, typename Measure>
 Matrix<T> CorrelationSelector<T, Measure>::transform(const Matrix<T> &X) const {
     // 1) CHECK(fitted_) << "must call fit() before transform()"
     // 2) CHECK(X.cols() == support_.size())

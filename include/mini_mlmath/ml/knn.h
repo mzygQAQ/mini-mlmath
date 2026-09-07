@@ -108,8 +108,8 @@
 // ============================================================================
 template <typename T>
 struct NeighborHit {
-    std::size_t index = 0;   // 训练样本的行号（第几个样本）
-    T distance = T(0);       // 它到查询点的距离（由 Metric 算出）
+    std::size_t index = 0; // 训练样本的行号（第几个样本）
+    T distance = T(0);     // 它到查询点的距离（由 Metric 算出）
 };
 
 // 邻居排序规则：先比距离（小 = 近），距离相同再比行号（保证确定性）。
@@ -117,8 +117,9 @@ struct NeighborHit {
 // KNN 投票。放在全局：它是查询结果 NeighborHit 的配套比较器，不属于某个算法。
 template <typename T>
 struct NeighborHitLess {
-    bool operator()(const NeighborHit<T>& a, const NeighborHit<T>& b) const {
-        if (a.distance != b.distance) return a.distance < b.distance;
+    bool operator()(const NeighborHit<T> &a, const NeighborHit<T> &b) const {
+        if (a.distance != b.distance)
+            return a.distance < b.distance;
         return a.index < b.index;
     }
 };
@@ -144,7 +145,7 @@ namespace distance {
 // 所以「比较远近」时其实可以省掉 sqrt（比较单调），这里为了距离值可读保留。
 struct EuclideanDistance {
     template <typename T>
-    T operator()(const T* a, const T* b, std::size_t dim) const {
+    T operator()(const T *a, const T *b, std::size_t dim) const {
         T sum = T(0);
         for (std::size_t i = 0; i < dim; ++i) {
             const T diff = a[i] - b[i];
@@ -156,10 +157,10 @@ struct EuclideanDistance {
 
 // L1 曼哈顿距离（Manhattan / city-block）： Σ_i |a_i - b_i|
 // 几何意义是「只能沿坐标轴走」的路径长度，对异常值不如 L2 敏感
-//（平方会让大偏差被放大），高维数据里有时比 L2 更稳。
+// （平方会让大偏差被放大），高维数据里有时比 L2 更稳。
 struct ManhattanDistance {
     template <typename T>
-    T operator()(const T* a, const T* b, std::size_t dim) const {
+    T operator()(const T *a, const T *b, std::size_t dim) const {
         T sum = T(0);
         for (std::size_t i = 0; i < dim; ++i) {
             sum += std::abs(a[i] - b[i]);
@@ -173,7 +174,7 @@ struct ManhattanDistance {
 // 就是切比雪夫距离，所以也叫棋盘距离（chessboard distance）。
 struct ChebyshevDistance {
     template <typename T>
-    T operator()(const T* a, const T* b, std::size_t dim) const {
+    T operator()(const T *a, const T *b, std::size_t dim) const {
         CHECK(dim >= 1) << "ChebyshevDistance: need dim >= 1";
         T best = std::abs(a[0] - b[0]);
         for (std::size_t i = 1; i < dim; ++i) {
@@ -183,8 +184,8 @@ struct ChebyshevDistance {
     }
 };
 
-}   // namespace distance
-}   // namespace detail
+} // namespace distance
+} // namespace detail
 
 // ============================================================================
 //  3. 近邻搜索策略（Strategy）—— 扩展点 B，编译期策略模板
@@ -215,14 +216,14 @@ public:
     using size_type = std::size_t;
 
     // 策略是「编译期类型」，构造无参数：Metric 作为成员默认构造即可
-    //（三个预置 metric 都是无状态 functor）。
+    // （三个预置 metric 都是无状态 functor）。
     BruteForce() = default;
 
     // ---- fit：原样拷贝训练数据（懒学习，不做任何统计/建树）----
     void build(const Matrix<T> &X) {
         CHECK(X.rows() > 0 && X.cols() > 0)
             << "BruteForce::build: X must be non-empty (n_samples x n_features)";
-        X_ = X;   // 深拷贝一份：predict 时训练集不能跑掉
+        X_ = X; // 深拷贝一份：predict 时训练集不能跑掉
     }
 
     // ---- query：线性扫描全部训练样本，返回距离最小的 k 个邻居 ----
@@ -253,8 +254,8 @@ public:
     size_type feature_count() const { return X_.cols(); }
 
 private:
-    Matrix<T> X_;        // 训练数据副本（懒学习：fit 的唯一产物）
-    Metric metric_{};    // 距离度量实例（默认构造；见文件头扩展点 A）
+    Matrix<T> X_;     // 训练数据副本（懒学习：fit 的唯一产物）
+    Metric metric_{}; // 距离度量实例（默认构造；见文件头扩展点 A）
 };
 
 // ============================================================================
@@ -289,7 +290,7 @@ public:
 
     // ---- fit：TODO —— 把 X 建成一棵 KDTree（沿方差最大维递归切分）----
     void build(const Matrix<T> &X) {
-        (void) X;   // 占位：参数暂不使用
+        (void)X; // 占位：参数暂不使用
         throw std::logic_error(
             "KDTreeSearch::build: not implemented yet — KDTree coming soon, "
             "use BruteForce (the default) until then");
@@ -297,8 +298,8 @@ public:
 
     // ---- query：TODO —— 剪枝搜索（见 3b 节头注释），返回最近 k 个邻居 ----
     std::vector<NeighborHit<T>> query(const T *p, size_type k) const {
-        (void) p;   // 占位：参数暂不使用
-        (void) k;
+        (void)p; // 占位：参数暂不使用
+        (void)k;
         throw std::logic_error(
             "KDTreeSearch::query: not implemented yet — KDTree coming soon, "
             "use BruteForce (the default) until then");
@@ -309,11 +310,11 @@ public:
     size_type feature_count() const { return 0; }
 
 private:
-    Metric metric_{};   // 距离度量实例（实现剪枝时算边界盒距离要用，先留着）
+    Metric metric_{}; // 距离度量实例（实现剪枝时算边界盒距离要用，先留着）
 };
 
-}   // namespace search
-}   // namespace detail
+} // namespace search
+} // namespace detail
 
 // ============================================================================
 //  4. KNN 分类器本体
@@ -347,7 +348,8 @@ public:
 
     // ---- 构造 ----
     // n_neighbors：k，投票的邻居个数（sklearn 同名参数），默认 5。
-    explicit KNN(size_type n_neighbors = 5) : k_(n_neighbors) {}
+    explicit KNN(size_type n_neighbors = 5)
+        : k_(n_neighbors) {}
 
     // ---- 训练阶段（懒学习：只拷贝数据，O(1) 逻辑）----
     // 在样本 X（n 行 × d 列）和离散标签 y（n 个）上 fit。
@@ -374,13 +376,13 @@ public:
     double score(const Matrix<T> &X, const std::vector<Label> &y) const;
 
     // 想「亲眼看看」每个查询点找到了谁：返回每个查询点的 k 个最近邻居
-    //（含行号与距离，按距离升序）。默认用构造时的 k。
+    // （含行号与距离，按距离升序）。默认用构造时的 k。
     std::vector<std::vector<NeighborHit<T>>>
     kneighbors(const Matrix<T> &X, size_type k = 0) const;
 
     // ---- 查询 ----
-    bool fitted() const { return fitted_; }              // 是否已 fit 过
-    size_type n_neighbors() const { return k_; }         // 当前 k 值
+    bool fitted() const { return fitted_; }      // 是否已 fit 过
+    size_type n_neighbors() const { return k_; } // 当前 k 值
 
 private:
     // 私有工具：校验 + 把 X 的每行喂给策略查 k 近邻，逐行收集结果。
@@ -391,10 +393,10 @@ private:
     // 对一组已按距离升序排好的邻居投票，返回胜出标签（平票取字典序最小）。
     Label vote(const std::vector<NeighborHit<T>> &nbrs) const;
 
-    size_type k_ = 5;              // 投票邻居数 k
-    Search<T, Metric> search_;     // 近邻搜索策略（默认 BruteForce）
-    std::vector<Label> y_;         // fit 时的标签副本（按行号对齐训练数据）
-    bool fitted_ = false;          // 是否已 fit 过
+    size_type k_ = 5;          // 投票邻居数 k
+    Search<T, Metric> search_; // 近邻搜索策略（默认 BruteForce）
+    std::vector<Label> y_;     // fit 时的标签副本（按行号对齐训练数据）
+    bool fitted_ = false;      // 是否已 fit 过
 };
 
 // ============================================================================
@@ -457,7 +459,8 @@ std::vector<Label> KNN<Label, T, Metric, Search>::predict(
     // 逐行查邻居再投票，预测标签与 X 行一一对应
     const auto rows = query_rows(X, k_);
     std::vector<Label> pred(X.rows());
-    for (std::size_t i = 0; i < X.rows(); ++i) pred[i] = vote(rows[i]);
+    for (std::size_t i = 0; i < X.rows(); ++i)
+        pred[i] = vote(rows[i]);
     return pred;
 }
 
@@ -471,7 +474,8 @@ double KNN<Label, T, Metric, Search>::score(
     const std::vector<Label> pred = predict(X);
     std::size_t correct = 0;
     for (std::size_t i = 0; i < pred.size(); ++i) {
-        if (pred[i] == y[i]) ++correct;
+        if (pred[i] == y[i])
+            ++correct;
     }
     return static_cast<double>(correct) / static_cast<double>(pred.size());
 }

@@ -11,23 +11,23 @@
 //
 //  实现与原理见 ml/knn.h 头部注释。
 // ============================================================================
+#include <cmath>
 #include <cstddef>
 #include <cstdio>
-#include <cmath>
 #include <map>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-#include "mini_mlmath/ml/knn.h"
 #include "mini_mlmath/matrix.h"
+#include "mini_mlmath/ml/knn.h"
 
 // 内置度量在 detail::distance、策略在 detail::search（见 knn.h 头注释）。
 // using 只是缩短前缀 —— 想验证限定名写法的话，直接把下面注释掉再改用
 // KNN<..., detail::distance::ManhattanDistance> 这种全限定名即可。
+using detail::distance::ChebyshevDistance;
 using detail::distance::EuclideanDistance;
 using detail::distance::ManhattanDistance;
-using detail::distance::ChebyshevDistance;
 using detail::search::KDTreeSearch;
 
 // ----------------------------------------------------------------------------
@@ -42,18 +42,18 @@ struct Fixture {
 Fixture make_data() {
     // 每簇 4 个点，行 = 样本，列 = 特征
     Matrix<double> X = {
-        {0.8, 1.1},   // A
-        {1.2, 0.9},   // A
-        {1.1, 1.3},   // A
-        {0.9, 0.8},   // A
-        {4.8, 5.2},   // B
-        {5.2, 4.8},   // B
-        {5.1, 5.3},   // B
-        {4.9, 4.7},   // B
-        {9.1, 0.9},   // C
-        {8.9, 1.1},   // C
-        {9.2, 0.7},   // C
-        {8.8, 1.2},   // C
+        {0.8, 1.1}, // A
+        {1.2, 0.9}, // A
+        {1.1, 1.3}, // A
+        {0.9, 0.8}, // A
+        {4.8, 5.2}, // B
+        {5.2, 4.8}, // B
+        {5.1, 5.3}, // B
+        {4.9, 4.7}, // B
+        {9.1, 0.9}, // C
+        {8.9, 1.1}, // C
+        {9.2, 0.7}, // C
+        {8.8, 1.2}, // C
     };
     std::vector<std::string> y = {"A", "A", "A", "A",
                                   "B", "B", "B", "B",
@@ -80,7 +80,8 @@ void verify_predict() {
                 ok = false;
             }
         }
-        if (ok) std::printf("  k=1 训练集自预测（每点归自己簇）: OK\n");
+        if (ok)
+            std::printf("  k=1 训练集自预测（每点归自己簇）: OK\n");
     }
 
     // 两个从未见过的查询点：落在 A 簇内 → "A"；落在 B 簇内 → "B"
@@ -98,7 +99,8 @@ void verify_predict() {
                 ok = false;
             }
         }
-        if (ok) std::printf("  k=3 三簇簇心查询分别命中 A/B/C: OK\n");
+        if (ok)
+            std::printf("  k=3 三簇簇心查询分别命中 A/B/C: OK\n");
     }
 
     // score：对训练集预测准确率应为 1.0
@@ -108,7 +110,8 @@ void verify_predict() {
         const double acc = knn.score(fx.X, fx.y);
         std::printf("  训练集 score（accuracy）: %.2f %s\n", acc,
                     (std::fabs(acc - 1.0) < 1e-12) ? "OK" : "FAIL");
-        if (std::fabs(acc - 1.0) >= 1e-12) std::printf("  FAIL: expected 1.0\n");
+        if (std::fabs(acc - 1.0) >= 1e-12)
+            std::printf("  FAIL: expected 1.0\n");
     }
 }
 
@@ -137,14 +140,15 @@ void verify_metrics() {
     }
     std::printf("  Euclidean / Manhattan / Chebyshev 全部命中: %s\n",
                 all_ok ? "OK" : "FAIL");
-    if (!all_ok) std::printf("  FAIL\n");
+    if (!all_ok)
+        std::printf("  FAIL\n");
 }
 
 // 自定义 metric（只比较第 0 维）：验证「新度量 = 新增一个 functor」即可用
 struct FirstDimensionOnly {
     template <typename T>
     T operator()(const T *a, const T *b, std::size_t dim) const {
-        (void) dim;   // 故意忽略第 1 维
+        (void)dim; // 故意忽略第 1 维
         return std::abs(a[0] - b[0]);
     }
 };
@@ -166,7 +170,8 @@ void verify_custom_metric() {
     const auto pred = knn.predict(Q);
     const bool ok = (pred.size() == 1 && pred[0] == "C");
     std::printf("  只看第 0 维 (8.7, 9999) → %s\n", ok ? "C: OK" : "FAIL");
-    if (!ok) std::printf("  FAIL: expected C\n");
+    if (!ok)
+        std::printf("  FAIL: expected C\n");
 }
 
 // 验证 strategy 输出：kneighbors 按距离升序，第一个邻居是自身
@@ -184,13 +189,17 @@ void verify_kneighbors() {
         const auto &row = nbrs[0];
         // 距离应单调不降（升序）
         for (std::size_t i = 1; i < row.size(); ++i) {
-            if (row[i].distance < row[i - 1].distance) { ok = false; break; }
+            if (row[i].distance < row[i - 1].distance) {
+                ok = false;
+                break;
+            }
         }
         // 第一个邻居是自身：距离 0，行号 0
         ok = ok && (std::fabs(row[0].distance) < 1e-12) && (row[0].index == 0);
     }
     std::printf("  邻居数=3、距离升序、最近为自身: %s\n", ok ? "OK" : "FAIL");
-    if (!ok) std::printf("  FAIL\n");
+    if (!ok)
+        std::printf("  FAIL\n");
 }
 
 // 错误处理：predict 前没 fit、k 超过样本数，都必须 CHECK 抛异常
@@ -201,7 +210,7 @@ void verify_guards() {
     {
         KNN<std::string, double> knn(3);
         try {
-            (void) knn.predict(fx.X);
+            (void)knn.predict(fx.X);
             std::printf("  FAIL: predict without fit should have thrown\n");
             return;
         } catch (const std::invalid_argument &) {
@@ -209,10 +218,10 @@ void verify_guards() {
         }
     }
     {
-        KNN<std::string, double> knn(99);   // k=99 > n_samples=12
+        KNN<std::string, double> knn(99); // k=99 > n_samples=12
         knn.fit(fx.X, fx.y);
         try {
-            (void) knn.predict(fx.X);
+            (void)knn.predict(fx.X);
             std::printf("  FAIL: k > n_samples should have thrown\n");
             return;
         } catch (const std::invalid_argument &) {

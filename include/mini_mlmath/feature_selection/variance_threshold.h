@@ -30,7 +30,7 @@
 #include "mini_mlmath/check.h"
 #include "mini_mlmath/matrix.h"
 
-template<typename T>
+template <typename T>
 class VarianceThreshold {
 public:
     using value_type = T;
@@ -40,7 +40,8 @@ public:
 
     // threshold：方差低于该值的特征列将被剔除，默认 0.0（sklearn 语义：
     // 默认只删「方差为 0」的常数列）
-    explicit VarianceThreshold(T threshold = T(0)) : threshold_(threshold) {}
+    explicit VarianceThreshold(T threshold = T(0))
+        : threshold_(threshold) {}
 
     // ---- 训练阶段 ----
 
@@ -66,9 +67,9 @@ public:
     std::vector<std::uint8_t> get_support() const { return support_; }
 
 private:
-    T threshold_ = T(0);        // 方差阈值
-    bool fitted_ = false;       // 是否已 fit 过（transform 前必须为 true）
-    std::vector<T> variances_;  // 每列方差，fit 后填充
+    T threshold_ = T(0);                // 方差阈值
+    bool fitted_ = false;               // 是否已 fit 过（transform 前必须为 true）
+    std::vector<T> variances_;          // 每列方差，fit 后填充
     std::vector<std::uint8_t> support_; // 每列是否保留（1/0），fit 后填充
 };
 
@@ -77,7 +78,7 @@ private:
 //  才能实例化）。以下是空骨架，待你自己填实现。
 // ============================================================================
 
-template<typename T>
+template <typename T>
 VarianceThreshold<T> &VarianceThreshold<T>::fit(const Matrix<T> &X) {
     // 1) 校验：X 至少有一列（n 行 × d 列）
     const auto n_samples = X.rows();
@@ -109,7 +110,7 @@ VarianceThreshold<T> &VarianceThreshold<T>::fit(const Matrix<T> &X) {
     return *this;
 }
 
-template<typename T>
+template <typename T>
 Matrix<T> VarianceThreshold<T>::transform(const Matrix<T> &X) const {
     // 必须先用 fit 学出筛选规则，才能谈「套用到新数据」
     CHECK(fitted_) << "must call fit() before transform()";
@@ -119,8 +120,8 @@ Matrix<T> VarianceThreshold<T>::transform(const Matrix<T> &X) const {
 
     // 新建输出矩阵：行数不变，列数 = support_ 中非 0 的个数
     const std::size_t n_kept =
-            static_cast<std::size_t>(std::count_if(support_.begin(), support_.end(),
-                                                   [](std::uint8_t s) { return s != 0; }));
+        static_cast<std::size_t>(std::count_if(support_.begin(), support_.end(),
+                                               [](std::uint8_t s) { return s != 0; }));
     Matrix<T> Y(X.rows(), n_kept);
 
     // 逐列搬运被选中的列，返回。注意 new_col 只在选中列时自增，
@@ -137,9 +138,7 @@ Matrix<T> VarianceThreshold<T>::transform(const Matrix<T> &X) const {
     return Y;
 }
 
-template<typename T>
+template <typename T>
 Matrix<T> VarianceThreshold<T>::fit_transform(const Matrix<T> &X) {
     return fit(X).transform(X);
 }
-
-

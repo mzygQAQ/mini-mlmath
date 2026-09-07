@@ -17,10 +17,10 @@
 //
 //  实现与原理见 ml/perceptron.h 头部注释。
 // ============================================================================
-//#include "mini_mlmath/ml/perceptron.h"
+// #include "mini_mlmath/ml/perceptron.h"
 
-#include "mini_mlmath/matrix.h"
 #include "mini_mlmath/check.h"
+#include "mini_mlmath/matrix.h"
 
 #include <iostream>
 
@@ -42,8 +42,8 @@ auto and_gate(const Matrix<float> &dataset) -> Matrix<float> {
     CHECK(dataset.cols() == 2) << "AND gate expects 2 inputs per row";
     CHECK(dataset.rows() > 0) << "dataset must not be empty";
 
-    const Matrix<float> feature = dataset.with_ones_column(); // n×3: [x1, x2, 1]
-    const Matrix<float> weight({{0.5f, 0.5f, -0.75f}});       // 1×3，第三分量 = bias
+    const Matrix<float> feature = dataset.with_ones_column();   // n×3: [x1, x2, 1]
+    const Matrix<float> weight({{0.5f, 0.5f, -0.75f}});         // 1×3，第三分量 = bias
     const Matrix<float> scores = feature * weight.transposed(); // n×1，纯矩阵乘
 
     // sign：分数 > 0 判 1，否则 0（分数恰好为 0 落在决策线上，归 0）
@@ -130,11 +130,10 @@ auto xor_gate(const Matrix<float> &dataset) -> Matrix<float> {
 int main() {
     // test_and：真值表全 4 个组合
     Matrix<float> dataset = {
-            {0, 0},
-            {0, 1},
-            {1, 0},
-            {1, 1}
-    };
+        {0, 0},
+        {0, 1},
+        {1, 0},
+        {1, 1}};
 
     // AND
     const auto pred = and_gate(dataset);

@@ -65,7 +65,7 @@ T sigmoid(T z) {
 //   H_activated = sigmoid(H)
 // 这就是 MLP 里「每个神经元先加权求和、再过激活」的矩阵化写法。
 template <typename T>
-Matrix<T> sigmoid(const Matrix<T>& m) {
+Matrix<T> sigmoid(const Matrix<T> &m) {
     Matrix<T> r(m.rows(), m.cols());
     for (std::size_t i = 0; i < m.rows() * m.cols(); ++i)
         r.data()[i] = sigmoid(m.data()[i]);
@@ -87,7 +87,7 @@ T relu(T z) {
 // 现代 CNN / Transformer 隐藏层激活的标配：
 //   H_activated = relu(X · W1 + b1)
 template <typename T>
-Matrix<T> relu(const Matrix<T>& m) {
+Matrix<T> relu(const Matrix<T> &m) {
     Matrix<T> r(m.rows(), m.cols());
     for (std::size_t i = 0; i < m.rows() * m.cols(); ++i)
         r.data()[i] = relu(m.data()[i]);

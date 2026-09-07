@@ -56,7 +56,8 @@ class Random {
 public:
     // 默认种子 42：开箱即可复现（教学/benchmark 友好）。想每次真随机，
     // 可传 std::random_device{}()（见文件头注释）。
-    explicit Random(std::uint64_t seed = 42) : engine_(seed) {}
+    explicit Random(std::uint64_t seed = 42)
+        : engine_(seed) {}
 
     // 重新播种，之后重新生成（可复现实验的标准操作）
     void seed(std::uint64_t s) { engine_.seed(s); }
@@ -85,7 +86,7 @@ public:
                             T mean = T(0), T variance = T(1));
 
 private:
-    std::mt19937 engine_;   // 梅森旋转伪随机引擎（状态全在这）
+    std::mt19937 engine_; // 梅森旋转伪随机引擎（状态全在这）
 };
 
 // ----------------------------------------------------------------------------
@@ -96,15 +97,17 @@ template <typename T>
 Matrix<T> Random::uniform_matrix(std::size_t rows, std::size_t cols,
                                  T low, T high) {
     Matrix<T> m(rows, cols);
-    T* d = m.data();
+    T *d = m.data();
     if constexpr (std::is_integral_v<T>) {
         // 整数 → 离散均匀（每个整数等概率）
         std::uniform_int_distribution<T> dist(low, high);
-        for (std::size_t i = 0; i < rows * cols; ++i) d[i] = dist(engine_);
+        for (std::size_t i = 0; i < rows * cols; ++i)
+            d[i] = dist(engine_);
     } else {
         // 浮点 → 连续均匀
         std::uniform_real_distribution<T> dist(low, high);
-        for (std::size_t i = 0; i < rows * cols; ++i) d[i] = dist(engine_);
+        for (std::size_t i = 0; i < rows * cols; ++i)
+            d[i] = dist(engine_);
     }
     return m;
 }
@@ -113,16 +116,18 @@ template <typename T>
 Matrix<T> Random::normal_matrix(std::size_t rows, std::size_t cols,
                                 T mean, T variance) {
     Matrix<T> m(rows, cols);
-    T* d = m.data();
+    T *d = m.data();
     if constexpr (std::is_floating_point_v<T>) {
         // 浮点 → 标准库原生 normal_distribution
         std::normal_distribution<T> dist(mean, std::sqrt(variance));
-        for (std::size_t i = 0; i < rows * cols; ++i) d[i] = dist(engine_);
+        for (std::size_t i = 0; i < rows * cols; ++i)
+            d[i] = dist(engine_);
     } else {
         // 整数 T：先在 double 里抽连续高斯，再 cast 量化（合理降级）
         std::normal_distribution<double> dist(static_cast<double>(mean),
                                               std::sqrt(static_cast<double>(variance)));
-        for (std::size_t i = 0; i < rows * cols; ++i) d[i] = static_cast<T>(dist(engine_));
+        for (std::size_t i = 0; i < rows * cols; ++i)
+            d[i] = static_cast<T>(dist(engine_));
     }
     return m;
 }
@@ -148,7 +153,6 @@ T Random::normal(T mean, T variance) {
     } else {
         return static_cast<T>(
             std::normal_distribution<double>(static_cast<double>(mean),
-                                              std::sqrt(static_cast<double>(variance)))
-            (engine_));
+                                             std::sqrt(static_cast<double>(variance)))(engine_));
     }
 }

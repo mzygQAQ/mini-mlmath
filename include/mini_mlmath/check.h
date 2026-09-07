@@ -44,14 +44,13 @@
 class Check {
 public:
     // cond 是 #cond 得到的条件原文，file/line 是调用点，全塞进消息前缀
-    Check(const char* cond, const char* file, int line)
-        : message_("CHECK(" + std::string(cond) + ") failed at "
-                   + std::string(file) + ":" + std::to_string(line) + ": ") {}
+    Check(const char *cond, const char *file, int line)
+        : message_("CHECK(" + std::string(cond) + ") failed at " + std::string(file) + ":" + std::to_string(line) + ": ") {}
 
     // 拼消息：模板 + ostringstream，兼容 const char* / std::string /
     // int / double 等任意能 << 的类型。
     template <typename T>
-    Check& operator<<(const T& v) {
+    Check &operator<<(const T &v) {
         std::ostringstream os;
         os << v;
         message_ += os.str();
@@ -67,5 +66,7 @@ private:
 // CHECK(条件) << "失败时的消息"：条件为 false 才抛（glog 同款语义）。
 // 注意这是本库唯一的宏，其余地方仍遵守 matrix.h 的「无宏」铁律。
 #define CHECK(cond) \
-    if (cond) (void)0; \
-    else Check(#cond, __FILE__, __LINE__)
+    if (cond)       \
+        (void)0;    \
+    else            \
+        Check(#cond, __FILE__, __LINE__)

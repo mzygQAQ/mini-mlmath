@@ -15,7 +15,7 @@ int main() {
         hist[rng.uniform<int>(0, 10)]++;
     }
     std::printf("[uniform<int>(0, 10)] x %d 次：\n", N);
-    for (const auto& [k, v] : hist) {
+    for (const auto &[k, v] : hist) {
         std::printf("  %d: %d (%.1f%%)\n", k, v, 100.0 * v / N);
     }
     // 期望每个值约 10%，容忍 ±1% 就算 OK
@@ -36,7 +36,7 @@ int main() {
         nhist[rng.normal<int>(0, 1)]++;
     }
     std::printf("\n[normal<int>(0, 1)] x %d 次：\n", N);
-    for (const auto& [k, v] : nhist) {
+    for (const auto &[k, v] : nhist) {
         std::printf("  %d: %d (%.1f%%)\n", k, v, 100.0 * v / N);
     }
     // 期望大部分集中在 -2..2，标准差 ~1

@@ -112,8 +112,8 @@
 #include <vector>
 
 #include "mini_mlmath/check.h"
+#include "mini_mlmath/ml/knn.h" // 复用 detail::distance::EuclideanDistance
 #include "mini_mlmath/random.h"
-#include "mini_mlmath/ml/knn.h"   // 复用 detail::distance::EuclideanDistance
 
 // ============================================================================
 //  1. 初始化策略（Init）—— 扩展点 A，全部是函数对象 functor
@@ -143,14 +143,25 @@ struct RandomInit {
      */
     template <typename T>
     Matrix<T> operator()(const Matrix<T> &X, std::size_t k, Random &rng) const {
-        // TODO —— 核心初始化留给你写（思路见结构体上方注释）：
-        //   1) 抽 k 个互不相同的行号（不放回）
-        //   2) 把 X 的这几行拷进返回矩阵
-        // 写完把下面两行删掉即可。
-        (void) rng;   // TODO: 删掉这一行
-        throw std::logic_error(
-            "RandomInit::operator(): not implemented yet — TODO: sample k "
-            "distinct rows from X uniformly at random");
+        CHECK(k >= 1 && k <= X.rows())
+            << "RandomInit: k (" << k << ") must be in [1, n_samples="
+            << X.rows() << "]";
+
+        const std::size_t n = X.rows();
+
+        std::vector<std::size_t> perm(n);
+        for (std::size_t i = 0; i < n; ++i)
+            perm[i] = i;
+        for (std::size_t i = 0; i < k; ++i) {
+            std::size_t j = rng.uniform(i, n - 1); // 整数闭区间，上界 n-1
+            std::swap(perm[i], perm[j]);
+        }
+
+        Matrix<T> centrals(k, X.cols());
+        for (std::size_t i = 0; i < k; ++i)
+            for (std::size_t c = 0; c < X.cols(); ++c)
+                centrals(i, c) = X(perm[i], c);
+        return centrals;
     }
 };
 
@@ -176,15 +187,15 @@ struct KMeansPlusPlus {
         //   1) 均匀抽第一个簇心
         //   2) 循环：算每个样本到最近已选簇心的 D(x)²，按加权概率抽下一个
         // 写完把下面两行删掉即可。
-        (void) rng;   // TODO: 删掉这一行
+        (void)rng; // TODO: 删掉这一行
         throw std::logic_error(
             "KMeansPlusPlus::operator(): not implemented yet — TODO: "
             "distance-squared weighted sampling, see comment above");
     }
 };
 
-}   // namespace init
-}   // namespace detail
+} // namespace init
+} // namespace detail
 
 // ============================================================================
 //  2. KMeans 聚类器本体
@@ -206,7 +217,7 @@ class KMeans {
 public:
     using value_type = T;
     using size_type = std::size_t;
-    using label_type = int;   // 簇号固定用 int（0..k-1，不像 KNN 用泛型 Label）
+    using label_type = int; // 簇号固定用 int（0..k-1，不像 KNN 用泛型 Label）
 
     /**
      * @brief 构造一个 KMeans 聚类器
@@ -303,16 +314,16 @@ private:
     T total_inertia(const Matrix<T> &X, const Matrix<T> &centers,
                     const std::vector<int> &labels) const;
 
-    size_type n_clusters_ = 8;      // 簇数 k
-    size_type max_iter_ = 300;      // Lloyd 迭代最大轮数
-    T tol_ = T(1e-4);               // 收敛容差
-    size_type n_init_ = 10;         // 多起点遍数
-    Random rng_;                    // 随机引擎（默认种子 42，实验可复现）
-    Init init_;                     // 初始化策略（默认 k-means++，扩展点 A）
-    Matrix<T> centers_;             // 簇心，fit 后为 k×d
-    std::vector<int> labels_;       // 最近一次 fit 的分配，长度 n
-    T inertia_ = T(0);              // 最近一次 fit 的总惯性
-    bool fitted_ = false;           // 是否已 fit 过
+    size_type n_clusters_ = 8; // 簇数 k
+    size_type max_iter_ = 300; // Lloyd 迭代最大轮数
+    T tol_ = T(1e-4);          // 收敛容差
+    size_type n_init_ = 10;    // 多起点遍数
+    Random rng_;               // 随机引擎（默认种子 42，实验可复现）
+    Init init_;                // 初始化策略（默认 k-means++，扩展点 A）
+    Matrix<T> centers_;        // 簇心，fit 后为 k×d
+    std::vector<int> labels_;  // 最近一次 fit 的分配，长度 n
+    T inertia_ = T(0);         // 最近一次 fit 的总惯性
+    bool fitted_ = false;      // 是否已 fit 过
 };
 
 // ============================================================================
@@ -325,8 +336,8 @@ private:
 template <typename T, typename Init>
 KMeans<T, Init>::KMeans(size_type n_clusters, size_type max_iter,
                         T tol, size_type n_init)
-        : n_clusters_(n_clusters), max_iter_(max_iter), tol_(tol),
-          n_init_(n_init) {}
+    : n_clusters_(n_clusters), max_iter_(max_iter), tol_(tol),
+      n_init_(n_init) {}
 
 template <typename T, typename Init>
 KMeans<T, Init> &KMeans<T, Init>::fit(const Matrix<T> &X) {
@@ -368,7 +379,7 @@ KMeans<T, Init> &KMeans<T, Init>::fit(const Matrix<T> &X) {
     //     - 距离比较用 detail::distance::EuclideanDistance（knn.h 里那份），
     //       assign 里已经写了思路，直接实现它即可。
 
-    (void) X;   // TODO: 删掉这一行
+    (void)X; // TODO: 删掉这一行
     throw std::logic_error(
         "KMeans::fit: not implemented yet — TODO: Lloyd iteration + n_init "
         "best-of, see the TODO comment above");
@@ -383,7 +394,7 @@ std::vector<int> KMeans<T, Init>::predict(const Matrix<T> &X) const {
 
     // 对 X 的每一行找最近的簇心，返回簇号（0..k-1）。
     //   TODO —— 其实就是一次分配步：return assign(X, centers_);
-    (void) X;   // TODO: 删掉这一行
+    (void)X; // TODO: 删掉这一行
     throw std::logic_error("KMeans::predict: not implemented yet");
 }
 
@@ -405,7 +416,7 @@ T KMeans<T, Init>::score(const Matrix<T> &X) const {
     // 和其他模型 score（越大越好）统一方向。
     //   TODO —— 一行即可：
     //   return -total_inertia(X, centers_, assign(X, centers_));
-    (void) X;   // TODO: 删掉这一行
+    (void)X; // TODO: 删掉这一行
     throw std::logic_error("KMeans::score: not implemented yet");
 }
 
