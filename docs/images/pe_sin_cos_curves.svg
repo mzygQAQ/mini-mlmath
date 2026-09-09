@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 480" font-family="sans-serif">
   <!-- ============ 位置编码：同一公式、三条不同维度的 sin 曲线 ============ -->
-  <!-- 角频率 w_i = 1/10000^(2i/d_model)（d_model=8）：i=0→1.00、i=1→0.562、i=2→0.316 -->
+  <!-- 角频率 w_i = 1/10000^(2i/d_model)（d_model=8）：i=0→1.00、i=1→0.10、i=2→0.01 -->
   <!-- 曲线映射：px = 90 + pos*11；py = 240 - sin(w*pos)*150 -->
 
   <text x="470" y="34" text-anchor="middle" font-size="20" font-weight="bold">
@@ -57,9 +57,10 @@
   <line x1="638" y1="122" x2="678" y2="122" stroke="#e53935" stroke-width="3"/>
   <text x="690" y="127" font-size="13" fill="#333">i=0：频率 1.00，周期 ≈6.3</text>
   <line x1="638" y1="152" x2="678" y2="152" stroke="#1e88e5" stroke-width="3"/>
-  <text x="690" y="157" font-size="13" fill="#333">i=1：频率 0.56，周期 ≈11</text>
+  <text x="690" y="157" font-size="13" fill="#333">i=1：频率 0.10，周期 ≈63</text>
   <line x1="638" y1="182" x2="678" y2="182" stroke="#43a047" stroke-width="3"/>
-  <text x="690" y="187" font-size="13" fill="#333">i=2：频率 0.32，周期 ≈20</text>
-  <text x="638" y="220" font-size="13" fill="#555">高频维：能区分「差几位」的相邻词</text>
-  <text x="638" y="240" font-size="13" fill="#555">低频维：负责刻画长距离的整体趋势</text>
+  <text x="690" y="187" font-size="13" fill="#333">i=2：频率 0.01，周期 ≈628</text>
+  <text x="638" y="220" font-size="13" fill="#555">高频维（秒针）：区分「差几位」的相邻词</text>
+  <text x="638" y="240" font-size="13" fill="#555">低频维（时针）：0..70 内几乎一条直线，</text>
+  <text x="638" y="258" font-size="13" fill="#555">负责长距离的整体趋势</text>
 </svg>
