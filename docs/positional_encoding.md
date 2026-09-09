@@ -1,6 +1,6 @@
 # 正弦位置编码（Sinusoidal Positional Encoding）原理
 
-> 对应代码：`include/mini_mlmath/positional_encoding.h`（骨架期，核心填充待你实现）
+> 对应代码：`include/mini_mlmath/positional_encoding.h`（完整实现）
 > 配套测试：`tests/positional_encoding_test.cpp`
 > 前置阅读：[Softmax](softmax.md)（注意力的邻居组件）、[自动求导](autograd.md)
 
@@ -129,7 +129,7 @@ embedded = embedded + PE(seq_len, d_model) # 逐元素相加，注入位置
 然后 embedded 作为 Q/K/V 的来源进入注意力
 ```
 
-加法而不是拼接，是为了不改变维度；常数而不是可学习，是因为「相对位置线性可算」这个性质已经是白送的。对应代码（骨架期）：
+加法而不是拼接，是为了不改变维度；常数而不是可学习，是因为「相对位置线性可算」这个性质已经是白送的。对应代码：
 
 ```cpp
 #include <mini_mlmath/positional_encoding.h>

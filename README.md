@@ -15,7 +15,7 @@ mini-mlmath/
 │       ├── vector.h          #   Vector<T>：点积 / 模长 / 余弦相似度
 │       ├── softmax.h           #   数值稳定的 softmax → [讲解](docs/softmax.md)
 │       ├── activation.h        #   激活函数：sigmoid + ReLU → [讲解](docs/activation.md)
-│       ├── positional_encoding.h  #   正弦位置编码（骨架，待实现）：给注意力注入位置信息
+│       ├── positional_encoding.h  #   正弦位置编码：给注意力注入位置信息 → [讲解](docs/positional_encoding.md)
 │       ├── rope.h              #   RoPE 旋转位置编码（骨架，待实现）→ [讲解](docs/rope.md)
 │       ├── autograd.h          #   迷你自动求导：Tensor + 记录式反向图 → [讲解](docs/autograd.md)
 │       ├── statistics.h        #   基础描述性统计：mean / median / mode / variance / stddev
@@ -39,7 +39,7 @@ mini-mlmath/
 │   ├── knn.md                 #   KNN：常见 metric、搜索策略（暴力/KDTree/BallTree）
 │   ├── kmeans.md              #   KMeans：Lloyd 迭代、初始化策略、k 怎么选
 │   ├── softmax.md             #   softmax：减 max 数值稳定性、attention 用法、温度
-│   ├── positional_encoding.md #   正弦位置编码：为什么需要、多尺度频率、PE 矩阵（骨架期）
+│   ├── positional_encoding.md #   正弦位置编码：为什么需要、多尺度频率、PE 矩阵
 │   ├── rope.md                #   RoPE：位置=旋转角、指数相消、KV cache 契合（骨架期）
 │   ├── flash_attention.md     #   FlashAttention：n×n 矩阵三宗罪、online softmax 推导、分块算法
 │   ├── autograd.md            #   自动求导：反向图 + 梯度怎么算出来
@@ -55,7 +55,7 @@ mini-mlmath/
     ├── knn_test.cpp          #   KNN：多数投票 + metric / strategy 扩展点
     ├── autograd_test.cpp     #   自动求导：手算链式法则 + MLP 数值梯度对拍
     ├── kmeans_test.cpp       #   KMeans：聚类 + 初始化策略扩展点（骨架期）
-    ├── positional_encoding_test.cpp   #   正弦位置编码：手算数值点核对（骨架期）
+    ├── positional_encoding_test.cpp   #   正弦位置编码：手算数值点核对 + 参数 guard
     └── rope_test.cpp        #   RoPE 旋转：相对位置性质 / 保范数（骨架期）
 ```
 
@@ -74,7 +74,7 @@ mini-mlmath/
 - [KNN](docs/knn.md) —— 距离模型：常见 metric（L1/L2/L∞/余弦/汉明…）、搜索策略（暴力/KDTree/BallTree）、k 与投票
 - [KMeans](docs/kmeans.md) —— 无监督：Lloyd 迭代、初始化策略（随机 / k-means++）、n_init 多起点、k 怎么选（骨架期，核心算法待实现）
 - [Softmax](docs/softmax.md) —— 减 max 救命符、按行归一化（attention 用法）、温度 T、KV cache 简化
-- [正弦位置编码](docs/positional_encoding.md) —— 注意力为什么是「集合运算」、多尺度频率、PE 矩阵（骨架期，待实现）
+- [正弦位置编码](docs/positional_encoding.md) —— 注意力为什么是「集合运算」、多尺度频率、PE 矩阵、完整数值表
 - [RoPE 旋转位置编码](docs/rope.md) —— 位置=旋转角、指数相消只剩相对距离、KV cache 契合、外推只拧一个旋钮（骨架期，待实现）
 - [FlashAttention](docs/flash_attention.md) —— n×n 矩阵三宗罪、GPU 算力/带宽鸿沟、online softmax 完整推导、分块算法与反向重算、KV cache 的关系
 - [自动求导](docs/autograd.md) —— 压轴：Tensor + 反向图，梯度怎么在图上算出来（reverse-mode AD）
@@ -105,7 +105,7 @@ cmake --build build -j
 ./build/tests/knn_test          # KNN：多数投票 + metric / strategy 扩展点
 ./build/tests/autograd_test     # 自动求导：手算链式法则 + MLP 数值梯度对拍
 ./build/tests/kmeans_test       # KMeans：聚类 + 初始化策略（骨架期，SKIPPED 为预期）
-./build/tests/positional_encoding_test   # 正弦位置编码（骨架期，SKIPPED 为预期）
+./build/tests/positional_encoding_test   # 正弦位置编码：手算核对 + 参数 guard
 ./build/tests/rope_test                  # RoPE 旋转位置编码（骨架期，SKIPPED 为预期）
 ```
 
