@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 560" font-family="sans-serif">
+  <!-- ============ RoPE：位置 = 旋转角（同一根向量按位置转到不同角度） ============ -->
+  <!-- 左：二维平面上一个维度对的旋转（pos=0/1/5 三根向量） -->
+  <!-- 右：加法（正弦版）vs 乘法（RoPE）对比 + 指数相消公式 -->
+
+  <text x="470" y="34" text-anchor="middle" font-size="20" font-weight="bold">
+    RoPE：位置 = 旋转角——同一根词向量，按位置转到不同角度
+  </text>
+  <text x="470" y="57" text-anchor="middle" font-size="14" fill="#555">
+    频率 θ_i = 10000^(−2i/d) 与正弦版一字不差；但位置从「加在词上」变成「乘（旋转）在 Q/K 上」
+  </text>
+
+  <!-- ===== 左半：旋转平面（第 i 对维度 = 一个二维平面） ===== -->
+  <text x="240" y="92" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">
+    第 i 对维度 (x_{2i}, x_{2i+1})：一个二维平面
+  </text>
+
+  <!-- 平面坐标轴 -->
+  <line x1="240" y1="310" x2="240" y2="115" stroke="#999" stroke-width="1.4" marker-end="url(#arrGray)"/>
+  <line x1="115" y1="310" x2="365" y2="310" stroke="#999" stroke-width="1.4" marker-end="url(#arrGray)"/>
+  <text x="252" y="120" font-size="12" fill="#666">x_{2i+1}</text>
+  <text x="358" y="328" font-size="12" fill="#666">x_{2i}</text>
+
+  <!-- 三个圆弧刻度（半径示意） -->
+  <circle cx="240" cy="310" r="105" fill="none" stroke="#e4e7eb" stroke-width="1"/>
+  <circle cx="240" cy="310" r="130" fill="none" stroke="#e4e7eb" stroke-width="1"/>
+
+  <!-- 向量 pos=0（原始，角度 ~15°）：灰色，终点 (340,282) -->
+  <line x1="240" y1="310" x2="340" y2="282" stroke="#9e9e9e" stroke-width="3.5" marker-end="url(#arrGray)"/>
+  <text x="344" y="276" font-size="13" fill="#757575" font-weight="bold">pos=0</text>
+
+  <!-- 向量 pos=1（再转 θ，角度 ~15°+55°=70°）：蓝色，终点 (284,188) -->
+  <line x1="240" y1="310" x2="284" y2="188" stroke="#1e88e5" stroke-width="3.5" marker-end="url(#arrBlue)"/>
+  <text x="292" y="180" font-size="13" fill="#1565c0" font-weight="bold">pos=1（转 θ）</text>
+
+  <!-- 向量 pos=5（转 5θ，角度 ~15°+215°=230°）：绿色，终点 (146,388→超界) 用 175°：终点 (110,298) -->
+  <line x1="240" y1="310" x2="118" y2="266" stroke="#43a047" stroke-width="3.5" marker-end="url(#arrGreen)"/>
+  <text x="76" y="252" font-size="13" fill="#2e7d32" font-weight="bold">pos=5（转 5θ）</text>
+
+  <!-- θ 角度标注（arc） -->
+  <path d="M 305,283 A 70,70 0 0,0 264,242" fill="none" stroke="#fb8c00" stroke-width="2"/>
+  <text x="300" y="246" font-size="13" fill="#e65100" font-weight="bold">θ</text>
+
+  <!-- 底部说明（左半） -->
+  <text x="240" y="362" text-anchor="middle" font-size="13" fill="#333">
+    位置 m = 把向量旋转 m·θ_i
+  </text>
+  <text x="240" y="384" text-anchor="middle" font-size="13" fill="#555">
+    θ_i 从快到慢铺开（10000^(−2i/d)）——
+  </text>
+  <text x="240" y="404" text-anchor="middle" font-size="13" fill="#555">
+    和正弦版同一束「多尺度指针」，只是转它、不抄读数
+  </text>
+
+  <!-- ===== 右半：加法 vs 乘法 + 指数相消 ===== -->
+  <!-- 加法（正弦版）框 -->
+  <rect x="500" y="80" width="410" height="76" rx="8" fill="#ffebee" stroke="#e53935" stroke-width="1.5"/>
+  <text x="520" y="106" font-size="14" font-weight="bold" fill="#c62828">正弦版（你已实现）：加法，绝对位置</text>
+  <text x="520" y="128" font-size="14" fill="#333">输入 = embedding + PE(pos)   ← 进注意力之前</text>
+  <text x="520" y="148" font-size="13" fill="#888">位置指纹抄在词脸上；V 也被动带上位置</text>
+
+  <!-- 乘法（RoPE）框 -->
+  <rect x="500" y="172" width="410" height="76" rx="8" fill="#e8f5e9" stroke="#43a047" stroke-width="1.5"/>
+  <text x="520" y="198" font-size="14" font-weight="bold" fill="#2e7d32">RoPE：乘法（旋转），相对位置</text>
+  <text x="520" y="220" font-size="14" fill="#333">Q_m ← R(m·θ)·Q_m，K_n ← R(n·θ)·K_n   ← 注意力内部</text>
+  <text x="520" y="240" font-size="13" fill="#888">只动 Q/K，不碰 embedding、不碰 V</text>
+
+  <!-- 指数相消框（核心） -->
+  <rect x="500" y="264" width="410" height="118" rx="8" fill="#fff8e1" stroke="#fb8c00" stroke-width="1.8"/>
+  <text x="520" y="290" font-size="14" font-weight="bold" fill="#e65100">点积时绝对位置相消（全部魔法）：</text>
+  <text x="520" y="316" font-size="15" fill="#333" font-weight="bold">e^{imθ} · e^{−inθ} = e^{i(m−n)θ}</text>
+  <text x="520" y="340" font-size="13" fill="#333">（矩阵版：R(m)ᵀ·R(n) = R(n−m)）</text>
+  <text x="520" y="364" font-size="13" fill="#555">分数只依赖内容 + 相对距离，「全局第几位」彻底消失</text>
+
+  <!-- KV cache 契合框 -->
+  <rect x="500" y="398" width="410" height="96" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="1.5"/>
+  <text x="520" y="424" font-size="14" font-weight="bold" fill="#1565c0">KV cache 契合（本仓库的主场）：</text>
+  <text x="520" y="448" font-size="13" fill="#333">K 在位置 n 旋转一次就缓存，之后永远不用再动——</text>
+  <text x="520" y="468" font-size="13" fill="#333">任何新 query 来点积，相对距离自动从旋转相消里长出来</text>
+  <text x="520" y="488" font-size="13" fill="#1e88e5">长度外推也只拧一个旋钮：调 θ 基频（NTK / YaRN）</text>
+
+  <defs>
+    <marker id="arrGray" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#9e9e9e"/>
+    </marker>
+    <marker id="arrBlue" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#1e88e5"/>
+    </marker>
+    <marker id="arrGreen" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#43a047"/>
+    </marker>
+  </defs>
+</svg>

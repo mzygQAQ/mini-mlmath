@@ -13,8 +13,9 @@ add_executable(knn_test knn_test.cpp)   # KNN：多数投票 + metric / strategy
 add_executable(autograd_test autograd_test.cpp)   # 自动求导：反向图 + 梯度对拍
 add_executable(kmeans_test kmeans_test.cpp)   # KMeans：聚类 + 初始化策略扩展点（骨架期）
 add_executable(positional_encoding_test positional_encoding_test.cpp)   # 正弦位置编码（骨架期）
+add_executable(rope_test rope_test.cpp)   # RoPE 旋转位置编码（骨架期）
 
-foreach(tgt matrix_test softmax_test vector_test logic_gate random_check perceptron_test knn_test autograd_test kmeans_test positional_encoding_test)
+foreach(tgt matrix_test softmax_test vector_test logic_gate random_check perceptron_test knn_test autograd_test kmeans_test positional_encoding_test rope_test)
   target_link_libraries(${tgt} PRIVATE mini_mlmath)
 
 # =====================================================================
