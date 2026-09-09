@@ -1,9 +1,7 @@
 // ============================================================================
 //  positional_encoding_test.cpp —— 验证正弦位置编码
 //
-//  数据用手算可核对的小矩阵（seq_len=3, d_model=4）。骨架期：核心函数抛
-//  std::logic_error("not implemented")，被统一 catch 成 SKIPPED；等你实现完
-//  positional_encoding.h，本文件自动变成验收清单，无需改动。
+//  数据用手算可核对的小矩阵（seq_len=3, d_model=4）。
 //
 //  手算依据（公式见 positional_encoding.h 文件头）：
 //    inv_freq[0] = 1/10000^(0/4) = 1
@@ -16,11 +14,10 @@
 //    PE(2,2)   = sin(2·0.01)   ≈ 0.019998667
 //
 //  验证点：
-//    1. 骨架占位：函数抛 not-implemented（占位就该立刻失败）；
-//    2. 形状：seq_len × d_model；
-//    3. pos=0 行恒为 [0,1,0,1,...]（sin0=0 / cos0=1，一眼可核对）；
-//    4. 手算的若干个数值点（容差 1e-6）；
-//    5. 参数校验：seq_len=0 / d_model=0 / d_model 奇数，必须 CHECK 失败。
+//    1. 形状：seq_len × d_model；
+//    2. pos=0 行恒为 [0,1,0,1,...]（sin0=0 / cos0=1，一眼可核对）；
+//    3. 手算的若干个数值点（容差 1e-6）；
+//    4. 参数校验：seq_len=0 / d_model=0 / d_model 奇数，必须 CHECK 失败。
 //
 //  实现与原理见 positional_encoding.h 头部注释。
 // ============================================================================
@@ -35,19 +32,6 @@
 // 手算用的固定尺寸
 constexpr std::size_t kSeq = 3;
 constexpr std::size_t kD = 4;
-
-/**
- * @brief 验证骨架占位：函数必须抛 not-implemented（骨架期的正确姿势）
- */
-void verify_placeholder() {
-    std::printf("== 骨架占位：抛 not-implemented ==\n");
-    try {
-        (void) sinusoidal_positional_encoding<double>(kSeq, kD);
-        std::printf("  FAIL: should have thrown (not implemented)\n");
-    } catch (const std::logic_error &) {
-        std::printf("  throws not-implemented: OK\n");
-    }
-}
 
 /**
  * @brief 验证形状：返回 seq_len × d_model 的矩阵
@@ -151,15 +135,14 @@ void verify_guards() {
 
 /**
  * @brief 测试程序入口
- * @return 0（骨架期功能测试显示 SKIPPED 是预期行为，不视为失败）
+ * @return 0（全部通过）
  */
 int main() {
-    std::printf("mini-mlmath —— 正弦位置编码测试（骨架期）\n\n");
-    verify_placeholder();
+    std::printf("mini-mlmath —— 正弦位置编码测试\n\n");
     verify_shape();
     verify_pos0_row();
     verify_known_values();
     verify_guards();
-    std::printf("\nDONE（骨架期：功能测试为 SKIPPED，实现后自动验收）\n");
+    std::printf("\nALL OK\n");
     return 0;
 }

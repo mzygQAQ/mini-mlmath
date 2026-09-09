@@ -42,8 +42,8 @@
 //  配套讲解：docs/softmax.md / docs/autograd.md 是它的邻居组件；
 //  位置编码单独的原理文档（docs/positional_encoding.md）待写。
 //
-//  留给你实现的：
-//    - 预计算 inv_freq[i] = 1 / 10000^(2i/d)，再逐行填 sin/cos（见 TODO）。
+//  实现（骨架期已填好）：预计算 inv_freq[i] = 1 / 10000^(2i/d)，再逐行填
+//  sin/cos（偶数维 sin、奇数维 cos，每两列共享同一频率）。
 //    - 想扩展可加：可学习位置编码（学一个参数矩阵）、相对位置编码
 //      （Transformer-XL 的 rotary / RoPE 是另一个故事）。
 // ============================================================================
@@ -52,6 +52,8 @@
 #include <cmath>
 #include <cstddef>
 #include <stdexcept>
+#include <type_traits>
+#include <vector>
 
 #include "mini_mlmath/check.h"
 #include "mini_mlmath/matrix.h"
@@ -69,6 +71,15 @@
 template <typename T>
 Matrix<T> sinusoidal_positional_encoding(std::size_t seq_len,
                                          std::size_t d_model) {
+    // 约束：T 必须是浮点类型（float / double / long double）。
+    // std::sin / std::cos / std::pow 对整型 T 没有定义，T=int 会在 <cmath>
+    // 内部报晦涩错误 —— 用 static_assert 把错误钉在本函数的实例化点，
+    // 并给出人话。（和 Perceptron / KMeans 同一个套路）
+    static_assert(std::is_floating_point_v<T>,
+                  "sinusoidal_positional_encoding<T> requires floating-point "
+                  "T (float / double / long double). sin/cos/pow are undefined "
+                  "for integer types.");
+
     // ---- 1) 参数校验 ----
     CHECK(seq_len >= 1)
         << "sinusoidal_positional_encoding: seq_len (" << seq_len
@@ -80,18 +91,29 @@ Matrix<T> sinusoidal_positional_encoding(std::size_t seq_len,
         << "sinusoidal_positional_encoding: d_model (" << d_model
         << ") must be even — sin/cos come in pairs (see file header)";
 
-    // ---- 2) 核心填充（留给你写，见文件头注释的公式）----
-    //   TODO —— 实现思路：
     //   1) 预计算角频率 inv_freq[i] = 1 / 10000^(2i/d_model)，i = 0..d/2-1
     //      （std::pow 只在初始化算一次，别放进内层循环）；
+    std::vector<T> inv_freq(d_model / 2);
+    for (std::size_t i = 0; i < d_model / 2; ++i) {
+        const T y = T(2 * i) / T(d_model);   // 浮点除法：2i/d_model 不能被整数截断
+        inv_freq[i] = T(1) / std::pow(T(10000), y);
+    }
+
     //   2) 建 Matrix<T> pe(seq_len, d_model)，双循环：
     //        for pos: for j in 0..d_model-1:
     //            angle = pos * inv_freq[j/2]
     //            pe(pos, j) = (j 为偶数) ? sin(angle) : cos(angle)
-    //   3) return pe。
-    //   写完把下面这行 throw 删掉即可。
+    Matrix<T> pe(seq_len, d_model);
+    for (std::size_t pos = 0; pos < seq_len; ++pos) {
+        for (std::size_t j = 0; j < d_model; ++j) {
+            const T angle = T(pos) * inv_freq[j / 2];
+            if (j % 2 == 0) {
+                pe(pos, j) = std::sin(angle);
+            } else {
+                pe(pos, j) = std::cos(angle);
+            }
+        }
+    }
 
-    throw std::logic_error(
-        "sinusoidal_positional_encoding: not implemented yet — TODO: fill "
-        "the matrix with sin/cos, see the TODO comment above");
+    return pe;
 }
