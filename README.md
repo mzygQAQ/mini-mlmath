@@ -45,6 +45,7 @@ mini-mlmath/
 │   ├── kmeans.md              #   KMeans：Lloyd 迭代、初始化策略、k 怎么选
 │   ├── softmax.md             #   softmax：减 max 数值稳定性、attention 用法、温度
 │   ├── positional_encoding.md #   正弦位置编码：为什么需要、多尺度频率、PE 矩阵（骨架期）
+│   ├── flash_attention.md     #   FlashAttention：n×n 矩阵三宗罪、online softmax 推导、分块算法
 │   ├── autograd.md            #   自动求导：反向图 + 梯度怎么算出来
 │   └── images/                #   配图（手写 SVG，零依赖）
 ├── tests/                    # 测试程序，每个模块一个
@@ -76,6 +77,7 @@ mini-mlmath/
 - [KMeans](docs/kmeans.md) —— 无监督：Lloyd 迭代、初始化策略（随机 / k-means++）、n_init 多起点、k 怎么选（骨架期，核心算法待实现）
 - [Softmax](docs/softmax.md) —— 减 max 救命符、按行归一化（attention 用法）、温度 T、KV cache 简化
 - [正弦位置编码](docs/positional_encoding.md) —— 注意力为什么是「集合运算」、多尺度频率、PE 矩阵（骨架期，待实现）
+- [FlashAttention](docs/flash_attention.md) —— n×n 矩阵三宗罪、GPU 算力/带宽鸿沟、online softmax 完整推导、分块算法与反向重算、KV cache 的关系
 - [自动求导](docs/autograd.md) —— 压轴：Tensor + 反向图，梯度怎么在图上算出来（reverse-mode AD）
 
 ## 三种乘法（越往后越接近真实 BLAS）

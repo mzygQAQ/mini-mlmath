@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 560" font-family="sans-serif">
+  <!-- ============ online softmax：分块算，边扫边校正（数值例子） ============ -->
+  <!-- x = [1,3,2 | 5,2]，块1 m1=3 l1=1.5032，块2 m2=5 l2=1.0498 -->
+  <!-- 合并 m=5，l = l1·e^(3-5) + l2·e^(5-5) = 0.2034 + 1.0498 = 1.2532 -->
+  <!-- 全量验算：e^-4 + e^-2 + e^-3 + 1 + e^-3 = 1.2532 一致 -->
+
+  <text x="470" y="34" text-anchor="middle" font-size="20" font-weight="bold">
+    online softmax：分块计算，边扫边用 e^(m旧−m新) 校正
+  </text>
+  <text x="470" y="57" text-anchor="middle" font-size="14" fill="#555">
+    同一行数字，左路「分块 + 合并」，右路「全量一次算」——结果必须相同
+  </text>
+
+  <!-- ===== 输入行：x = [1, 3, 2 | 5, 2] ===== -->
+  <text x="470" y="96" text-anchor="middle" font-size="15" fill="#333">输入 x（某一行注意力分数）：</text>
+  <text x="470" y="124" text-anchor="middle" font-size="17" font-weight="bold" fill="#333">x = [ 1, 3, 2</text>
+  <text x="563" y="124" text-anchor="middle" font-size="17" font-weight="bold" fill="#333">|</text>
+  <text x="585" y="124" text-anchor="middle" font-size="17" font-weight="bold" fill="#333">5, 2 ]</text>
+  <!-- 块归属下划线：块1 蓝、块2 绿 -->
+  <line x1="435" y1="132" x2="545" y2="132" stroke="#1e88e5" stroke-width="3"/>
+  <line x1="555" y1="132" x2="620" y2="132" stroke="#43a047" stroke-width="3"/>
+  <text x="490" y="152" text-anchor="middle" font-size="13" fill="#1e88e5">块 1</text>
+  <text x="587" y="152" text-anchor="middle" font-size="13" fill="#43a047">块 2</text>
+
+  <!-- ===== 左路：分块 + 合并 ===== -->
+  <text x="235" y="188" text-anchor="middle" font-size="15" font-weight="bold" fill="#1e88e5">分块 + 合并（一趟，内存里永远只有一块）</text>
+
+  <!-- 块 1 框 -->
+  <rect x="60" y="205" width="350" height="108" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="1.5"/>
+  <text x="80" y="231" font-size="14" font-weight="bold" fill="#1565c0">块 1：用块内自己的 max</text>
+  <text x="80" y="256" font-size="14" fill="#333">m₁ = max(1,3,2) = 3</text>
+  <text x="80" y="280" font-size="14" fill="#333">l₁ = e^(1−3)+e^(3−3)+e^(2−3)</text>
+  <text x="80" y="302" font-size="14" fill="#333">   = 0.1353 + 1 + 0.3679 = 1.5032</text>
+
+  <!-- 块 2 框 -->
+  <rect x="60" y="328" width="350" height="108" rx="8" fill="#e8f5e9" stroke="#43a047" stroke-width="1.5"/>
+  <text x="80" y="354" font-size="14" font-weight="bold" fill="#2e7d32">块 2：用块内自己的 max</text>
+  <text x="80" y="379" font-size="14" fill="#333">m₂ = max(5,2) = 5</text>
+  <text x="80" y="403" font-size="14" fill="#333">l₂ = e^(5−5) + e^(2−5)</text>
+  <text x="80" y="425" font-size="14" fill="#333">   = 1 + 0.0498 = 1.0498</text>
+
+  <!-- 合并框 -->
+  <rect x="60" y="455" width="350" height="90" rx="8" fill="#fff8e1" stroke="#fb8c00" stroke-width="1.5"/>
+  <text x="80" y="481" font-size="14" font-weight="bold" fill="#e65100">合并：m = max(m₁,m₂) = 5</text>
+  <text x="80" y="506" font-size="14" fill="#333">l = l₁·e^(m₁−m) + l₂·e^(m₂−m)</text>
+  <text x="80" y="528" font-size="14" fill="#333">  = 1.5032×0.1353 + 1.0498×1 = 1.2532</text>
+
+  <!-- 左路连线 -->
+  <line x1="235" y1="313" x2="235" y2="328" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="235" y1="436" x2="235" y2="455" stroke="#666" stroke-width="1.5"/>
+
+  <!-- ===== 右路：全量一次算 ===== -->
+  <text x="705" y="188" text-anchor="middle" font-size="15" font-weight="bold" fill="#c62828">全量一次算（要等所有数据到齐）</text>
+  <rect x="530" y="205" width="350" height="128" rx="8" fill="#ffebee" stroke="#e53935" stroke-width="1.5"/>
+  <text x="550" y="231" font-size="14" font-weight="bold" fill="#c62828">直接用全局 max：</text>
+  <text x="550" y="258" font-size="14" fill="#333">m = max(1,3,2,5,2) = 5</text>
+  <text x="550" y="284" font-size="14" fill="#333">l = e^(1−5)+e^(3−5)+e^(2−5)</text>
+  <text x="570" y="308" font-size="14" fill="#333">  + e^(5−5)+e^(2−5)</text>
+  <text x="550" y="326" font-size="14" fill="#333">  = 0.0183+0.1353+0.0498+1+0.0498</text>
+
+  <!-- 右路结果框 -->
+  <rect x="530" y="355" width="350" height="62" rx="8" fill="#ffebee" stroke="#e53935" stroke-width="1.5"/>
+  <text x="705" y="381" text-anchor="middle" font-size="15" font-weight="bold" fill="#c62828">l = 1.2532</text>
+  <text x="705" y="404" text-anchor="middle" font-size="13" fill="#666">（分块合并结果 = 全量结果 ✓）</text>
+
+  <!-- 左右对照 -->
+  <line x1="410" y1="300" x2="530" y2="269" stroke="#bbb" stroke-width="1.2" stroke-dasharray="6,5"/>
+  <text x="470" y="270" text-anchor="middle" font-size="13" fill="#888">殊途同归</text>
+  <line x1="410" y1="500" x2="530" y2="398" stroke="#bbb" stroke-width="1.2" stroke-dasharray="6,5"/>
+
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#666"/>
+    </marker>
+  </defs>
+
+  <!-- 底部结论 -->
+  <text x="470" y="546" text-anchor="middle" font-size="14" fill="#333">
+    差别在过程：分块路「先按旧 max 算、遇到更大的 m 就乘 e^(m旧−m新) 重标定」——一趟扫完，n×n 从不落地
+  </text>
+</svg>

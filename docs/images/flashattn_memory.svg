@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 500" font-family="sans-serif">
+  <!-- ============ 标准 attention vs FlashAttention：n×n 矩阵的命运 ============ -->
+  <!-- 左：标准流程，n×n 的 S/P 矩阵写进 HBM 再读出来；右：分块流过 SRAM，n×n 从不存在 -->
+
+  <text x="470" y="34" text-anchor="middle" font-size="20" font-weight="bold">
+    标准 attention vs FlashAttention：那个 n×n 矩阵的命运
+  </text>
+  <text x="470" y="57" text-anchor="middle" font-size="14" fill="#555">
+    同一个公式 softmax(QKᵀ/√d)·V —— 左边把它显式写进显存，右边分块流过 SRAM 从不落地
+  </text>
+
+  <!-- 中缝分隔 -->
+  <line x1="470" y1="75" x2="470" y2="430" stroke="#bbb" stroke-width="1.5" stroke-dasharray="6,5"/>
+
+  <!-- ===== 左半：标准流程 ===== -->
+  <text x="255" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#c62828">标准：n×n 矩阵落地 HBM（显存）</text>
+
+  <!-- Q K V 小块 -->
+  <rect x="75" y="130" width="60" height="44" rx="6" fill="#e3f2fd" stroke="#1e88e5" stroke-width="1.5"/>
+  <text x="105" y="157" text-anchor="middle" font-size="14" font-weight="bold" fill="#1565c0">Q K V</text>
+  <text x="105" y="192" text-anchor="middle" font-size="12" fill="#666">n×d</text>
+
+  <!-- 箭头到 n×n -->
+  <line x1="140" y1="152" x2="195" y2="152" stroke="#c62828" stroke-width="2" marker-end="url(#arrRed)"/>
+
+  <!-- n×n 大矩阵（深红，标注写 HBM） -->
+  <rect x="200" y="108" width="130" height="88" rx="6" fill="#ffcdd2" stroke="#e53935" stroke-width="2"/>
+  <text x="265" y="140" text-anchor="middle" font-size="16" font-weight="bold" fill="#c62828">S = QKᵀ/√d</text>
+  <text x="265" y="162" text-anchor="middle" font-size="15" font-weight="bold" fill="#c62828">n × n</text>
+  <text x="265" y="184" text-anchor="middle" font-size="12" fill="#c62828">写进 HBM ↓ 读回来</text>
+
+  <!-- 箭头到 softmax -->
+  <line x1="335" y1="152" x2="380" y2="152" stroke="#c62828" stroke-width="2" marker-end="url(#arrRed)"/>
+
+  <!-- softmax / ×V -->
+  <rect x="383" y="130" width="80" height="44" rx="6" fill="#f3e5f5" stroke="#8e24aa" stroke-width="1.5"/>
+  <text x="423" y="150" text-anchor="middle" font-size="13" font-weight="bold" fill="#6a1b9a">softmax</text>
+  <text x="423" y="167" text-anchor="middle" font-size="13" font-weight="bold" fill="#6a1b9a">P·V</text>
+
+  <!-- 输出 O -->
+  <line x1="423" y1="176" x2="423" y2="205" stroke="#c62828" stroke-width="2" marker-end="url(#arrRed)"/>
+  <rect x="390" y="208" width="66" height="40" rx="6" fill="#e8f5e9" stroke="#43a047" stroke-width="1.5"/>
+  <text x="423" y="233" text-anchor="middle" font-size="14" font-weight="bold" fill="#2e7d32">O</text>
+
+  <!-- 左半问题标注 -->
+  <rect x="60" y="280" width="405" height="128" rx="8" fill="#fafafa" stroke="#ddd"/>
+  <text x="80" y="308" font-size="14" fill="#c62828" font-weight="bold">三宗罪：</text>
+  <text x="80" y="334" font-size="14" fill="#333">① 显存 O(n²)：n=128K 时 170 亿个数，直接爆</text>
+  <text x="80" y="360" font-size="14" fill="#333">② n×n 在 HBM 写进读出，纯搬运时间占大头</text>
+  <text x="80" y="386" font-size="14" fill="#333">③ 反向传播还要保存 P → 再吃一份 O(n²)</text>
+
+  <!-- ===== 右半：Flash 分块流式 ===== -->
+  <text x="710" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">Flash：分块流过 SRAM，n×n 从不存在</text>
+
+  <!-- Q 行块（3 个细条） -->
+  <g fill="#e3f2fd" stroke="#1e88e5" stroke-width="1.2">
+    <rect x="520" y="118" width="70" height="16" rx="3"/>
+    <rect x="520" y="140" width="70" height="16" rx="3"/>
+    <rect x="520" y="162" width="70" height="16" rx="3"/>
+  </g>
+  <text x="555" y="205" text-anchor="middle" font-size="12" fill="#666">Q 按行块</text>
+
+  <!-- K/V 列块 -->
+  <g fill="#ede7f6" stroke="#8e24aa" stroke-width="1.2">
+    <rect x="620" y="118" width="16" height="60" rx="3"/>
+    <rect x="644" y="118" width="16" height="60" rx="3"/>
+    <rect x="668" y="118" width="16" height="60" rx="3"/>
+  </g>
+  <text x="650" y="205" text-anchor="middle" font-size="12" fill="#666">K/V 按列块</text>
+
+  <!-- SRAM 小格子（中间算 64×64 的块） -->
+  <rect x="720" y="112" width="180" height="74" rx="8" fill="#fff8e1" stroke="#fb8c00" stroke-width="1.8"/>
+  <text x="810" y="134" text-anchor="middle" font-size="14" font-weight="bold" fill="#e65100">SRAM（片上缓存）</text>
+  <text x="810" y="154" text-anchor="middle" font-size="13" fill="#333">块内算 S=Q·Kᵀ（如 128×64）</text>
+  <text x="810" y="174" text-anchor="middle" font-size="13" fill="#333">online softmax + P·V 累加</text>
+
+  <line x1="594" y1="148" x2="714" y2="148" stroke="#2e7d32" stroke-width="2" marker-end="url(#arrGreen)"/>
+  <line x1="690" y1="148" x2="714" y2="148" stroke="#2e7d32" stroke-width="2"/>
+
+  <!-- 算完即丢标注 -->
+  <text x="810" y="205" text-anchor="middle" font-size="12" fill="#e65100">小块算完即丢 ↓ 从不写回 HBM</text>
+
+  <!-- 状态行 -->
+  <rect x="530" y="225" width="370" height="40" rx="6" fill="#e8f5e9" stroke="#43a047" stroke-width="1.5"/>
+  <text x="715" y="250" text-anchor="middle" font-size="13" fill="#2e7d32">每行 query 只带 3 个状态：m（max）、l（sum）、O（输出累加）</text>
+
+  <line x1="810" y1="186" x2="810" y2="225" stroke="#2e7d32" stroke-width="2" marker-end="url(#arrGreen)"/>
+
+  <!-- 右半收益标注 -->
+  <rect x="520" y="280" width="405" height="128" rx="8" fill="#fafafa" stroke="#ddd"/>
+  <text x="540" y="308" font-size="14" fill="#2e7d32" font-weight="bold">三个收益：</text>
+  <text x="540" y="334" font-size="14" fill="#333">① 显存 O(n²) → O(n)（n×n 中间量彻底消失）</text>
+  <text x="540" y="360" font-size="14" fill="#333">② HBM 读写只剩 Q/K/V/O 的 O(n·d)，数据贴着 SRAM 走</text>
+  <text x="540" y="386" font-size="14" fill="#333">③ 结果 bit 级一致——精确，不是近似！</text>
+
+  <!-- 底部结论 -->
+  <text x="470" y="445" text-anchor="middle" font-size="14" fill="#333">
+    数学上唯一的差别：允许「先按旧 max 算，遇到更大的 max 就乘 e^(m旧−m新) 校正」——把 softmax 的全局性拆成了流式
+  </text>
+  <text x="470" y="468" text-anchor="middle" font-size="13" fill="#666">
+    （反向传播不存 P：只存 Q/K/V/O + 每行的 m、l，梯度需要时块内重算——用计算换显存）
+  </text>
+
+  <defs>
+    <marker id="arrRed" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#c62828"/>
+    </marker>
+    <marker id="arrGreen" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#2e7d32"/>
+    </marker>
+  </defs>
+</svg>
