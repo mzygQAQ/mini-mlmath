@@ -52,8 +52,8 @@
 //    scores = q2 * k2.transposed() / sqrt(d);  // 点积里只剩相对位置
 //    // 注意：V 不旋转！RoPE 只动 Q/K
 //
-//  留给你实现的（骨架期方法体 throw，见 TODO）：
-//    - rope_rotate(...)：核心旋转（预计算 θ，逐行逐对旋转）
+//  留给你实现的（骨架期方法体 throw，不给提示，公式见上方数学定义）：
+//    - rope_rotate(...)
 //    - 想扩展可加：显式传位置数组（稀疏/偏移场景）、θ 基频可配（外推
 //      scaling）、只旋转部分维度（partial rotary，GPT-NeoX 的做法）
 // ============================================================================
@@ -89,22 +89,7 @@ Matrix<T> rope_rotate(const Matrix<T> &X) {
         << "rope_rotate: d_model (" << X.cols()
         << ") must be even and >= 2 — rotary pairs dimensions (2i, 2i+1)";
 
-    // ---- 2) 核心旋转（留给你写，公式见文件头注释）----
-    //   TODO —— 实现思路：
-    //   1) 预计算角频率 theta[i] = 1 / 10000^(2i/d)，i = 0..d/2-1
-    //      （std::pow 只在初始化算一次，别放进内层循环；浮点除法，
-    //        T(2*i)/T(d) —— 教训见 positional_encoding.h 的整数除法坑）；
-    //   2) 建 Matrix<T> out(X.rows(), X.cols())，双循环：
-    //        for m in 0..rows-1:            // 行号 = 位置
-    //          for i in 0..d/2-1:           // 第 i 对维度
-    //            angle = m * theta[i]
-    //            c = cos(angle); s = sin(angle)
-    //            out(m, 2i)   = X(m, 2i)·c   − X(m, 2i+1)·s
-    //            out(m, 2i+1) = X(m, 2i)·s   + X(m, 2i+1)·c
-    //   3) return out。
-    //   写完把下面这行 throw 删掉即可。
-
-    throw std::logic_error(
-        "rope_rotate: not implemented yet — TODO: rotate each row by "
-        "m*theta_i, see the TODO comment above");
+    // ---- 2) 核心旋转（留给你实现，不给提示）----
+    //   TODO —— 公式见文件头注释或 docs/rope.md；写完删掉 throw。
+    throw std::logic_error("rope_rotate: not implemented yet");
 }
