@@ -82,7 +82,7 @@ k-means++ 的核心就是**故意不让质心扎堆**——每挑一个新质心
 
 `D(x)²` 的平方是精髓：已选质心附近的点概率被压得很低，**逼着新质心往没被覆盖的区域放**。代价是每个新质心都要扫一遍全部样本（O(k²·n·d)），换来的是初始质心彼此离得远、Lloyd 收敛进好局部最优的概率大幅提升。实践里 k-means++ 几乎总是更优，所以它是 sklearn 和本库的默认。
 
-`kmeans.h` 里两个策略目前都还是骨架（抛 `std::logic_error`），接口已定好，**换策略只改一个模板实参**：
+`kmeans.h` 里 `RandomInit` 已实现（Fisher-Yates 不放回抽样），`KMeansPlusPlus` 仍是骨架（抛 `std::logic_error`）；接口已定好，**换策略只改一个模板实参**：
 
 ```cpp
 KMeans<float, detail::init::RandomInit> km_rand(3);        // 随机（可能扎堆，教学用）
@@ -169,7 +169,7 @@ k 从 3 加到 4，把一大簇硬切成两半，J 掉一大截；k 从 9 加到
 
 ## 9. 扩展路线（实现完骨架后可挑战）
 
-- **两种初始化策略**：`detail::init::RandomInit` / `KMeansPlusPlus` 目前是骨架，先实现它们（`kmeans.h` 里注释给了完整思路）。
+- **KMeansPlusPlus 初始化策略**：`detail::init::KMeansPlusPlus` 目前是骨架，先实现它（`RandomInit` 已完成，`kmeans.h` 里注释给了思路）。
 - **自定义 init**：照 `detail::init` 的签名写新 functor（FarthestFirst、按数据范围均匀撒点……）。
 - **自定义度量 + 配套中心**：换 L1 → 中位数、余弦 → 单位化均值，挑战「欧氏配均值」的配套约束。
 - **Mini-batch K-Means**：每次只用一小批样本更新簇心，scikit-learn 的 `MiniBatchKMeans`，大数据时代的标配。

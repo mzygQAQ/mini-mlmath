@@ -86,13 +86,14 @@
 //  配套讲解：docs/kmeans.md（聚类目标、Lloyd 迭代、初始化策略、k 怎么选）
 //
 //  留给你实现的（骨架期方法体一律 throw，见类外定义处的 TODO 注释）：
+//    - detail::init::RandomInit        ✅ 已实现（Fisher-Yates 不放回抽样）
+//    - detail::init::KMeansPlusPlus    待实现
 //    - fit(...)              完整 Lloyd 迭代（分配→更新→收敛判断）
 //                             + n_init 多起点选优
 //    - predict(...)          给任意样本矩阵分配最近簇心
 //    - assign(...)           分配步（私有工具，predict 复用）
 //    - total_inertia(...)    惯性（WCSS）计算（私有工具，score 复用）
 //    - score(...)            负惯性评指标
-//    - detail::init::RandomInit / KMeansPlusPlus   两种初始化策略
 //  每个方法体的 throw 换成真实现即可，参数校验和接口已全部就位；
 //  写完用 tests/kmeans_test.cpp 当验收清单。
 //
